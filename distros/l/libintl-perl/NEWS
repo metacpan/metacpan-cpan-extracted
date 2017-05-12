@@ -1,0 +1,202 @@
+Version 1.26 - 13 May 2016
+
+* Fixed more false negatives in tests, no need to upgrade.
+
+* Bugs fixed:
+
+  https://rt.cpan.org/Ticket/Display.html?id=115052
+
+Version 1.25 - 09 May 2016
+
+* Fixed false negatives in test suite, no need to upgrade the module!
+
+* Bugs fixed:
+
+  https://rt.cpan.org/Ticket/Display.html?id=83980
+  https://rt.cpan.org/Ticket/Display.html?id=47968
+
+Version 1.24 - 08 Apr 2016
+
+* Better portability for tests.
+
+* Updated documentation.
+
+* License changed to GPLv3.
+
+* Bugs fixed:
+
+  https://rt.cpan.org/Ticket/Display.html?id=98109
+  https://rt.cpan.org/Ticket/Display.html?id=47968
+  https://rt.cpan.org/Ticket/Display.html?id=83980
+  https://rt.cpan.org/Ticket/Display.html?id=102288
+
+Version 1.23 - 24 Jan 2013
+
+* New message retrieval backend Locale::gettext_dumb(3pm) which produces
+  translations even, when the corresponding locale is not present in
+  the system.
+
+* Fixed a bug where the Perl backend under certain circumstances clobbered
+  the environment variable LC_ALL.
+
+* Avoid test failures by skipping all tests that depend on the de_AT
+  locale, when that locale is not installed.
+
+* Bugs fixed:
+  https://rt.cpan.org/Ticket/Display.html?id=82856
+
+Version 1.22 - 24 Jan 2013
+
+* Version 1.22 outsmarted PAUSE (the CPAN upload facility) and had to
+  be removed.
+
+Version 1.21 - 15 Jan 2013
+
+* Environment variables LANGUAGE and LANG are interpreted in the same way
+  in the XS and the pure Perl version.
+
+* Package design closer to GNU standards.
+
+* If present, File::ShareDir is used for searching message catalogs.
+
+* Cleaned up distribution.
+
+* Bugs fixed:
+  https://rt.cpan.org/Ticket/Display.html?id=78341
+  https://rt.cpan.org/Ticket/Display.html?id=81315
+  https://rt.cpan.org/Ticket/Display.html?id=79461
+  https://rt.cpan.org/Ticket/Display.html?id=71509
+  https://rt.cpan.org/Ticket/Display.html?id=49744
+  https://rt.cpan.org/Ticket/Display.html?id=49744
+  https://rt.cpan.org/Ticket/Display.html?id=64284
+
+Version 1.20 - 29 Jue 2009
+
+* Test suite revamped.  Failures are now explained better, and it should
+  be easier to debug them remotely.
+
+* Bugs fixed:
+  https://rt.cpan.org/Ticket/Display.html?id=49744
+
+Version 1.19 - 19 Jun 2009
+
+* New context functions now work with Perl 5.6.2.
+
+* N__() now mirrors its argument in scalar context for convenience.
+
+Version 1.18 - 26 May 2009
+
+* Cosmetic change: The version number is now both in Locale::Messages
+  and in Locale::TextDomain to work around a shortcoming of the
+  PAUSE indexer.
+
+Version 1.17 - 25 May 2009
+
+* New context support, supporting .po files with msgctxt, and 
+  appropriate supporting calls (*pgettext calls) under both
+  gettext_pp and gettext_xs. TextDomain.pm received corresponding
+  calls: __p __px __np __npx __xnp.
+
+* New module Locale::Util with some utility functions, especially for
+  web development.  Attention, this is still alpha code!
+
+* Try to warn about wrong usage of the tied hashes in
+  Locale::TextDomain.
+
+* Minor bugfixes
+
+Version 1.16 - 28 Sep 2005
+
+* New function Locale::Messages::bind_textdomain_filter() allows you 
+  to register an output filter as a callback.  You can use this
+  feature for example to set the utf-8 flag on translated string when
+  you are sure that the output is actually utf-8.
+
+* New function Locale::Messages::turn_utf_8_on().
+
+* various minor bug fixes.
+
+Version 1.15 - 1 Sep 2005
+
+* Workarounds and bugfixes for misconfigured Solaris systems
+
+* Fixed the completely broken simplecal example
+
+* Added section about non-ascii msgids to the POD of Locale::Messages
+
+Version 1.14 - 11 Aug 2005
+
+* Oops: forgot to update the version check in Locale::Messages
+
+* The XS version builds easier on *BSD systems now
+
+Version 1.12 - 11 Aug 2005
+
+* Minor bugfixes
+
+* The test scripts now check whether the needed locales are installed
+
+Version 1.11 - 11 Jun 2004
+
+* Version 1.11 is a minor bugfix release
+
+Version 1.10 - 12 Jan 2004
+
+* XS version now compiles under Windows (GNU gettext and libiconv required,
+  build with "perl Makefile.PL DIR=gettext_xs", see README.win32 for details)
+
+Version 1.09 - 29 Dec 2003
+
+* check version match with XS module
+
+* in pure Perl version, use user supplied locale name when guessing
+  the output character set
+
+* corrections for Atari character maps
+
+Version 1.08 - 30 Nov 2003
+
+* fixed bug #4512 on https://rt.cpan.org/ (reported by unknown guest)
+
+Version 1.07 - 28 Nov 2003
+
+* bug with charset detection via I18N::Langinfo fixed
+
+* new function Locale::Messages::turn_utf_8_off()
+
+Version 1.06 - 24 Nov 2003
+
+* fixed warning/error under Solaris 8 when I18N::Langinfo is not available
+
+* simplified sample packaging
+
+Version 1.05 - 10 Oct 2003
+
+* fixed compatibility problems with gettext libraries under Solaris 8
+  and higher
+
+Version 1.04 - 09 Oct 2003
+
+* support for language chains in $LANGUAGE (e. g. "fr_BE:fr:de")
+
+* performance tweaks for Locale::gettext_pp
+
+* do not clobber $@ in Locale::gettext_pp
+
+Version 1.03 - 15 Sep 2003
+
+* alternative XS implemenation of gettext() and friends (outperforms
+  pure Perl version by factor 10-15)
+
+Version 1.02 - 04 Sep 2003
+
+* bugfixes for systems that lack both /usr/share/locale and
+  /usr/local/share/locale
+
+* compatibility tweaks for Perl 5.005
+
+Version 1.01 - 19 Aug 2003
+
+* bugfixes
+
+* compatibility tweaks for MS-DOS

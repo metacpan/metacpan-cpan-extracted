@@ -1,0 +1,89 @@
+****************************************************
+* NOTE TO OS X users- PLEASE READ THE INSTALLATION *
+* INSTRUCTIONS IN INSTALL.MacOSX                   *
+****************************************************
+
+--------------------------------------------------
+IMPORTANT NOTE: To install the Perl modules, your 
+mod_perl installation MUST includes support for 
+Apache::Table.  This means that mod_perl should
+be built using the EVERYTHING=1, or at minimum 
+PERL_TABLE_API=1.  If you see errors like this 
+(during compilation of libapreq)
+
+  Error: 'Apache::Table' not in typemap in Request.xs,
+
+your mod_perl must be rebuilt to include Apache::Table 
+support.
+--------------------------------------------------
+
+To install the Perl and C libraries, simply run:
+
+ perl Makefile.PL && make && make test && make install
+
+The libapreq.a and header files will be installed in the Perl
+architecture dependent library.  See the Apache::libapreq module for
+routines that can be called by your application Makefile to find the
+include and linker arguments.
+
+--------------------------------------------------
+
+NOTES ON THE TEST SUITE:
+
+The current libapreq test suite requires Apache::Test version 1.03 
+or greater.
+
+If you have more than one apache+modperl installation on your 
+system, Apache::Test might need help in determining which build 
+to use for the tests.  If your apache build has DSO support (mod_so 
+is installed), set the APXS variable [*] to the location of the 
+apxs binary prior to building libapreq:
+
+        % APXS=/path/to/apache/bin/apxs
+        % export APXS
+        % perl Makefile.PL
+        % make && make test
+
+Otherwise set the APACHE environment variable [*] to the location 
+of httpd:
+
+        % APACHE=/path/to/apache/bin/httpd
+        % export APACHE
+        % perl Makefile.PL
+        % make && make test
+
+
+There are 3 more env vars to know about: 
+
+        APACHE_GROUP APACHE_USER APACHE_PORT
+
+which let you customize the Group, User, and Port config settings
+for the tests.
+
+
+[*] - the command-line equivalents for the APXS and APACHE env
+      vars are (respectively)
+
+         perl Makefile.PL -apxs /path/to/apache/bin/apxs
+
+         perl Makefile.PL -httpd /path/to/apache/bin/httpd
+
+      However, the env vars provide a more CPAN-friendly approach.
+      Please see the Apache::Test documentation for more details.
+
+--------------------------------------------------
+
+Alternatively, to build and install a shared version 
+of libapreq using GNU libtool, do this:
+
+ ./configure --with-apache-includes=DIR && make && make install
+
+Note: The mod_perl API (Apache::Request and Apache::Cookie) will
+link against this version of libapreq if it is available.  That
+means if you're upgrading from an older version of libapreq.so, 
+that was installed using this "./configure" method, you may need 
+to upgrade the old library installation PRIOR to building Request.so
+and Cookie.so:
+
+ ./configure --with-apache-includes=DIR && make && make install
+ perl Makefile.PL && make && make test && make install

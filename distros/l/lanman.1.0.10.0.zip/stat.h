@@ -1,0 +1,33 @@
+#ifndef __STAT_H
+#define __STAT_H
+
+
+#include "plmisc.h"
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// prototypes
+//
+///////////////////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////////////////////////
+//
+// retrieves operating statistics for a service
+//
+// param:  server - computer to execute the command
+//				 client - computer name of the client to disconnect
+//				 user   - name of the user whose session is to be terminated
+//
+// return: success - 1 
+//         failure - 0 
+//
+// note:   call GetLastError() to get the error code on failure
+//
+///////////////////////////////////////////////////////////////////////////////
+
+XS(XS_NT__Lanman_NetStatisticsGet);
+
+
+#endif //#ifndef __STAT_H

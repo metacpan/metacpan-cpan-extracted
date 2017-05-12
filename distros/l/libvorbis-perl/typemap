@@ -1,0 +1,40 @@
+########################################################################
+TYPEMAP
+
+OggVorbis_File *        T_VORBIS
+vorbis_info *           T_VORBINFO
+vorbis_comment *        T_HVREF
+ov_callbacks *          T_PTROBJ
+ogg_int64_t             T_IV
+int *                   T_PTR
+
+
+########################################################################
+INPUT
+
+T_VORBIS
+        if (sv_derived_from($arg, \"Ogg::Vorbis\")) {
+                IV tmp = SvIV((SV*)SvRV($arg));
+                $var = ($type) tmp;
+        }
+        else
+                croak(\"$var is not of type Ogg::Vorbis\");
+
+T_VORBINFO
+        if (sv_derived_from($arg, \"Ogg::Vorbis::Info\")) {
+                IV tmp = SvIV((SV*)SvRV($arg));
+                $var = ($type) tmp;
+        }
+        else
+                croak(\"$var is not of type Ogg::Vorbis::Info\");
+
+
+########################################################################
+OUTPUT
+
+T_VORBIS
+        sv_setref_pv($arg, \"Ogg::Vorbis\", (void*)$var);
+
+T_VORBINFO
+        sv_setref_pv($arg, \"Ogg::Vorbis::Info\", (void*)$var);
+

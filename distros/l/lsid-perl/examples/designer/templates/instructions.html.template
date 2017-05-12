@@ -1,0 +1,79 @@
+<h3>Installing your Authority</h3>
+
+<p>
+Before your authority can be used it must be placed in the proper location
+on your server. You may need <b>root</b> access to accomplish this task, see
+your system administrator for help if you do not have root access.
+</p>
+
+<p>
+Assuming your Apache installation is in <b><code>/usr/local/apache</code></b>, we
+will install your authority related files in <code>/usr/local/apache<b>/test</b></code>.
+If that directory does not already exist, create it using the following command:
+</p>
+
+<pre>
+mkdir /usr/local/apache/test/
+</pre>
+
+<p>
+Once the directory is made, copy the source code from the <b>Authority Service</b> and
+<b>Namespaces</b> page to the files <b>test.pl</b> and <b>Namespaces.pm</b> respectively.
+</p>
+
+<p>
+Verify that you have the files installed correctly using teh following command:
+</p>
+
+<pre>
+-rw-rw-r--    1 user group        12345 Oct 22 09:29 Namespaces.pm
+-rw-rw-r--    1 user group        12345 Oct 22 09:29 test.pl
+</pre>
+
+<p>
+The <b>final step</b> is to make <code>test.pl</code> executable:
+</p>
+
+<pre>
+chmod +x /usr/local/apache/test/test.pl
+</pre>
+
+<h3>Sample Apache virtual host configuration</h3>
+
+<p>
+Below is a sample Apache configuration that will map the URLs:
+<ul>
+ <li><code>http://localhost:8081/authority/</code></li>
+ <li><code>http://localhost:8081/authority/metadata/</code></li>
+ <li><code>http://localhost:8081/authority/data/</code></li>
+</ul>
+to the Authority application in <code>/usr/local/apache/test/test.pl</code>.
+<br/>
+<br/>
+</p>
+
+
+
+<pre>
+&lt;VirtualHost *:8081&gt;
+    ServerName localhost
+    DocumentRoot /usr/local/apache/test
+
+    ErrorLog logs/test-error_log
+    CustomLog logs/test-access_log common
+
+    ScriptAlias /authority "/usr/local/apache/test/test.pl"
+    ScriptAlias /authority/metadata "/usr/local/apache/test/test.pl"
+    ScriptAlias /authority/data "/usr/local/apache/test/test.pl"
+
+    &lt;Directory /usr/local/apache/test&gt;
+        Options ExecCGI
+        Order allow,deny
+        Allow from all
+    &lt;/Directory&gt;
+&lt;/VirtualHost&gt;
+</pre>
+
+<p>
+Restart the Apache server and test your authority!
+</p>

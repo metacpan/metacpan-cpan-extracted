@@ -1,0 +1,15 @@
+Revision history for Perl extension later
+
+0.01  2007-01-23
+	- first working version
+
+0.02  2007-01-23
+        - fixed MANIFEST
+
+0.03  2007-01-24
+        - POD updates
+
+0.04  2007-01-25
+        - added debug output
+        - improved POD with comparisons between 'later' and other similar modules
+

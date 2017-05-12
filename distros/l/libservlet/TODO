@@ -1,0 +1,61 @@
+
+=pod
+
+=head1 NAME
+
+TODO - task list
+
+=head1 TASKS
+
+=head2 Design
+
+=over
+
+=item 1
+
+What is the Locale API? Does it interface to the OS locale system?
+
+=item 2
+
+Provide Reader/Writer classes that do character conversions under the
+hood.
+
+=item 3
+
+What is the Principal API?
+
+=back
+
+=head2 Code
+
+=over
+
+=item 1
+
+For the C<doOptions()> method of B<Servlet::Http::HttpServlet>, look
+only at descendent classes when determining available HTTP methods
+
+=item 2
+
+Is there a way to implement C<available()> on
+B<Servlet::ServletInputStream>? Is it sufficient to know that a stream
+is readable, even if there's no way to tell how many bytes are
+available?
+
+=back
+
+=head2 Documentation
+
+=over
+
+=item 1
+
+complete "Writing Servlet Applications"
+
+=item 2
+
+create frameset for API docs
+
+=back
+
+=cut

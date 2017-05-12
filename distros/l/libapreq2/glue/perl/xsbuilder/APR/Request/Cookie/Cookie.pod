@@ -1,0 +1,487 @@
+=head1 NAME
+
+APR::Request::Cookie - wrapper for libapreq2's cookie API.
+
+
+=for testing
+    use APR::Pool;
+    use APR::Brigade;
+    use APR::Bucket;
+    use APR::BucketAlloc;
+    use APR::Request;
+    use APR::Request::Parser;
+    $pool = APR::Pool->new;
+    $ba = APR::BucketAlloc->new($pool);
+    $bb = APR::Brigade->new($pool, $ba);
+    $bb->insert_tail(APR::Bucket->new($ba,
+                                  "alpha=body1&beta=body2;foo=body3"));
+    $parser = APR::Request::Parser->urlencoded($pool, $ba,
+                                    "application/x-www-form-urlencoded");
+    $req = APR::Request::Custom->handle($pool, "foo=bar",
+                                                "cookie1=apache1;cookie2=apache2",
+                                                $parser, 1e6, $bb);
+
+
+
+=head1 SYNOPSIS
+
+
+=for example begin
+
+  use APR::Request::Cookie;
+
+  # fetch inbound cookie
+  $jar = $req->jar;
+  $cookie1 = $jar->get("cookie1");
+
+  # generate new cookie
+  $cookie = APR::Request::Cookie->new($req->pool,
+                                      name => "foo",
+                                     value => "bar",
+                                    domain => "capricorn.com");
+  print "$cookie"; # prints "bar"
+
+  $cookie->domain("example.com"); # change domains
+  $cookie->version(1); # upgrade it to conform with RFC 2109/2965.
+
+  # send a response header
+  print sprintf "Set-Cookie: %s\n", $cookie->as_string;
+
+=for example end
+
+=for example_testing
+  ok "$cookie1" eq "apache1";
+  ok $jar->isa("APR::Request::Cookie::Table");
+  is $_STDOUT_ , qq[barSet-Cookie: foo=bar; Version=1; domain="example.com"\n];
+
+
+
+
+=head1 DESCRIPTION
+
+The APR::Request::Cookie module provides base methods
+for interfacing with libapreq2's cookie API.  It also provides
+a few utility functions and constants.
+
+This manpage documents version 2.13
+of the APR::Request::Cookie package.
+
+
+
+
+=head1 OVERLOADS
+
+APR::Request::Cookie
+
+
+
+
+=head2 ""
+
+    "$cookie"
+
+The double-quote interpolation operator maps to
+C<< APR::Request::Cookie::value() >>.
+
+=for example begin
+
+    ok "$cookie" eq $cookie->value;
+
+=for example end
+
+=for example_testing
+    1;
+
+
+=head1 METHODS
+
+APR::Request::Cookie
+
+
+
+
+=head2 new
+
+    APR::Request::Cookie->new($pool,
+                               name => $name,
+                              value => $value,
+                              %args)
+
+
+Creates a new cookie.  Here C<< $pool >> is an APR::Pool object,
+and C<< $name >> is the cookie's name. The C<< $value >> is transformed
+into the cookie's raw value through the class' C<< freeze() >> method.
+The remaining arguments are optional:
+
+=over 4
+
+=item -secure
+
+=item -httponly
+
+=item -version
+
+=item -path
+
+=item -domain
+
+=item -port
+
+=item -expires
+
+=item -comment
+
+=item -commentURL
+
+=back
+
+For details on these arguments, please consult
+the corresponding method's documentation.
+
+
+
+
+=head2 freeze
+
+    APR::Request::Cookie->freeze($value)
+
+Class method representing the default serializer;
+here it returns $value unmodified.
+
+=for example begin
+
+    ok "foo" eq APR::Request::Cookie->freeze("foo");
+
+=for example end
+
+=for example_testing
+    1;
+
+
+
+
+=head2 thaw
+
+    $cookie->thaw()
+
+Reverses C<< freeze() >>; here it simply returns 
+$cookie->value since freeze() is a noop.
+
+=for example begin
+
+    ok $cookie->thaw eq $cookie->value;
+
+=for example end
+
+=for example_testing
+    1;
+
+
+
+
+=head2 name
+
+    $cookie->name()
+
+Fetch the cookie's name.  This attribute
+cannot be modified and is never serialized;
+ie freeze() and thaw() do not act on the
+cookie's name.
+
+=for example begin
+
+=for example end
+
+=for example_testing
+    is $cookie->name, "foo", "name";
+
+
+
+
+=head2 value
+
+    $cookie->value()
+
+Fetch the cookie's raw (frozen) value.
+This attribute cannot be modified.
+
+=for example begin
+
+=for example end
+
+=for example_testing
+    is $cookie->value, "bar", "value";
+
+
+
+
+=head2 secure
+
+    $cookie->secure()
+    $cookie->secure($set)
+
+
+Get/set the cookie's secure flag.
+
+=for example begin
+
+    $cookie->secure(1);
+    ok $cookie->secure == 1;
+
+=for example end
+
+=for example_testing
+    $cookie->secure(0);
+    is $cookie->secure, 0, "secure";
+
+
+
+
+=head2 httponly
+
+    $cookie->httponly()
+    $cookie->httponly($set)
+
+
+Get/set the cookie's HttpOnly flag.
+
+=for example begin
+
+    $cookie->httponly(1);
+    ok $cookie->httponly == 1;
+
+=for example end
+
+=for example_testing
+    $cookie->httponly(0);
+    is $cookie->httponly, 0, "HttpOnly";
+
+
+
+
+=head2 version
+
+    $cookie->version()
+    $cookie->version($set)
+
+Get/set the cookie's version number.
+Version 0 cookies conform to the Netscape
+spec; Version 1 cookies conform to either
+RFC 2109 or RFC 2965.
+
+=for example begin
+
+    $version = $cookie->version;
+    $cookie->version(1);
+    ok $cookie->version == 1;
+
+=for example end
+
+=for example_testing
+    $cookie->version($version);
+    is $cookie->version, $version, "version";
+
+
+
+
+=head2 path
+
+    $cookie->path()
+    $cookie->path($set)
+
+Get/set the cookie's path string.
+
+=for example begin
+
+    $path = $cookie->path;
+    $cookie->path("/1/2/3/4");
+    ok $cookie->path eq "/1/2/3/4";
+
+=for example end
+
+=for example_testing
+    $cookie->path($path);
+    is $cookie->path, $path, "path";
+
+
+
+
+=head2 domain
+
+    $cookie->domain()
+    $cookie->domain($set)
+
+Get/set the cookie's domain string.
+
+=for example begin
+
+    $domain = $cookie->domain;
+    $cookie->domain("apache.org");
+    ok $cookie->domain eq "apache.org";
+
+=for example end
+
+=for example_testing
+    $cookie->domain($domain);
+    is $cookie->domain, $domain, "domain";
+
+
+
+
+=head2 port
+
+    $cookie->port()
+    $cookie->port($set)
+
+Get/set the cookie's port string.
+Only valid for Version 1 cookies.
+
+=for example begin
+
+    $port = $cookie->port;
+    $cookie->port(8888);
+    ok $cookie->port == 8888;
+
+=for example end
+
+=for example_testing
+    $cookie->port($port);
+    is $cookie->port, $port, "port";
+
+
+
+
+=head2 comment
+
+    $cookie->comment()
+    $cookie->comment($set)
+
+Get/set the cookie's comment string.
+Only valid for Version 1 cookies.
+
+=for example begin
+
+    $comment = $cookie->comment;
+    $cookie->comment("quux");
+    ok $cookie->comment eq "quux";
+
+=for example end
+
+=for example_testing
+    $cookie->comment($comment);
+    is $cookie->comment, $comment, "comment";
+
+
+
+
+=head2 commentURL
+
+    $cookie->commentURL()
+    $cookie->commentURL($set)
+
+Get/set the cookie's commentURL string.
+Only valid for Version 1 cookies.
+
+=for example begin
+
+    $commentURL = $cookie->commentURL;
+    $cookie->commentURL("/foo/bar");
+    ok $cookie->commentURL eq "/foo/bar";
+
+=for example end
+
+=for example_testing
+    $cookie->commentURL($commentURL);
+    is $cookie->commentURL, $commentURL, "commentURL";
+
+
+
+
+=head2 is_tainted
+
+    $cookie->is_tainted()
+    $cookie->is_tainted($set)
+
+Get/set the cookie's internal tainted flag.
+
+=for example begin
+
+    $tainted = $cookie->is_tainted;
+    $cookie->is_tainted(1);
+    ok $cookie->is_tainted == 1;
+
+=for example end
+
+=for example_testing
+    $cookie->is_tainted($tainted);
+    is $cookie->is_tainted, $tainted, "tainted";
+
+
+=head2 make
+
+    APR::Request::Cookie->make($pool, $name, $value)
+
+Fast XS cookie constructor invoked by C<< new() >>.
+The cookie's raw name & value are taken directly from the
+passed in arguments; no freezing/encoding is done on the $value.
+
+
+
+
+=head2 as_string
+
+    $cookie->as_string()
+
+
+String representation of the cookie, suitable for inclusion
+in a "Set-Cookie" header.
+
+=for example begin
+
+    print "Set-Cookie: ", $cookie->as_string, "\n";
+
+=for example end
+
+=for example_testing
+    is $_STDOUT_, qq/Set-Cookie: foo=bar; Version=1; domain="example.com"\n/,
+        "as_string";
+
+
+=head1 SUBROUTINES
+
+  APR::Request::Cookie
+
+
+
+
+=head2 expires
+
+
+  expires($date_string)
+
+
+
+
+=head1 SEE ALSO
+
+L<< Apache2::Cookie >>, L<< APR::Request >>.
+
+
+
+
+=head1 COPYRIGHT
+
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.

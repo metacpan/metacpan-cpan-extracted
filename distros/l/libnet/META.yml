@@ -1,0 +1,74 @@
+---
+abstract: 'Collection of network protocol modules'
+author:
+  - 'Graham Barr <gbarr@pobox.com>, Steve Hay <shay@cpan.org>'
+build_requires:
+  Config: '0'
+  Cwd: '0'
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  Getopt::Std: '0'
+  IO::File: '0'
+  perl: '5.008001'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: libnet
+no_index:
+  directory:
+    - t
+    - inc
+optional_features:
+  APOP:
+    description: 'APOP support'
+    requires:
+      Digest::MD5: '0'
+  AUTH:
+    description: 'AUTH support'
+    requires:
+      Authen::SASL: '0'
+      MIME::Base64: '0'
+  IPv6:
+    description: 'IPv6 support'
+    requires:
+      IO::Socket::IP: '0.25'
+  SSL:
+    description: 'SSL support'
+    requires:
+      IO::Socket::SSL: '2.007'
+  changestest:
+    description: 'Changes testing'
+  critictest:
+    description: 'Perl::Critic testing'
+  podcoveragetest:
+    description: 'POD coverage testing'
+  podtest:
+    description: 'POD testing'
+requires:
+  Carp: '0'
+  Errno: '0'
+  Exporter: '0'
+  Fcntl: '0'
+  File::Basename: '0'
+  FileHandle: '0'
+  IO::Select: '0'
+  IO::Socket: '1.05'
+  POSIX: '0'
+  Socket: '2.016'
+  Symbol: '0'
+  Time::Local: '0'
+  constant: '0'
+  perl: '5.008001'
+  strict: '0'
+  utf8: '0'
+  vars: '0'
+resources:
+  repository: https://github.com/steve-m-hay/perl-libnet.git
+version: '3.10'

@@ -1,0 +1,87 @@
+=head1 Issues during installation.
+
+[...]
+
+
+
+
+=head1 Using libapreq2 with Apache2 and mod_perl2.
+
+
+
+
+=head2 I keep getting "undefined symbol" errors whenever 
+       I use Apache2::Request or APR::Request::Apache2.
+
+You need to load mod_apreq2.so at server startup, which grabs
+all the required symbols at server startup.  Be sure your server
+config contains a line like
+
+        LoadModule apreq_module   modules/mod_apreq2.so
+
+
+
+
+=head2 When I use Apache2::Request in my output filter, it seems to lose
+       the incoming POST variables.
+
+The problem is likely that the mod_apreq2 filter has not been 
+added to the input filter chain in time to read the POST data.
+
+There are two solutions to this problem:
+
+
+ 1) Write a filter init handler for you filter that instantiates an
+    Apache2::Request object. 
+
+    http://perl.apache.org/docs/2.0/api/Apache2/Filter.html#C_FilterInitHandler_
+
+ 2) Use .htaccess or your server config to ensure the apreq input filter
+    is active for this request with "AddInputFilter APREQ" or somesuch.
+
+We recommend using (1), and falling back to (2) until you get (1) working.
+
+
+
+
+=head2 When I try to upload a file, why do I get this error 
+       "[error] Can't locate .../Apache2/Request/upload.al in @INC"?
+
+I<Apache2::Upload> is now a separate module in apreq2, so you need to 
+C<use Apache2::Upload> to load the C<Apache2::Request::upload> function.
+
+This also applies to "Can't locate auto/APR/Request/Param/slurp.al in @INC".
+This is because I<Apache2::Upload> is implement by wrapping the I<APR::Request::*>
+packages.
+
+
+
+=head1 Using libapreq2 outside of Apache.
+
+[...]
+
+
+
+
+=head1 Contributing to apreq development.
+
+
+
+
+=head2 How is the subversion repository managed?
+
+apreq's repository is broken into three subdirectories:
+
+    /trunk    - the current codebase for active development.
+    /tags     - release snapshots.
+    /branches - where older releases and experimental development lines live.
+
+apreq follows a Commit-then-Review policy for its entire repository,
+but being a shared library places certain restrictions on the admissible
+changes for stable trees.   Basically the header files cannot be modified;
+only new functions and structures may be added to them.  Any time that 
+happens, the minor-version needs to be bumped, and the patch-level gets
+reset to zero.  Changes that only modify the library's implementation (.c)
+files require a bump to the patch-level.  On stable trees, this version 
+tracking should happen on each commit, to make auditing easy for other 
+developers without resorting to a draconian Review-then-Commit policy.

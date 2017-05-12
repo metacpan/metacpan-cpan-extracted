@@ -1,0 +1,45 @@
+---
+abstract: 'Installs missing modules on demand'
+author:
+  - 'Fuji, Goro (gfx) <gfuji@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.88
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.11.0, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: lib-xi
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  lib::xi:
+    file: lib/lib/xi.pm
+    version: 1.03
+requires:
+  App::cpanminus: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/gfx/p5-lib-xi/issues
+  homepage: https://github.com/gfx/p5-lib-xi
+  repository: git://github.com/gfx/p5-lib-xi.git
+version: 1.03
+x_contributors:
+  - 'Fuji Goro <fuji.goro@dena.jp>'
+  - 'Fuji, Goro <g.psy.va@gmail.com>'
+  - 'Fuji, Goro <goro-fuji@cookpad.com>'
+  - 'Ben Booth <benwbooth@gmail.com>'

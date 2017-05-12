@@ -1,0 +1,7 @@
+<b>View:</b> &nbsp;
+<input type="button" name="instr" value="Instructions" onClick="document.view.rm.value='view'; document.view.code=''; document.view.submit();" />
+
+<input type="button" name="auth_svc" value="Authority Service" onClick="document.view.rm.value='view'; document.view.code.value='driver'; document.view.submit();" />
+
+<input type="button" name="ns_view" value="Namespaces" onClick="document.view.rm.value='view'; document.view.code.value='namespaces'; document.view.submit();" />
+

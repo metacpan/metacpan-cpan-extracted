@@ -1,0 +1,24 @@
+
+<div style="width: 400px;">
+<h1 id="title">Graph of metadata triples</h1>
+<p id="description">
+Below is an RDF graph of the metadata for your LSID. Each connecting arrow represents a predicate in the metadata.
+These predicates connect your LSID to <b>resources</b> and <b>literals</b>.
+<br/>
+<br/>
+<b>Resources</b> are denoted by an oval containing text while <b>Literals</b> are denoted by square boxes containing
+text.
+</p>
+<center>
+<TMPL_VAR name="submit">
+</center>
+</div>
+
+
+<br/>
+<br/>
+
+
+<div id="graphArea">
+<TMPL_VAR name="graph">
+</div>

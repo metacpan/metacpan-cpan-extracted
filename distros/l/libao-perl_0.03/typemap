@@ -1,0 +1,44 @@
+########################################################################
+TYPEMAP
+
+const char *    T_PV
+ao_info_t *     T_HVREF
+ao_device_t *   T_AODEV
+ao_option_t *   T_PV
+uint_32         T_IV
+
+
+########################################################################
+INPUT
+
+T_AODEV
+        if (sv_derived_from($arg, \"Ao\")) {
+                IV tmp = SvIV((SV*)SvRV($arg));
+                $var = ($type) tmp;
+        }
+        else
+                croak(\"$var is not of type Ao\");
+
+#T_AOINFO
+#        if (! $var) {
+#                $var = (ao_info_t*) malloc(sizeof(ao_info_t));
+#        }
+#        ($var)->name = SvPV(hv_fetch($arg, "name", 4, 0), PL_na);
+#        ($var)->short_name = SvPV(hv_fetch($arg, "name", 10, 0), PL_na);
+#        ($var)->author = SvPV(hv_fetch($arg, "name", 6, 0), PL_na);
+#        ($var)->comment = SvPV(hv_fetch($arg, "name", 7, 0), PL_na);
+
+
+########################################################################
+OUTPUT
+
+T_AODEV
+        sv_setref_pv($arg, \"Ao\", (void*)$var);
+
+#T_AOINFO
+#        $arg = newHV();
+#        hv_store($arg, "name", 4, newSVpv(($var)->name,0), 0);
+#        hv_store($arg, "short_name", 10, newSVpv(($var)->short_name,0), 0);
+#        hv_store($arg, "author", 6, newSVpv(($var)->author,0), 0);
+#        hv_store($arg, "comment", 7, newSVpv(($var)->comment,0), 0);
+

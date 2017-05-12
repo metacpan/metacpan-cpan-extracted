@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/lib/absolute.pm
+t/basic.t
+t/hard.t
+t/load.t
+t/release-pod-syntax.t

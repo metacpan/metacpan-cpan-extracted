@@ -1,0 +1,181 @@
+<HTML>
+<HEAD>
+<TITLE>Servlet::Servlet - servlet interface</TITLE>
+<LINK REL="stylesheet" HREF="../../libservlet.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Servlet::Servlet - servlet interface</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  $servlet-&gt;getServletInfo();</PRE>
+<PRE>
+  $servlet-&gt;init($config);</PRE>
+<PRE>
+  # later</PRE>
+<PRE>
+  $servlet-&gt;service($request, $response);</PRE>
+<PRE>
+  my $config = $servlet-&gt;getServletConfig();</PRE>
+<PRE>
+  # finally</PRE>
+<PRE>
+  $servlet-&gt;destroy();</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>A servlet is a Perl component that runs within a servlet
+container. Servlets receive and respond to requests from Web clients,
+usually across HTTP.</P>
+<P>To implement this interface, you can write a generic servlet that
+extends <STRONG>Servlet::GenericServlet</STRONG> or an HTTP servlet that extends
+<STRONG>Servlet::Http::HttpServlet</STRONG>.</P>
+<P>This interface deinfes methods to initialize a servlet, to service
+requests, and to remove a servlet from the server. These are known as
+life-cycle methods and are called in the following sequence:</P>
+<OL>
+<LI>
+The servlet is constructed, then initialized with <A HREF="#item_init"><CODE>init()</CODE></A>.
+<P></P>
+<LI>
+Any calls from clients to <A HREF="#item_service"><CODE>service()</CODE></A> are handled.
+<P></P>
+<LI>
+The servlet is taken out of service, then destroyed with <A HREF="#item_destroy"><CODE>destroy()</CODE></A>.
+<P></P></OL>
+<P>In addition to the life-cycle methods, this interface provides the
+getServletConfig method, which the servlet can use to get any startup
+information, and <A HREF="#item_getServletInfo"><CODE>getServletInfo()</CODE></A>, which allows the servlet to
+return basic information about itself, such as author, version and
+copyright.</P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_destroy"><CODE>destroy()</CODE></A></STRONG><BR>
+<DD>
+Called by the servlet container to indicate to a servlet that the
+servlet is being taken out of service. This method is only called once
+all threads within the servlet's <A HREF="#item_service"><CODE>service()</CODE></A> method have exited or
+after a timeout period has passed. After the servlet container calls
+this method, it will not call <A HREF="#item_service"><CODE>service()</CODE></A> again on this servlet.
+<P>This method gives the servlet an opportunity to clean up any resources
+that are being held (for example, memory, file handles, threads) and
+make sure that any persistent state is synchronized with the servlet's
+current state in memory.</P>
+<P></P>
+<DT><STRONG><A NAME="item_getServletConfig"><CODE>getServletConfig()</CODE></A></STRONG><BR>
+<DD>
+Returns a <STRONG>Servlet::ServletConfig</STRONG> object which contains
+initialization and startup parameters for this servlet. The object
+returned is the one passed to the <A HREF="#item_init"><CODE>init()</CODE></A> method.
+<P>Implementations of this interface are responsible for storing the
+object so that this method can return it. The
+<STRONG>Servlet::GenericServlet</STRONG> class, which implements this interface,
+already does this.</P>
+<P></P>
+<DT><STRONG><A NAME="item_getServletInfo"><CODE>getServletInfo()</CODE></A></STRONG><BR>
+<DD>
+Returns information about the servlet, such as author, version, and
+copyright.
+<P>The string that this method returns should be plain text and not
+markup of any kind (such as HTML, XML etc).</P>
+<P></P>
+<DT><STRONG><A NAME="item_init"><CODE>init($config)</CODE></A></STRONG><BR>
+<DD>
+Called by the servlet container to indicate to a servlet that the
+servlet is being placed into service.
+<P>The servlet container calls the <A HREF="#item_init"><CODE>init()</CODE></A> method exactly once after
+instantiating the servlet. The <A HREF="#item_init"><CODE>init()</CODE></A> method must complete
+successfully before the servlet can receive any requests.</P>
+<P>The servlet container cannot place the servlet into service if <A HREF="#item_init"><CODE>init()</CODE></A>.</P>
+<OL>
+<LI>
+Throws a <STRONG>Servlet::ServletException</STRONG>
+<P></P>
+<LI>
+Does not return within a time defined by the servlet container
+<P></P></OL>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24config"><EM>$config</EM></A></STRONG><BR>
+<DD>
+a <STRONG>Servlet::ServletConfig</STRONG> object containing the servlet's
+configuration and initialization parameters
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AServletException"><STRONG>Servlet::ServletException</STRONG></A></STRONG><BR>
+<DD>
+if an exception has occurred that interferes with the servlet's normal
+operation
+<P></P></DL>
+<DT><STRONG><A NAME="item_service">service($request, $response)</A></STRONG><BR>
+<DD>
+Called by the servlet container to allow the servlet to respond to a
+request.
+<P>This method is only called after the servlet's <A HREF="#item_init"><CODE>init()</CODE></A> method has
+completed successfully.</P>
+<P>Servlets may run inside multithreaded servlet containers that can
+handle multiple requests concurrently. Developers must be aware to
+synchronize ac cess to any shared resources such as files, network
+connections, and as well the servlet's class and instance
+variables.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24request"><EM>$request</EM></A></STRONG><BR>
+<DD>
+the <STRONG>Servlet::ServletRequest</STRONG> object that contains the client's
+request
+<P></P>
+<DT><STRONG><A NAME="item_%24response"><EM>$response</EM></A></STRONG><BR>
+<DD>
+the <STRONG>Servlet::ServletResponse</STRONG> object that contains the servlet's
+response
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::ServletException</STRONG></STRONG><BR>
+<DD>
+if an exception occurs that interferes with the servlet's normal
+operation
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../api/Servlet/GenericServlet.html">the Servlet::GenericServlet manpage</A>,
+<A HREF="../../api/Servlet/ServletConfig.html">the Servlet::ServletConfig manpage</A>,
+<A HREF="../../api/Servlet/ServletException.html">the Servlet::ServletException manpage</A>,
+<A HREF="../../api/Servlet/ServletRequest.html">the Servlet::ServletRequest manpage</A>,
+<A HREF="../../api/Servlet/ServletResponse.html">the Servlet::ServletResponse manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,363 @@
+<HTML>
+<HEAD>
+<TITLE>Servlet::ServletRequest - servlet request interface</TITLE>
+<LINK REL="stylesheet" HREF="../../libservlet.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Servlet::ServletRequest - servlet request interface</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  for my $name ($request-&gt;getAttributeNames()) {
+      my $val = $request-&gt;getAttribute($name);
+      $request-&gt;removeAttribute($name);
+      # or
+      $request-&gt;setAttribute($name, $newValue);
+  }</PRE>
+<PRE>
+  my $encoding = $request-&gt;getCharacterEncoding();
+  $request-&gt;setCharacterEncoding($newEncoding);</PRE>
+<PRE>
+  my $length = $request-&gt;getContentLength();</PRE>
+<PRE>
+  my $type = $request-&gt;getContentType();</PRE>
+<PRE>
+  # gets request body as binary data
+  my $input = $request-&gt;getInputHandle();</PRE>
+<PRE>
+  # gets preferred locale
+  my $locale = $request-&gt;getLocale();</PRE>
+<PRE>
+  # gets all locales in descending order of preference
+  my @locales = $request-&gt;getLocales();</PRE>
+<PRE>
+  my %paramMap = $request-&gt;getParameterMap();
+  for my $name ($request-&gt;getParameterNames()) {
+      my $val = $request-&gt;getParameter($name);
+      # or
+      my @vals = $request-&gt;getParameterValues($name);
+  }</PRE>
+<PRE>
+  my $protocol = $request-&gt;getProtocol();</PRE>
+<PRE>
+  # gets request body as character data, converted from bytes using
+  # the request's character encoding
+  my $reader = $request-&gt;getReader();</PRE>
+<PRE>
+  my $addr = $request-&gt;getRemoteAddr();</PRE>
+<PRE>
+  my $host = $request-&gt;getRemoteHost();</PRE>
+<PRE>
+  # get a request dispatcher in order to do an include or forward
+  my $dispatcher = $request-&gt;getRequestDispatcher($path);</PRE>
+<PRE>
+  my $scheme = $request-&gt;getScheme();</PRE>
+<PRE>
+  my $server = $request-&gt;getServerName();</PRE>
+<PRE>
+  my $port = $request-&gt;getServerPort();</PRE>
+<PRE>
+  my $flag = $request-&gt;isSecure();</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This interface defines an object that provides client request
+information to a servlet. The servlet container creates a request
+object and passes it as an argument to the servlet's <CODE>service()</CODE>
+method.</P>
+<P>A <STRONG>Servlet::ServletRequest</STRONG> object provides data including parameter
+name and values, attributes, and an input handle. Interfaces that
+extend ServletRequest can provide additional protocol-specific data
+(for example, HTTP data is provided by
+<STRONG>Servlet::Http::HttpServletRequest</STRONG>.</P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getAttribute"><CODE>getAttribute($name)</CODE></A></STRONG><BR>
+<DD>
+Returns the value of the named attribute, or <EM>undef</EM> if no attribute
+of the given name exists.
+<P>Attributes can be set two ways. The servlet container may set
+attributes to make available custom information about a request. For
+example, for requests made using HTTPS, the attribute
+<EM>Servlet::Request::X509Certificate</EM> can be used to retrieve
+information on the certificate of the client. Attributes can also be
+set programatically using <A HREF="#item_setAttribute"><CODE>setAttribute()</CODE></A>. This allows information
+to be embedded into a request before a <STRONG>Servlet::RequestDispatcher</STRONG>
+call.</P>
+<P>Attribute names should follow the same convention as package
+names. The Servlet API specification reserves names matching
+<EM>main::*</EM>, <EM>CORE::*</EM>, <EM>UNIVERSAL::*</EM>, and any other standard
+reserved package names.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24name"><EM>$name</EM></A></STRONG><BR>
+<DD>
+The name of the attribute
+<P></P></DL>
+<DT><STRONG><A NAME="item_getAttributeNames"><CODE>getAttributeNames()</CODE></A></STRONG><BR>
+<DD>
+Returns an array containing the names of the attributes available to
+this request, or an empty array if the request has no attributes
+available to it.
+<P></P>
+<DT><STRONG><A NAME="item_getCharacterEncoding"><CODE>getCharacterEncoding()</CODE></A></STRONG><BR>
+<DD>
+Returns the name of the character encoding used in the body of this
+request, or <EM>undef</EM> if the request does not specify a character
+encoding.
+<P></P>
+<DT><STRONG><A NAME="item_getContentLength"><CODE>getContentLength()</CODE></A></STRONG><BR>
+<DD>
+Returns the length, in bytes, of the request body and made available
+by the input handle, or <EM>undef</EM> if the length is not known. For HTTP
+servlets, same as the value of the CGI variable <EM>CONTENT_LENGTH</EM>.
+<P></P>
+<DT><STRONG><A NAME="item_getContentType"><CODE>getContentType()</CODE></A></STRONG><BR>
+<DD>
+Returns the MIME type of the body of the request, or <EM>undef</EM> if the
+type is not known. For HTTP servlets, same as the value of the CGI
+variable <EM>CONTENT_TYPE</EM>.
+<P></P>
+<DT><STRONG><A NAME="item_getInputHandle"><CODE>getInputHandle()</CODE></A></STRONG><BR>
+<DD>
+Retrieves the body of the request as binary data using a
+<STRONG>IO::Handle</STRONG>. Either this method or <A HREF="#item_getReader"><CODE>getReader()</CODE></A> may be called to
+read the body, not both.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIllegalStateException"><STRONG>Servlet::Util::IllegalStateException</STRONG></A></STRONG><BR>
+<DD>
+if the <A HREF="#item_getReader"><CODE>getReader()</CODE></A> method has already been called for this request
+<P></P>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIOException"><STRONG>Servlet::Util::IOException</STRONG></A></STRONG><BR>
+<DD>
+if an input or output exception occurred
+<P></P></DL>
+<DT><STRONG><A NAME="item_getLocale"><CODE>getLocale()</CODE></A></STRONG><BR>
+<DD>
+Returns the preferred locale that the client will accept content in,
+based on the <EM>Accept-Language</EM> header. If the client request doesn't
+provide an <EM>Accept-Language</EM> header, this method returns the default
+locale for the server.
+<P></P>
+<DT><STRONG><A NAME="item_getLocales"><CODE>getLocales()</CODE></A></STRONG><BR>
+<DD>
+Returns an array of locales indicating in decreasing order of
+preference the locales that are acceptable to the client based on the
+<EM>Accept-Language</EM> header. If the client request doesn't provde an
+<EM>Accept-Language</EM> header, this method returns an array containing one
+locale, the default locale for the server.
+<P></P>
+<DT><STRONG><A NAME="item_getParameter"><CODE>getParameter($name)</CODE></A></STRONG><BR>
+<DD>
+Returns the value of a request parameter, or <EM>undef</EM> if the parameter
+does not exist. Request parameters are extra information sent with the
+request. For HTTP servlets, parameters are contained in the query
+string or posted form data.
+<P>You should only use this method when you are sure the parameter has
+only one value. If the parameter might have more than one value, use
+<A HREF="#item_getParameterValues"><CODE>getParameterValues()</CODE></A>.</P>
+<P>If you use this method with a multivalued parameter, the value
+returned is equal to the first value in the array returned by
+<A HREF="#item_getParameterValues"><CODE>getParameterValues()</CODE></A>.</P>
+<P>If the parameter data was sent in the request body, such as occurs
+with an HTTP POST request, then reading the body directly via
+<A HREF="#item_getInputHandle"><CODE>getInputHandle()</CODE></A> or <A HREF="#item_getReader"><CODE>getReader()</CODE></A> can interfere with the execution
+of this method.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><EM>$name</EM></STRONG><BR>
+<DD>
+The name of the parameter
+<P></P></DL>
+<DT><STRONG><A NAME="item_getParameterMap"><CODE>getParameterMap()</CODE></A></STRONG><BR>
+<DD>
+Returns a hash of the parameters of this request. The keys of the hash
+are the parameter names, and the values of the hash are arrays of
+parameter values.
+<P>See <A HREF="#item_getParameter"><CODE>getParameter()</CODE></A> for more information about parameters and usage.</P>
+<P></P>
+<DT><STRONG><A NAME="item_getParameterNames"><CODE>getParameterNames()</CODE></A></STRONG><BR>
+<DD>
+Returns an array containing the names of the parameters contained in
+this request. If the request has no parameters, the array is empty.
+<P>See <A HREF="#item_getParameter"><CODE>getParameter()</CODE></A> for more information about parameters and usage.</P>
+<P></P>
+<DT><STRONG><A NAME="item_getParameterValues"><CODE>getParameterValues($name)</CODE></A></STRONG><BR>
+<DD>
+Returns an array containing all of the values of the given request
+parameter, or <EM>undef</EM> if the parameter does not exist.
+<P>If the parameter has a single value, the array has a length of 1. If
+the parameter has no value, the array is empty.</P>
+<P>See <A HREF="#item_getParameter"><CODE>getParameter()</CODE></A> for more information about parameters and usage.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><EM>$name</EM></STRONG><BR>
+<DD>
+The name of the parameter
+<P></P></DL>
+<DT><STRONG><A NAME="item_getProtocol"><CODE>getProtocol()</CODE></A></STRONG><BR>
+<DD>
+Returns the name and version of the protocol the request uses in the
+form <EM>protocol/majorVersion.minorVersion</EM>, for example, HTTP/1.1. For
+HTTP servlets, the value returned is the same as the value of the CGI
+variable <EM>SERVER_PROTOCOL</EM>.
+<P></P>
+<DT><STRONG><A NAME="item_getReader"><CODE>getReader()</CODE></A></STRONG><BR>
+<DD>
+Retrieves the body of the request as character data using a
+<STRONG>XXX</STRONG>. The reader translates the character data according to the
+character encoding used on the body. Either this method or
+<A HREF="#item_getInputHandle"><CODE>getInputHandle()</CODE></A> may be called to read the body, not both.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AUnsupportedEncodingExceptio"><STRONG>Servlet::Util::UnsupportedEncodingException</STRONG></A></STRONG><BR>
+<DD>
+if the character encoding used is not supported and the text cannot be
+decoded
+<P></P>
+<DT><STRONG><STRONG>Servlet::Util::IllegalStateException</STRONG></STRONG><BR>
+<DD>
+if the <A HREF="#item_getInputHandle"><CODE>getInputHandle()</CODE></A> method has already been called for this
+request
+<P></P>
+<DT><STRONG><STRONG>Servlet::Util::IOException</STRONG></STRONG><BR>
+<DD>
+if an input or output exception occurred
+<P></P></DL>
+<DT><STRONG><A NAME="item_getRemoteAddr"><CODE>getRemoteAddr()</CODE></A></STRONG><BR>
+<DD>
+Returns the Internet Protocol (IP) address of the client that sent the
+request. For HTTP servlets, same as the value of the CGI variable
+<EM>REMOTE_ADDR</EM>.
+<P></P>
+<DT><STRONG><A NAME="item_getRemoteHost"><CODE>getRemoteHost()</CODE></A></STRONG><BR>
+<DD>
+Returns the fully qualified name of the client that sent the request,
+or the IP address of the client if the name cannot be determined. For
+HTTP servlets, same as the value of the CGI variable <EM>REMOTE_HOST</EM>.
+<P></P>
+<DT><STRONG><A NAME="item_getRequestDispatcher"><CODE>getRequestDispatcher($path)</CODE></A></STRONG><BR>
+<DD>
+Returns a <STRONG>Servlet::RequestDispatcher</STRONG> object that acts as a wrapper
+for the resource located at the given path. The object can be used to
+forward a request to the resource or to include the resource in a
+response. The resource can be dynamic or static.
+<P>The pathname specified may be relative, although it cannot extend
+outside the current servlet context. If the path begins with a ``/'', it
+is interpreted as relative to the current context root. This method
+returns <EM>undef</EM> if the servlet cannot return a dispatcher.</P>
+<P>The difference between this method and the one provided by
+<STRONG>Servlet::ServletContext</STRONG> is that this method can take a relative
+path.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24path"><EM>$path</EM></A></STRONG><BR>
+<DD>
+The path to the resource
+<P></P></DL>
+<DT><STRONG><A NAME="item_getScheme"><CODE>getScheme()</CODE></A></STRONG><BR>
+<DD>
+Returns the name of th scheme used to make this request, for example,
+<EM>http</EM>, <EM>https</EM>, or <EM>ftp</EM>. Different schemes have different rules
+for constructing URLs, as noted in RFC 1738.
+<P></P>
+<DT><STRONG><A NAME="item_getServerName"><CODE>getServerName()</CODE></A></STRONG><BR>
+<DD>
+Returns the host name of the server that received the request. For
+HTTP servlets, same as the value of the CGI variable <EM>SERVER_NAME</EM>.
+<P></P>
+<DT><STRONG><A NAME="item_getServerPort"><CODE>getServerPort()</CODE></A></STRONG><BR>
+<DD>
+Returns the port number on which this request was received. For HTTP
+servlets, same as the value of the CGI variable <EM>SERVER_PORT</EM>.
+<P></P>
+<DT><STRONG><A NAME="item_isSecure"><CODE>isSecure()</CODE></A></STRONG><BR>
+<DD>
+Returns a boolean indicating whether this request was made using a
+secure channel, such as HTTPS.
+<P></P>
+<DT><STRONG><A NAME="item_removeAttribute"><CODE>removeAttribute($name)</CODE></A></STRONG><BR>
+<DD>
+Removes an attribute from this request. This method is not generally
+needed as attributes only persist as long as the request is being
+handled.
+<P>See <A HREF="#item_getAttribute"><CODE>getAttribute()</CODE></A> for information about allowable attribute names.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><EM>$name</EM></STRONG><BR>
+<DD>
+The name of the attribute to remove
+<P></P></DL>
+<DT><STRONG><A NAME="item_setAttribute">setAttribute($name, $object)</A></STRONG><BR>
+<DD>
+Stores an attribute in this request. Attributes are reset between
+requests. This method is most often used in conjunction with
+<STRONG>Servlet::RequestDispatcher</STRONG>.
+<P>See <A HREF="#item_getAttribute"><CODE>getAttribute()</CODE></A> for information about allowable attribute names.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><EM>$name</EM></STRONG><BR>
+<DD>
+The name of the attribute to set
+<P></P>
+<DT><STRONG><A NAME="item_%24object"><EM>$object</EM></A></STRONG><BR>
+<DD>
+The object to be stored. Can be a scalar or a reference to an
+arbitrary data structure.
+<P></P></DL>
+<DT><STRONG><A NAME="item_setCharacterEncoding"><CODE>setCharacterEncoding($name)</CODE></A></STRONG><BR>
+<DD>
+Overrides the name of the character encoding used for the body of this
+request. This method must be called prior to reading request
+parameters or reading input using <A HREF="#item_getReader"><CODE>getReader()</CODE></A>.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><EM>$name</EM></STRONG><BR>
+<DD>
+The name of the encoding to set
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::Util::UnsupportedEncodingException</STRONG></STRONG><BR>
+<DD>
+if this is not a valid encoding
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../api/IO/Handle.html">the IO::Handle manpage</A>,
+<A HREF="../../api/Servlet/RequestDispatcher.html">the Servlet::RequestDispatcher manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

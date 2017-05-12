@@ -1,0 +1,293 @@
+<HTML>
+<HEAD>
+<TITLE>Servlet::Http::HttpServletRequest - HTTP servlet request interface</TITLE>
+<LINK REL="stylesheet" HREF="../../../libservlet.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#fields">FIELDS</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Servlet::Http::HttpServletRequest - HTTP servlet request interface</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  my $type = $request-&gt;getAuthType();</PRE>
+<PRE>
+  my $contextpath = $request-&gt;getContextPath();</PRE>
+<PRE>
+  my @cookies = $request-&gt;getCookies();</PRE>
+<PRE>
+  my $date = $request-&gt;getDateHeader($name);</PRE>
+<PRE>
+  for my $name ($request-&gt;getHeaderNames()) {
+    my $val = $request-&gt;getHeader($name);
+    # or
+    my @vals = $request-&gt;getHeaders($name);
+  }</PRE>
+<PRE>
+  my $method = $request-&gt;getMethod();</PRE>
+<PRE>
+  my $pathinfo = $request-&gt;getPathInfo();</PRE>
+<PRE>
+  my $realpath = $request-&gt;getPathTranslated();</PRE>
+<PRE>
+  my $querystring = $request-&gt;getQueryString();</PRE>
+<PRE>
+  my $user = $request-&gt;getRemoteUser();</PRE>
+<PRE>
+  my $sessionid = $request-&gt;getRequestedSessionID();</PRE>
+<PRE>
+  my $uri = $request-&gt;getRequestURI();</PRE>
+<PRE>
+  my $url = $request-&gt;getRequestURL();</PRE>
+<PRE>
+  my $servletpath = $request-&gt;getServletPath();</PRE>
+<PRE>
+  my $session = $request-&gt;getSession($createFlag);</PRE>
+<PRE>
+  my $principal = $request-&gt;getUserPrincipal();</PRE>
+<PRE>
+  my $bool = $request-&gt;isRequestedSessionIdFromCookie();
+  my $bool = $request-&gt;isRequestedSessionIdFromURL();
+  my $bool = $request-&gt;isRequestedSessionIdValid();</PRE>
+<PRE>
+  my $bool = $request-&gt;isUserInRole($role);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Extends the <STRONG>Servlet::ServletRequest</STRONG> interface to provide request
+information for HTTP servlets.</P>
+<P>The servlet container creates this object and passes it as an argument
+to the servlet's service methods (<CODE>doGet()</CODE>, <CODE>doPost()</CODE>, etc).</P>
+<P>
+<HR>
+<H1><A NAME="fields">FIELDS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_BASIC_AUTH">BASIC_AUTH</A></STRONG><BR>
+<DD>
+String identifier for Basic authentication. Value ``BASIC''.
+<P></P>
+<DT><STRONG><A NAME="item_CLIENT_CERT_AUTH">CLIENT_CERT_AUTH</A></STRONG><BR>
+<DD>
+String identifier for certificate authentication. Value ``CERT-CLIENT''.
+<P></P>
+<DT><STRONG><A NAME="item_DIGEST_AUTH">DIGEST_AUTH</A></STRONG><BR>
+<DD>
+String identifier for Digest authentication. Value ``DIGEST''.
+<P></P>
+<DT><STRONG><A NAME="item_FORM_AUTH">FORM_AUTH</A></STRONG><BR>
+<DD>
+String identifier for form authentication. Value ``FORM''.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getAuthType"><CODE>getAuthType()</CODE></A></STRONG><BR>
+<DD>
+Returns the name of the authentication scheme used to protect the
+servlet. All servlet containers must support BASIC_AUTH, FORM_AUTH
+and CLIENT_CERT_AUTH and may support DIGEST_AUTH. If the servlet is
+not authenticated, <EM>undef</EM> is returned.
+<P>Same as the CGI variable <EM>AUTH_TYPE</EM>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_getContextPath"><CODE>getContextPath()</CODE></A></STRONG><BR>
+<DD>
+Returns the portion of the request URI that indicates the context of
+the request. The context path always comes first in a request URI. The
+path starts with a ``/'' character but does not end with a ``/''
+character. For servlets in the default (root) context, this method
+returns ``''. The container does not decode this string.
+<P></P>
+<DT><STRONG><A NAME="item_getCookies"><CODE>getCookies()</CODE></A></STRONG><BR>
+<DD>
+Returns an array containing all of the <STRONG>Servlet::Http::Cookie</STRONG>
+objects the client sent with this request, or an empty array if no
+cookies were sent.
+<P></P>
+<DT><STRONG><A NAME="item_getDateHeader"><CODE>getDateHeader($name)</CODE></A></STRONG><BR>
+<DD>
+Returns the value of the specified request header as an integer value
+representing the number of seconds since the epoch. Use this method
+with headers that contain dates, such as If-Modified-Since.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24name"><EM>$name</EM></A></STRONG><BR>
+<DD>
+the header name
+<P></P></DL>
+<DT><STRONG><A NAME="item_getHeader"><CODE>getHeader($name)</CODE></A></STRONG><BR>
+<DD>
+Returns the value of the specified request header, or <EM>undef</EM> if the
+request did not include a header of the specified name. The header
+name is case insensitive. This method can be used with any request
+header.
+<P></P>
+<DT><STRONG><A NAME="item_getHeaderNames"><CODE>getHeaderNames()</CODE></A></STRONG><BR>
+<DD>
+Returns an array of all the header names this request contains, or an
+empty array if the request has no headers.
+<P>Some servlet containers do not allow servlets to access headers using
+this method, in which case this method returns <EM>undef</EM>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_getHeaders"><CODE>getHeaders($name)</CODE></A></STRONG><BR>
+<DD>
+Returns an array of the values of the specified request header, or an
+empty array if the request did not include a header of the specified
+name. The header name is case insensitive. This method can be used
+with any request header.
+<P>Some headers (such as Accept-Language) can be sent by clients as
+several headers each with a different value rather than sending the
+header as a comma separated list.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><EM>$name</EM></STRONG><BR>
+<DD>
+the header name
+<P></P></DL>
+<DT><STRONG><A NAME="item_getMethod"><CODE>getMethod()</CODE></A></STRONG><BR>
+<DD>
+Returns the name of the HTTP method with which this request was made,
+for example, GET, POST, or PUT. Same as the value of the CGI variable
+<EM>REQUEST_METHOD</EM>.
+<P></P>
+<DT><STRONG><A NAME="item_getPathInfo"><CODE>getPathInfo()</CODE></A></STRONG><BR>
+<DD>
+Returns any extra path information associated with the URL the client
+sent when it made this request, or <EM>undef</EM> if there was no extra path
+information. The extra path information follows the servlet path but
+precedes the query string. Same as the value of the CGI variable
+<EM>PATH_INFO</EM>.
+<P></P>
+<DT><STRONG><A NAME="item_getPathTranslated"><CODE>getPathTranslated()</CODE></A></STRONG><BR>
+<DD>
+Returns any extra path information after the servlet name but before
+the query string, translated to a real path, or <EM>undef</EM> if there was
+no extra path information. The web container does not decode this
+string. Same as the value of the CGI variable <EM>PATH_TRANSLATED</EM>.
+<P></P>
+<DT><STRONG><A NAME="item_getQueryString"><CODE>getQueryString()</CODE></A></STRONG><BR>
+<DD>
+Returns the query string that is contained in the request URL after
+the path, or <EM>undef</EM> if the URL does not have a query string. Same as
+the value of the CGI variable <EM>QUERY_STRING</EM>.
+<P></P>
+<DT><STRONG><A NAME="item_getRemoteUser"><CODE>getRemoteUser()</CODE></A></STRONG><BR>
+<DD>
+Returns the name of the user making this request, if the user has been
+authenticated, or <EM>undef</EM> if the user has not been
+authenticated. Whether the user name is sent with each subsequent
+request depends on the client and type of authentication. Same as the
+value of the CGI variable <EM>REMOTE_USER</EM>.
+<P></P>
+<DT><STRONG><A NAME="item_getRequestedSessionId"><CODE>getRequestedSessionId()</CODE></A></STRONG><BR>
+<DD>
+Returns the session ID specified by the client (or <EM>undef</EM> if the
+request did not specify a session ID). This may not be the same as the
+ID of the actual session in use. For example, if the request specified
+an old (expired) session ID and the server has started a new session,
+this method gets a new session with a new ID.
+<P></P>
+<DT><STRONG><A NAME="item_getRequestURI"><CODE>getRequestURI()</CODE></A></STRONG><BR>
+<DD>
+Returns the part of this request's URL from the protocol name up to
+the query string in the first line of the HTTP request. The web
+container does not decod this string.
+<P>To reconstruct a URL with a scheme and host, use <A HREF="#item_getRequestURL"><CODE>getRequestURL()</CODE></A>.</P>
+<P></P>
+<DT><STRONG><A NAME="item_getRequestURL"><CODE>getRequestURL()</CODE></A></STRONG><BR>
+<DD>
+Reconstructs the URL the client used to make the request. The returned
+URL contains a protocol, server name, port number, and server path,
+but it does no tinclude query string parameters.
+<P>This method is useful for creating redirect messages and for reporting
+errors.</P>
+<P></P>
+<DT><STRONG><A NAME="item_getServletPath"><CODE>getServletPath()</CODE></A></STRONG><BR>
+<DD>
+Returns the part of this request's URL that calls the servlet. This
+includes either the servlet name or a path to the servlet but does not
+include any extra path information or a query string. Same as the
+value of the CGI variable <EM>SCRIPT_NAME</EM>.
+<P></P>
+<DT><STRONG><A NAME="item_getSession"><CODE>getSession($boolean)</CODE></A></STRONG><BR>
+<DD>
+Returns the current session associated with this request, or if the
+request does not have a session and <EM>$create</EM> is true, creates
+one. If <EM>$create</EM> is false and the request has no valid session,
+<EM>undef</EM> is returned.
+<P>To make sure the session is properly maintained, you must call this
+method before the response is committed.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24create"><EM>$create</EM></A></STRONG><BR>
+<DD>
+true to create a new session for this request if necessary; false to
+return <EM>undef</EM> if there's no current session.
+<P></P></DL>
+<DT><STRONG><A NAME="item_getUserPrincipal"><CODE>getUserPrincipal()</CODE></A></STRONG><BR>
+<DD>
+Returns a <STRONG>XXX</STRONG> object containing th ename of the current
+authenticated user, or <EM>undef</EM> if the user has not been
+authenticated.
+<P></P>
+<DT><STRONG><A NAME="item_isRequestedSessionIdFromCookie"><CODE>isRequestedSessionIdFromCookie()</CODE></A></STRONG><BR>
+<DD>
+Returns true if the requested session ID came in as a cookie,
+otherwise false.
+<P></P>
+<DT><STRONG><A NAME="item_isRequestedSessionIdFromURL"><CODE>isRequestedSessionIdFromURL()</CODE></A></STRONG><BR>
+<DD>
+Returns true if the requested session ID came in as part of the
+request URL, otherwise false.
+<P></P>
+<DT><STRONG><A NAME="item_isRequestedSessionIdValid"><CODE>isRequestedSessionIdValid()</CODE></A></STRONG><BR>
+<DD>
+Returns true if the requested session ID is still valid, false
+otherwise.
+<P></P>
+<DT><STRONG><A NAME="item_isUserInRole"><CODE>isUserInRole($role)</CODE></A></STRONG><BR>
+<DD>
+Returns true if the authenticated user is included in the specified
+logical role, or false if the user has not been authenticated or is
+not included in the role. Roles and role membership can be defined
+using deployment descriptors.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24role"><EM>$role</EM></A></STRONG><BR>
+<DD>
+the name of the role
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../api/Servlet/ServletRequest.html">the Servlet::ServletRequest manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

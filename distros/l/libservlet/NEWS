@@ -1,0 +1,16 @@
+
+11 Jun 2001:
+
+  libservlet 0.9.1 is released!
+
+  This is the first public version of libservlet. You can't do much
+  with it yet, since no Perl servlet containers exist yet. However, I
+  wanted to get some eyeballs on it, and it would be great if somebody
+  got excited enough to volunteer help. There are a few outstanding
+  issues and some documentation work needs to be done. 95% of the work
+  is done tho, which means I can turn my attention back to Wombat and
+  hopefully get a working container released in the next week or so.
+
+  For more information, see http://www.maz.org/libservlet/. A mailing
+  list has been created - mailto:libservlet-subscribe@maz.org.
+  Feedback is most certainly welcome!

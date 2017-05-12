@@ -1,0 +1,54 @@
+<HTML><HEAD><TITLE>XML::DOM::Text - A piece of XML text in XML::DOM</TITLE></HEAD><BODY><H1><A NAME="NAME">NAME
+
+</A></H1><P>XML::DOM::Text - A piece of XML text in XML::DOM
+
+<P><HR><H1><A NAME="DESCRIPTION">DESCRIPTION
+
+</A></H1><P>XML::DOM::Text extends <A HREF="CharacterData.html">XML::DOM::CharacterData</A>, which extends
+<A HREF="Node.html">XML::DOM::Node</A>.
+
+<P>The Text interface represents the textual content (termed character
+data in XML) of an Element or Attr. If there is no markup inside an
+element's content, the text is contained in a single object
+implementing the Text interface that is the only child of the element.
+If there is markup, it is parsed into a list of elements and Text nodes
+that form the list of children of the element.
+
+<P>When a document is first made available via the DOM, there is only one
+Text node for each block of text. Users may create adjacent Text nodes
+that represent the contents of a given element without any intervening
+markup, but should be aware that there is no way to represent the
+separations between these nodes in XML or HTML, so they will not (in
+general) persist between DOM editing sessions. The normalize() method
+on Element merges any such adjacent Text objects into a single node for
+each block of text; this is recommended before employing operations
+that depend on a particular document structure, such as navigation with
+XPointers.
+
+<H2><A NAME="METHODS">METHODS
+
+</A></H2><DL><DT><A NAME="splitText_offset_"><STRONG><P>splitText (offset)
+
+</STRONG></A><DD>Breaks this Text node into two Text nodes at the specified
+offset, keeping both in the tree as siblings. This node then
+only contains all the content up to the offset point. And a
+new Text node, which is inserted as the next sibling of this
+node, contains all the content at and after the offset point.
+
+<P>Parameters:
+ <I>offset</I>  The offset at which to split, starting from 0.
+
+<P>Return Value: The new Text node.
+
+<P>DOMExceptions:
+
+<DL><DT><A NAME="_INDEX_SIZE_ERR_"><STRONG><P>* INDEX_SIZE_ERR
+
+</STRONG></A><DD>Raised if the specified offset is negative or greater than the number of 
+characters in data.
+
+<DT><A NAME="_NO_MODIFICATION_ALLOWED_ERR_"><STRONG><P>* NO_MODIFICATION_ALLOWED_ERR
+
+</STRONG></A><DD>Raised if this node is readonly.
+
+</DL></DL><P><HR><I><FONT SIZE="-1">Last updated: Fri Oct 22 18:47:32 1999</FONT></I></BODY></HTML>

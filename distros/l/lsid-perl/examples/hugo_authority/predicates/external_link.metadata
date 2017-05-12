@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<rdf:RDF
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+>
+	<rdf:Description rdf:about="urn:lsid:gene.ucl.ac.uk.lsid.biopathways.org:predicates:external_link">
+		<rdfs:label>Link to external database</rdfs:label>
+		<dc:title>The External Link Predicate</dc:title>
+		<rdfs:comment>The predicate points to an external database</rdfs:comment>
+	</rdf:Description>
+</rdf:RDF>

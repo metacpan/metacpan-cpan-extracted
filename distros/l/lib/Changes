@@ -1,0 +1,34 @@
+Revision history for Perl extension lib
+
+0.63  Sat Nov 20 01:41 2010
+  - Remove MacOS classic support.
+
+0.62  Sun Mar 15 18:01 2009
+  - Add a fake package for PAUSE to index.
+
+0.61  Sat Oct 25 12:05 2008
+  - The Makefile.PL breakage in 0.59_01 and 0.60 wasn't detected
+    for a month, but it was still there!
+  - Fix META_ADD for recent MakeMakers.
+
+0.60  Thu Oct 23 23:00 2008
+  - No breakage in a month, release stable lib.
+
+0.59_01  Sun Sep 28 11:32 2008
+  - Add special case to Makefile.PL for ExtUtils::MakeMaker 6.46 and up.
+  * To P5P: This is purely a change to the CPAN distribution. The module code is
+    unchanged from 0.59, a patch to the perl core is not necessary.
+
+0.59  Sun Jun 29 10:38 2008
+  - Merge changes from blead, documentation fixes.
+
+0.58  Thu Jun 12 10:00 2008
+  - Repaired distribution, now indexable by PAUSE.
+
+0.57  Mon May 26 16:22 2008
+  - First release to CPAN. Previously available in core perl.
+  - Released to CPAN in order to backport a fix for
+    "use lib 'foo.par'" which should not warn about
+    foo.par being a file. (Any files with other extensions
+    still trigger warnings as appropriate.)
+

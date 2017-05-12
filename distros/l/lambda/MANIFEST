@@ -1,0 +1,9 @@
+Build.PL
+Changes
+lib/lambda.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/00-load.t
+t/imports.t

@@ -1,0 +1,17 @@
+<IfModule mod_env.c>
+    PassEnv PERL5LIB
+</IfModule>
+
+<IfModule mod_alias.c>
+    ScriptAlias /cgi-bin/ "@ServerRoot@/cgi-bin/"
+</IfModule>
+
+<IfModule !mpm_winnt.c>
+   LockFile @ServerRoot@/logs/accept.lock
+</IfModule>
+
+<Directory "@ServerRoot@/cgi-bin">
+   AllowOverride None
+   Options None
+</Directory>
+

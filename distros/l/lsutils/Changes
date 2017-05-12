@@ -1,0 +1,43 @@
+2010-01-20 13:07  cvs
+
+	* bin/: lsas, lscount, lsd, lsdcounts, lsdu: Improved some of the
+	  documentation.
+
+2009-12-08 16:36  cvs
+
+	* bin/lscount: fixed bug in lscount
+
+2009-11-12 12:20  cvs
+
+	* bin/lsf: added lsf
+
+2009-10-28 22:52  cvs
+
+	* lib/LEOCHARRE/Dir/Lsutils.pm: made a lot of changes took out c
+	  versions the perl versions are better
+
+2009-09-06 20:45  cvs
+
+	* bin/lsd.c, bin/lsdu, lib/lsdu.pod: Fixed up lsdu
+
+2009-05-18 16:39  cvs
+
+	* MANIFEST, bin/findnewest: added script to tranverse dir trees and
+	  find newest/oldest modified entry
+
+2009-04-23 11:58  cvs
+
+	* bin/: findirs, lsdcounts: added findirs, to get newest, oldest..
+	  dirs in a dest
+
+2009-03-26 13:20  cvs
+
+	* bin/lsdu: had to alted lsdu to be perl instead of bash, beacause
+	  it was freaking out on dirnames with spaces etc..
+
+2009-03-26 13:11  cvs
+
+	* INSTALL, MANIFEST, Makefile.PL, README, bin/lsas, bin/lscount,
+	  bin/lsd, bin/lsdcounts, bin/lsdu, lib/lscount.pod, lib/lsd.pod,
+	  lib/lsdcounts.pod, lib/lsdu.pod: Initial revision
+

@@ -1,0 +1,11 @@
+Revision history for lib-none
+
+0.02    2014-04-12 (SHARYANTO)
+
+        - Empty @INC inside import(), not outside [suggested by Graham Knop
+          RT#94668].
+
+
+0.01    2014-04-12 (SHARYANTO)
+
+        - First release.

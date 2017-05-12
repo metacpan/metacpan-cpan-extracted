@@ -1,0 +1,12 @@
+Things that should be done:
+
+	- HTTP Only authority framework completion
+	- SOAP and HTTP authority hooks
+	- Multiple authorities within one source file (e.g key on the host name as well as namespace)
+	- Service configuration file that is loaded on startup and enables services (in addition to the codifed additions to services)
+	- HTTP Expires header (HTTP 1.1) for cached items to expire (ex: from a HTTP metadata location)
+	- Change an Authority's authenticate method to use named parameters
+	- New cache manager (95% complete)
+	- Strict regexes for the cache config file reader (80% complete)
+	- Add Foreign Authority Notification (FAN) Service (90% complete)
+	- Pretty print XML RDF results of getMetdata

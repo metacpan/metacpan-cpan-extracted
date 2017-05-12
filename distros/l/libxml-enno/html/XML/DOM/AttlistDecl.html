@@ -1,0 +1,43 @@
+<HTML><HEAD><TITLE>XML::DOM::AttlistDecl - An XML ATTLIST declaration in XML::DOM</TITLE></HEAD><BODY><H1><A NAME="NAME">NAME
+
+</A></H1><P>XML::DOM::AttlistDecl - An XML ATTLIST declaration in XML::DOM
+
+<P><HR><H1><A NAME="DESCRIPTION">DESCRIPTION
+
+</A></H1><P>XML::DOM::AttlistDecl extends <A HREF="Node.html">XML::DOM::Node</A> but is not part of the 
+DOM Level 1 specification.
+
+<P>This node represents an ATTLIST declaration, e.g.
+
+<PRE> &lt;!ATTLIST person
+   sex      (male|female)  #REQUIRED
+   hair     CDATA          "bold"
+   eyes     (none|one|two) "two"
+   species  (human)        #FIXED "human"&gt; 
+
+</PRE><P>Each attribute definition is stored a separate AttDef node. The AttDef nodes can
+be retrieved with getAttDef and added with addAttDef.
+(The AttDef nodes are stored in a NamedNodeMap internally.)
+
+<H2><A NAME="METHODS">METHODS
+
+</A></H2><DL><DT><A NAME="getName_"><STRONG><P>getName
+
+</STRONG></A><DD>Returns the Element tagName.
+
+<DT><A NAME="getAttDef_attrName_"><STRONG><P>getAttDef (attrName)
+
+</STRONG></A><DD>Returns the AttDef node for the attribute with the specified name.
+
+<DT><A NAME="addAttDef_attrName_type_default_fixed_"><STRONG><P>addAttDef (attrName, type, default, [ fixed ])
+
+</STRONG></A><DD>Adds a AttDef node for the attribute with the specified name.
+
+<P>Parameters:
+ <I>attrName</I> the attribute name.
+ <I>type</I>     the attribute type (e.g. "CDATA" or "(male|female)".)
+ <I>default</I>  the default value enclosed in quotes (!), the string #IMPLIED or 
+             the string #REQUIRED.
+ <I>fixed</I>    whether the attribute is '#FIXED' (default is 0.)
+
+</DL><P><HR><I><FONT SIZE="-1">Last updated: Fri Oct 22 18:47:23 1999</FONT></I></BODY></HTML>

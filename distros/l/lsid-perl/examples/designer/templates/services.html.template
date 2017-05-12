@@ -1,0 +1,90 @@
+<TMPL_INCLUDE name="javascript.html.template">
+
+<h1 id="title">Configure Services and Namespaces</h1>
+<h2 id="subtitle"></h2>
+
+<div id="instructions">
+
+<div id="position">
+        Instructions &nbsp; &nbsp; 
+        Authority Identity &nbsp; &nbsp; 
+        <span id="bolden">Services and Namespaces</span> &nbsp; &nbsp; 
+        Service Endpoints &nbsp; &nbsp; 
+        View Code
+</div>
+
+</div>
+
+
+<p id="description"> 
+Etiam eu nibh. Vivamus vitae lacus. Donec hendrerit, nibh eget tincidunt vulputate, diam nisl dictum mi, in eleifend purus urna id orci. Vivamus in mi eu nisl dignissim egestas. Nulla interdum nulla id neque. Quisque bibendum enim laoreet mi. Donec dapibus scelerisque sapien. Fusce imperdiet feugiat nibh. Nam nec mi vitae massa viverra hendrerit. Nulla semper diam ut odio. Etiam venenatis consequat wisi. Ut faucibus sapien sed dui. Sed est quam, pretium ut, aliquet nec, porta quis, lacus. Phasellus luctus ligula. Ut tincidunt tellus ac urna.
+</p>
+
+<div id="namespaces">
+
+<h3>Current Namespaces</h3>
+
+<span class="">
+	<TMPL_VAR name="namespaces">
+</span>
+
+<br/>
+
+<h4>Add a namespace</h4>
+
+<p>
+New Namespace: <TMPL_VAR name="newNamespace"> <br/>
+<br/>
+This value corresponds to the namespaces porition of an LSID. 
+Example: If you have the LSID <code>urn:lsid:myauthority.org:<b>Namespace</b>:object</code>, then
+you would enter the value &quot;<b>Namespace</b>&quot; in the box labeled &quot;New Namespace&quot;.
+</p>
+
+<br/>
+
+<div class="controls">
+<TMPL_VAR name="addNamespace"> &nbsp; <TMPL_VAR name="removeNamespace">   
+</div>
+
+</div> <!-- namespaces -->
+
+<br/>
+<br/>
+
+<div id="mappings">
+
+<h3>Current Namespace Mappings</h3>
+
+
+<span class=""> 
+	<TMPL_VAR name="mappings">
+</span>
+
+<br/>
+<br/>
+
+
+Create Namespace Mapping: 
+
+<TMPL_VAR name="newMapping"> 
+
+&nbsp; &nbsp; maps to &nbsp; &nbsp; 
+
+<TMPL_VAR name="mappingsPopup">
+
+<br/>
+<br/>
+<br/>
+
+<div class="controls">
+<TMPL_VAR name="addMapping"> &nbsp; <TMPL_VAR name="removeMapping">
+</div>
+
+</div> <!-- mappings -->
+
+<br/>
+<br/>
+
+<div class="controls">
+<TMPL_VAR name="submit">
+</div>

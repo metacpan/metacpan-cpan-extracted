@@ -1,0 +1,17 @@
+MANIFEST
+Makefile2
+Makefile.PL
+fallback/const-c.inc
+fallback/const-xs.inc
+const.pl
+const.c
+Module.xs
+lib/Authen/PAM/Module.pm
+lib/Authen/PAM/Module/test.pm
+lib/Authen/PAM/Module/BBS.pm
+ppport.h
+typemap
+README
+t/PAM-Module.t
+Local/ExtUtils/Constant.pm
+META.yml                                 Module meta-data (added by MakeMaker)

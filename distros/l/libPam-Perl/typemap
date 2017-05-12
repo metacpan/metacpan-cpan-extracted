@@ -1,0 +1,34 @@
+TYPEMAP
+
+pam_handle_x	X_PAM_HANDLE
+pam_handle_t *	T_PAM_HANDLE
+xint		Q_IV
+
+#############################################################################
+INPUT
+
+T_PAM_HANDLE
+	if (sv_derived_from($arg, \"Authen::PAM::Module::_pamh\")) {
+		$var = INT2PTR($type, SvIV((SV*)SvRV($arg)));
+	} else
+		croak(\"$var is not of type ${(my $ntt=$ntype);\$ntt}\");
+
+X_PAM_HANDLE
+	if (sv_derived_from($arg, \"Authen::PAM::Module\")) {
+		($var).hv = (HV*)SvRV($arg);
+	} else if (sv_derived_from($arg, \"Authen::PAM::Module::_user\")) {
+		($var).hv = (HV*)SvRV(SvRV($arg));
+	} else if (sv_derived_from($arg, \"Authen::PAM::Module::_item\")) {
+		($var).hv = (HV*)SvRV(SvRV($arg));
+	} else if (sv_derived_from($arg, \"Authen::PAM::Module::_env\")) {
+		($var).hv = (HV*)SvRV(SvRV($arg));
+	} else if (sv_derived_from($arg, \"Authen::PAM::Module\")) {
+		($var).hv = (HV*)SvRV($arg);
+	} else
+		croak(\"$var is not of type ${(my $ntt=$ntype);\$ntt}\");
+	SV** tmp = hv_fetch(($var).hv,\"pamh\",4,0);
+	($var).pamh = INT2PTR(pam_handle_t *, SvIV((SV*)SvRV(*tmp)));
+
+Q_IV
+	$var = ($type)SvIV(Q_intorconst(aTHX_ $arg))
+

@@ -1,0 +1,199 @@
+#!/usr/bin/perl
+
+###########
+# REQUIRE #
+###########
+
+  use lib::http ;
+  use Compress::Zlib ;
+
+########
+# HELP #
+########
+
+if ( !@ARGV || join(" ", @ARGV) =~ /^-+h(?:elp|$)/i ) {
+
+print qq`
+__________________________________________________________________
+
+lib::http - $lib::http::VERSION
+__________________________________________________________________
+
+This script will prepare a Perl libray in the server, creating
+compressed versions of the files and an index of the file tree,
+making the use of the Perl libray over the HTTP protocol faster.
+
+To use just point the target direatory:
+
+  \$> libhttp ./perl5/lib
+
+Enjoy! ;-P
+
+(C) Copyright 2004-2005, Graciliano M. P. <gmpassos@cpan.org>
+__________________________________________________________________
+
+`;
+
+exit;
+
+}
+
+########
+# INIT #
+########
+
+  $|=1;
+
+  my $target_dir = $ARGV[0] ;
+
+  die("** Target dir not defined!\n") if !$target_dir ;  
+  die("** Can't find target dir: $target_dir\n") if !-d $target_dir ;
+   
+  print "Scanning files... " ;
+  
+  my @files = catdir($target_dir , 0 , 1 , 1) ;
+  
+  print "OK\n" ;
+  
+  my $index_file = "$target_dir/libhttp.idx" ;
+  
+  if ( $ARGV[1] =~ /(?:clean|cls)/i ) {
+    foreach my $files_i ( @files ) {
+      next if $files_i !~ /\.\w+\.gz$/i ;
+      my ($fl_org) = ( $files_i =~ /(.*?)\.gz$/si );
+      next if !-s $fl_org ;
+      unlink( $files_i ) ;
+      print "UNLINK> $files_i\n" ;
+    }
+    
+    if ( -e $index_file ) {
+      unlink( $index_file ) ;
+      print "UNLINK> $index_file\n" ;
+    }
+      
+    exit ;
+  }
+  
+  my %files ;
+  
+  foreach my $files_i ( @files ) {
+    next if $files_i =~ /\.gz$/i ;
+
+    my $new_file = "$files_i.gz" ;
+    
+    my ($org_size , $org_mdtime) = (stat($files_i))[7,9] ;
+    my ($new_size , $new_mdtime) = (stat($new_file))[7,9] ;
+    
+    next if $org_size && $org_size == $new_size && $org_mdtime <= $new_mdtime ;
+
+    $files{$files_i} = $org_size ;
+
+    my $comp = Compress::Zlib::memGzip( cat($files_i) ) ;
+    next if $org_size < length($comp) || !$comp ;
+
+    savefile($new_file , $comp , 1) ;
+
+    $new_size = -s $new_file ;
+    $files{$new_file} = $new_size if $new_size ;
+
+    print "$new_file\n" if $new_size ;
+  }
+  
+  $target_dir =~ s/[\\\/]*$/\//gs ;
+
+  open (IDX,">$index_file") ;
+  foreach my $Key (sort keys %files ) {
+    my $fl = $Key ;
+    $fl =~ s/^\Q$target_dir\E// ;
+    print IDX "$fl = $files{$Key}\n" ;
+  }
+  close (IDX) ;
+  
+  print "$index_file\n" if -s $index_file ;
+  
+  my $comp = Compress::Zlib::memGzip( cat($index_file) ) ;
+  savefile("$index_file.gz" , $comp , 1) ;
+  
+#######
+# CAT #
+#######
+
+sub cat {
+  my ( $file ) = @_ ;
+  if (ref($file) eq 'SCALAR') { $file = ${$file} ;}
+  
+  my $fh = $file ;
+  if (ref($fh) ne 'GLOB') { open($fh,$file) ; binmode($fh) ;}
+  
+  if ( *{$fh}->{DATA} && *{$fh}->{content} ne '' ) { return( *{$fh}->{content} ) ;}
+  
+  my $data ;
+  seek($fh,0,1) if ! *{$fh}->{DATA} ;
+  1 while( read($fh, $data , 1024*8*2 , length($data) ) ) ;
+  close($fh) ;
+
+  return( $data ) ;
+}
+
+##########
+# CATDIR # (DIR , CUT_BASE , RECURSIVE , ONLY_FILES)
+##########
+
+sub catdir {
+  my ( $dir , $cut , $r , $f ) = @_ ;
+  
+  my @files ;
+  
+  my @DIR = $dir ;
+  foreach my $DIR ( @DIR ) {
+    my $DH ;
+    opendir ($DH, $DIR);
+
+    while (my $filename = readdir $DH) {
+      if ($filename ne "\." && $filename ne "\.\.") {
+        my $file = "$DIR/$filename" ;
+        if ($r && -d $file) { push(@DIR , $file) ;}
+        else {
+          if (!$f || !-d $file) {
+            $file =~ s/^\Q$dir\E\/?//s if $cut ;
+            push(@files , $file) ;
+          }
+        }
+      }
+    }
+    
+    closedir ($DH) ;
+  }
+  
+  return( @files ) ;
+}
+
+
+############
+# SAVEFILE # (FILE , DATA , OPEN|OVERWRITE , NOBINMODE|ASCII)
+############
+
+sub savefile {
+  my ( $file ) = @_ ;
+  if (ref($file) eq 'SCALAR') { $file = ${$file} ;}
+  
+  my $fh = $file ;
+  if (ref($fh) ne 'GLOB') {
+    if ( !$_[2] && -e $file ) { return( undef ) ;}
+    open($fh,">$file") ; binmode($fh) if !$_[3] ;
+  }
+  
+  print $fh $_[1] ;
+  close($fh) ;
+
+  return( 1 ) ;
+}
+
+#######
+# END #
+#######
+
+1;
+
+
+

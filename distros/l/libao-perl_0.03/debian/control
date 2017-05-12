@@ -1,0 +1,14 @@
+Source: libao-perl
+Section: interpreters
+Priority: optional
+Maintainer: Alex Shinn <foof@debian.org>
+Standards-Version: 3.1.1
+
+Package: libao-perl
+Architecture: any
+Depends: ${shlibs:Depends}, ${perl:Depends}
+Description: Perl extension for ao audio library
+ The Ao Perl module, an object-oriented interface to the libao
+ cross-platform audio library.  ao supports oss, esd, alsa, irix and
+ solaris devices, and can output to wav.  Includes a sample script for
+ playing raw PCM data.

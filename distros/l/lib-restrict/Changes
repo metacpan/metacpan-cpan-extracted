@@ -1,0 +1,18 @@
+Revision history for Perl extension lib::restrict.
+
+0.0.5  Fri Oct 20 15:00:52 2006
+	- fixed up assumption of "latest" lib
+	
+0.0.4  Tue Oct 17 10:00:50 2006
+    - Added $ENV{'lib::restrict-!-d_ok_in'} support
+
+0.0.3  Mon Oct 16 18:33:45 2006
+    - minor fixups
+
+0.0.2  Sat Oct 14 11:41:56
+    - fixed POD examples use of 'use lib' where it should have been 'use lib::restrict', doh!
+
+0.0.1  Thu Oct 12 16:48:41 2006
+	- original version; created by h2xs 1.23 with options
+		-AXc -n lib::restrict
+

@@ -1,0 +1,132 @@
+#!/usr/bin/perl
+use strict;
+use vars qw($VERSION);
+use lib './lib';
+use LEOCHARRE::Dir::Lsutils ':all';
+use LEOCHARRE::CLI2 'oputTDqrfF';
+$VERSION = sprintf "%d.%02d", q$Revision: 1.4 $ =~ /(\d+)/g;
+use Time::Format 'time_format';
+
+use File::Find::Rule;
+
+
+
+# first let's figure out what the hell the file path args are
+my @abs_paths;
+for (@ARGV){   
+   my $abs =  Cwd::abs_path($_)
+      or warn("Can't resolve '$_' to disk.\n") and next;
+
+   # is the search inside dirs arg on?
+   if ( $opt_r and -d $abs ) { #recurse on
+      my @subpaths = File::Find::Rule->in($abs);
+      push @abs_paths, @subpaths;
+   }
+      
+   push @abs_paths, $abs;
+}
+
+# only dirs?
+if ($opt_F){
+   debug("only dirs on");
+   @abs_paths = grep { -d $_ } @abs_paths;
+}
+
+# only files??
+if ($opt_f){
+   debug("only files on");
+   @abs_paths = grep { -f $_ } @abs_paths;
+}
+
+@abs_paths or die("No paths remaining or none chosen.");
+
+
+
+
+
+# ------------------------------------------------------
+
+# ok.. now do it..
+
+my ($chosen_path, $chosen_value);
+
+if ( $opt_o ){ 
+   debug("oldest on");
+   ($chosen_path, $chosen_value) = oldest(@abs_paths);
+}
+else {
+   debug("newest on");
+   ($chosen_path, $chosen_value) = newest(@abs_paths);
+}
+
+debug("chosen path: $chosen_path, value: $chosen_value");
+
+
+
+# ------------------------------------------------------
+
+# ok.. now what do we want to do with the output??
+
+my $value_output =
+   $opt_u # unix time
+   ? $chosen_value 
+   : Time::Format::time_format('yyyymmdd', $chosen_value);
+
+
+$chosen_path=~/^(.+)\/[^\/]+$/;
+my $abs_loc = $1;
+my $abs_loc_filename = $abs_loc;
+$abs_loc_filename=~s/^.+\///;
+
+
+my $path_output = $opt_T ? $abs_loc : $opt_t ? $abs_loc_filename : $chosen_path;
+
+# just output date?
+if ($opt_p){
+   printf "%s\n", $value_output;
+   exit;
+}
+
+
+# no date?
+if ($opt_D){
+   printf "%s\n", $path_output;
+   exit;
+}
+
+printf "%s %s\n", $value_output, $path_output;
+
+
+exit;
+
+sub usage {
+   qq{$0 [OPTION].. PATHS..
+
+Given PATHS, tell us which is newest.
+
+
+
+OPTIONS
+
+   -r       recurse, search inside dirs (otherwise we use paths provided)
+   -f       files only
+   -F       dirs only
+   -h       help
+   -v       version
+   
+   -o       find oldest instead
+   -p       just print time to output
+   -u       show time as unix timestamp instead of regular date
+   -t       show name of abs loc to selection
+   -T       show full path to abs loc to selection
+   -D       don't print date
+   -q       quiet
+
+USAGE EXAMPLE
+   $0 ~/* > list
+
+lsutils - parent package
+}}
+
+
+

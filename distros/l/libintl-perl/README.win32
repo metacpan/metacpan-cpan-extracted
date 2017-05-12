@@ -1,0 +1,110 @@
+When building libintl-perl under 32 bit versions of MS-DOS, you have several
+options, depending on the facilities available on your system, and on the Perl
+version you use.
+
+Cygwin Perl
+===========
+
+When using the Perl interpreter that ships with cygwin, you are in a pretty
+Unix-like environment, and you should be able to build and use libintl-perl
+like on ordinary operating system.
+
+ActiveState Perl
+================
+
+By default, the XS version of libintl-perl is not built.  You will not win
+a lot, by trying to build the XS version, but if you can't help, here are
+the instructions that worked on my system.  Your mileage may vary, however.
+
+C Compiler
+----------
+
+Windows does not ship with a C compiler.  Since ActiveState Perl is built
+with Microsoft Visual C, you probably will not have a choice, and have to
+purchase MSVC.
+
+Building libiconv and GNU gettext
+---------------------------------
+
+The XS version of libintl-perl requires the runtime facilities provided by
+GNU gettext, which in turn rely on libiconv.  You can both in source form
+from ftp://ftp.gnu.org/pub/gnu.
+
+First, unpack both the libiconv and gettext sources in a directory of your
+choice, open the MS-DOS cripple shell ("cmd.exe"), and cd into the directory
+where you have unpacked the libiconv sources.  There read the file 
+"README.woe32" or just type
+
+    nmake -f Makefile.msvc MFLAGS=-MD DLL=1 NO_NLS=1
+    nmake -f Makefile.msvc MFLAGS=-MD DLL=1 NO_NLS=1 check
+    nmake -f Makefile.msvc MFLAGS=-MD DLL=1 NO_NLS=1 install
+
+The second command line will run the test suite (you may omit this step).
+
+Now cd to the directory where you have unpacked the gettext sources, and
+read "README.woe32", or just type
+
+    nmake -f Makefile.msvc MFLAGS=-MD DLL=1
+    nmake -f Makefile.msvc MFLAGS=-MD DLL=1 check
+    nmake -f Makefile.msvc MFLAGS=-MD DLL=1 install
+    
+You should now go back into the libiconv build directory, and re-build
+the package again with native language support:
+
+    nmake -f Makefile.msvc MFLAGS=-MD DLL=1 NO_NLS=1 distclean
+    nmake -f Makefile.msvc MFLAGS=-MD DLL=1
+    nmake -f Makefile.msvc MFLAGS=-MD DLL=1 check
+    nmake -f Makefile.msvc MFLAGS=-MD DLL=1 install
+
+You should now have the gettext and libiconv DLLs installed in "\usr\bin",
+and libraries in "\usr\lib".  It should be theoretically possible to build
+static versions (instead of DLLs) of both gettext and libiconv, but I
+did not manage to do so here.
+
+Build libintl-perl
+------------------
+
+The Makefile.PL provided with libintl-perl normally autodetects the presence
+of the required gettext shared libraries, but this test (intentionally) fails
+under Windows.  You have to bypass the mechanism by saying
+
+    perl Makefile.PL DIR=gettext_xs
+    
+This should produce an output like this:
+
+    Checking whether we can compile the XS version ... no
+    => Cannot build the XS version of libintl-perl (see 'config.log' for
+    => details).  This is harmless!
+    Writing Makefile Locale::gettext_xs
+    Writing Makefile for libintl-perl
+
+Ignore the warning, that the XS version cannot be built.  It will be
+built anyhow.
+
+Now do the usual:
+
+    nmake
+    nmake test
+    nmake install
+    
+Please run the testsuite!  If it fails, and you cannot sort out the reason,
+re-build the module without the XS version.
+
+Distribution
+------------
+
+If you want a binary version of libintl-perl, you either have to bundle it
+with the DLLs and libraries for GNU gettext and libiconv, or you have to
+build and link against static versions of the two libraries (which I didn't
+manage to do).  In any case, please take care that your distribution does
+not violate the licenses under which GNU gettext, libiconv, and libintl-perl
+are provided! Please read the following statement by Bruno Haible,
+maintainer of GNU gettext and libiconv:
+
+  Note that DLLs created with MSVC 7.0 cannot be distributed: They depend
+  on a closed-source library 'msvcr70.dll' which is not normally part of a
+  Woe32 installation, therefore the distribution of such DLLs - with or
+  without msvcr70.dll - would be a violation of the LGPL. This problem does
+  not occur with MSVC 6.0 and earlier.
+
+Guido Flohr <guido.flohr@cantanea.com>

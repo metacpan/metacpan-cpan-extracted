@@ -1,0 +1,40 @@
+11/24/04
+
+INSTALLATION
+
+See INSTALL
+
+WHAT
+
+This is an LDAP shell.  I wrote it a long time ago, actually, but have
+only recently gotten around to making it release-worthy.
+
+It is composed of two parts:  Net::LDAP::Config, and ldapsh.
+
+Net::LDAP::Config is a library for simplifying and centralizing
+access to your LDAP repositories.  Instead of having every single
+script ask for your ldap server and search base, or have it hard
+coded, you can simply use this library:
+
+my $config = Net::LDAP::Config->new("default");
+
+It's got a couple other nice features, like the fact that it caches
+your LDAP UID (per host), so you should only ever have to type it in
+once.  It's pretty well documented, so 'perldoc Net::LDAP::config'
+should get you the rest of the way.
+
+ldapsh, and its corresponding library Net::LDAP::Shell, provide
+(shockingly) the shell behaviour.  When run, ldapsh drops you into a
+(very simple) interpreter.  Even given its simplicity, though, ldapsh
+is still very useful:  You can use it to walk your LDAP tree, you can
+clone existing objects (using the 'clone' command), remove objects
+(can you guess the command?), and create new objects using 'new'.  The
+'new' command, when provided one or more objectclasses, will
+automatically retrieve the required and optional attributes for those
+objectclasses, which can be a great time-saver.
+
+ELSE
+
+Feedback is greatly appreciated.
+
+luke at madstop.com

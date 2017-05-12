@@ -1,0 +1,84 @@
+{
+   "abstract" : "locate .git root at compile time and use as lib path",
+   "author" : [
+      "Victor Efimov <efimov@reg.ru>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132661",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "lib-gitroot",
+   "no_index" : {
+      "directory" : [
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::Kwalitee" : "1.12",
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Spec" : "0",
+            "Modern::Perl" : "0",
+            "lib" : "0",
+            "perl" : "5.010000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "File::Path" : "0",
+            "File::Temp" : "0.16",
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.22",
+            "Test::Spec" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "lib::gitroot" : {
+         "file" : "lib/lib/gitroot.pm",
+         "version" : "0.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/regru/lib-gitroot/issues"
+      },
+      "homepage" : "https://github.com/regru/lib-gitroot",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/regru/lib-gitroot.git",
+         "web" : "https://github.com/regru/lib-gitroot"
+      }
+   },
+   "version" : "0.004"
+}
+

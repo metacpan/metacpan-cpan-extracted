@@ -1,0 +1,96 @@
+# Russian translations for SimpleCal.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: SimpleCal\n"
+"Report-Msgid-Bugs-To: Edit the file PACAKGE to change this.\n"
+"POT-Creation-Date: 2013-01-14 18:14+0200\n"
+"PO-Revision-Date: 2003-07-28 04:21+0200\n"
+"Last-Translator: Guido Flohr <Guido.Flohr@cantanea.com>\n"
+"Language-Team: Russian <guido.flohr@cantanea.com>\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-5\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../lib/SimpleCal.pm:26
+msgid "January"
+msgstr "Января"
+
+#: ../lib/SimpleCal.pm:28
+msgid "February"
+msgstr "Февраля"
+
+#: ../lib/SimpleCal.pm:30
+msgid "March"
+msgstr "Марта"
+
+#: ../lib/SimpleCal.pm:32
+msgid "April"
+msgstr "Апреля"
+
+#: ../lib/SimpleCal.pm:34
+msgid "May"
+msgstr "Мая"
+
+#: ../lib/SimpleCal.pm:36
+msgid "June"
+msgstr "Июня"
+
+#: ../lib/SimpleCal.pm:38
+msgid "July"
+msgstr "Июля"
+
+#: ../lib/SimpleCal.pm:40
+msgid "August"
+msgstr "Августа"
+
+#: ../lib/SimpleCal.pm:42
+msgid "September"
+msgstr "Сентября"
+
+#: ../lib/SimpleCal.pm:44
+msgid "October"
+msgstr "Октября"
+
+#: ../lib/SimpleCal.pm:46
+msgid "November"
+msgstr "Ноября"
+
+#: ../lib/SimpleCal.pm:48
+msgid "December"
+msgstr "Декабря"
+
+#: ../lib/SimpleCal.pm:70
+msgid "Sun"
+msgstr "Вск"
+
+#: ../lib/SimpleCal.pm:71
+msgid "Mon"
+msgstr "Пнд"
+
+#: ../lib/SimpleCal.pm:72
+msgid "Tue"
+msgstr "Втр"
+
+#: ../lib/SimpleCal.pm:73
+msgid "Wed"
+msgstr "Срд"
+
+#: ../lib/SimpleCal.pm:74
+msgid "Thu"
+msgstr "Чтв"
+
+#: ../lib/SimpleCal.pm:75
+msgid "Fri"
+msgstr "Птн"
+
+#: ../lib/SimpleCal.pm:76
+msgid "Sat"
+msgstr "Сбт"
+
+#~ msgid "Welcome to {package}!\n"
+#~ msgstr "Добро пожаловать в {package}!\n"
+
+#~ msgid "Bye.\n"
+#~ msgstr "Пока!\n"

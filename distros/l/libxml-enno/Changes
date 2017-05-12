@@ -1,0 +1,56 @@
+Change History for libxml-enno:
+
+  Entries in this file may have module specific prefixes, e.g DOM for XML::DOM,
+  XQL for XML::XQL and CHK for XML::Checker.
+
+  See Changes.DOM, Changes.XQL and Changes.Checker for the change history prior
+  to libxml-enno.
+
+1.00 (enno)
+- This is the first version of libxml-enno. It contains
+  XML::DOM 1.26, XML::XQL 0.62 and XML::Checker 0.08.
+  See Changes.DOM, Changes.XQL and Changes.Checker for the change history prior
+  to libxml-enno.
+
+- I redid the html documentation. Lots of cross links, more info. Check it out!
+- Added XML::DOM::PerlSAX. It's a PerlSAX handler that builds DOM trees.
+- Added XML::Filter::SAXT. It's a PerlSAX handler that forwards the callbacks
+  to 2 or more PerlSAX handlers, kind of like the Unix 'tee' command.
+- Added XML::RegExp. It contains regular expressions for several XML tokens,
+  as defined in the XML spec.
+
+- DOM: XML::DOM warnings now go thru XML::DOM::warning() 
+  (which uses warn by default) 
+  You can redefine XML::DOM::warning() to change this behavior.
+  Currently, warning() is called only in one place: 
+  in XML::DOM::AttListDecl::addAttDef when multiple attribute definitions exist
+  for the same attribute.
+- DOM: I added the xql() method to XML::DOM::Node as yet another shortcut to
+  perform XQL queries on nodes. Make sure you 'use' XML::XQL and XML::XQL::DOM.
+
+- XQL: Added the '..' operator. If '.' returns the current node, '..' returns
+  the parent node. This is not standard XQL.
+- XQL: Removed $`, $' and $& from code to speed up pattern matching in general
+- XQL: The query parser used to allow bogus characters after a valid expression.
+  It now croaks when there is stuff left over.
+  (Thanks to Jack Chu <Jack_Chu@mail.bankone.com>)
+- XQL: Added links to Japanese versions of XML::XQL and XML::XQL::Tutorial
+  by Takanori Kawai (aka Hippo2000 <kawaitkn@sal.pb.nttdata.co.jp>)
+  to the XML::XQL documentation and web pages
+- XQL: The `tput ...` calls were put in a wrapper function that checks the OS
+  its running under to prevent warning messages under Windows.
+
+- CHK: XML::Checker now implements the PerlSAX Handler interface.
+- CHK: Fixed XML::Checker::Parser to use XML::Parser::Expat::specified_attr to
+  determine which attributes were specified (and which were defaulted by expat.)
+  (I was using original_string before and parsing the string myself to
+  figure out which attributes were specified, but there was a bug in my code
+  which would generate bogus error-159's.)
+  (Thanks to Jim Anderson <jander@ml.com>)
+- CHK: External DTDs with relative file paths (and without the 'file://' prefix)
+  are now located using SGML_SEARCH_PATH.
+  See XML::Checker::Parser pod for details.
+  (Thanks to Stephane Bortzmeyer <bortzmeyer@pasteur.fr>)
+- CHK: XML::Checker::DOM is now obsolete. I moved the functionality to XML::DOM.
+- CHK: The error descriptions in the XML::Checker manual page now have links to
+  the appropriate sections and Validity Constraints in the XML spec.

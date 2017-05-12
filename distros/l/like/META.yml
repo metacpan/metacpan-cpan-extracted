@@ -1,0 +1,22 @@
+---
+name: like
+version: 0.02
+author:
+  - 'Andy Armstrong <andy@hexten.net>'
+abstract: Declare support for an interface
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=like
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/AndyA/like.git
+requires:
+  Test::More: 0
+  latest: 0.02
+provides:
+  like:
+    file: lib/like.pm
+    version: 0.02
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

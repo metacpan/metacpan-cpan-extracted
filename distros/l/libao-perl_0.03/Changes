@@ -1,0 +1,11 @@
+Revision history for Perl extension Ao.
+
+0.03  Tue Jan 23 00:04:32 EST 2001
+        - removed hard coded ao/ao.h.
+
+0.02  Sun Oct 22 12:22:00 2000
+        - works :)
+
+0.01  Sat Oct 21 15:16:12 2000
+	- original version; created by h2xs 1.19
+

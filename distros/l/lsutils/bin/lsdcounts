@@ -1,0 +1,66 @@
+#!/usr/bin/perl
+use strict;
+use LEOCHARRE::CLI2 ':all';
+use LEOCHARRE::Dir 'lsda';
+our $VERSION = sprintf "%d.%02d", q$Revision: 1.5 $ =~ /(\d+)/g;
+
+@ARGV or push @ARGV, '.';
+for (@ARGV){
+   -d $_ or warn "not dir: $_, skipped\n" and next;
+
+   my @subd = lsda($_);
+   
+   for (@subd){
+      system('lscount', sq($_) );
+   }
+}
+
+
+sub usage { q{lsdcounts [OPTIONS].. PATH..
+Count entries in subdirectories of PATH.
+
+   -h       help
+   -d       debug
+   -v       version
+
+Try 'man lsdcounts' for more info.
+}}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+lsdcounts - count entries in subdirectories of a path
+
+=head1 USAGE
+
+   -h       help
+   -d       debug
+   -v       version
+
+=head2 EXAMPLE USAGE
+
+   lsdcounts ./pathtodir
+   lsdcounts
+
+=head1 SEE ALSO
+
+lsutils - parent package
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+
+=cut

@@ -1,0 +1,5 @@
+The FAQ has been podified, see "perldoc Locale::libintlFAQ".  If you
+haven't installed libintl-perl and read this file in the source distribution,
+either try "perldoc lib/Locale/libintlFAQ.pod", or point your favorite
+web browser to 
+http://search.cpan.org/~guido/libintl-perl/lib/Locale/libintlFAQ.pod.

@@ -1,0 +1,64 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 a5b18baef2b88946f753071b189ee1f43aa6d79e Changes
+SHA1 d27d3b83dce11a77748ea6865c21c43e62619f90 INSTALL
+SHA1 05207cbc5971035849c1de2c7cb3babaeaccb6fb LICENSE
+SHA1 38e01b2a8f4b962477224b5f65776b0cc4a33e27 MANIFEST
+SHA1 4c6c0d51e3a1bbeb6301dcc1342d722eb87e0b52 META.json
+SHA1 e94622661c7043ae8281f9c23b86c7ed9b84d0de META.yml
+SHA1 8e28952325c7ddf3e0aa7ecf568638c95e2c15a4 Makefile.PL
+SHA1 b4d5c83a09a6738d5cf9e603d65902ffbfe098c9 README
+SHA1 16ff1e9556af3886fc93cb7c9b4be6c2f1829172 cpanfile
+SHA1 ba5a4bd1057190b6e23ecf2ea9234825e1a6c148 dist.ini
+SHA1 621a4a4da02df83ebc9a5e12cdfd62ef9d5693c6 lib/lib/if/dev.pm
+SHA1 0b1a72bfaa0524af9067e86295cb06db83e1dbbe t/00-compile.t
+SHA1 bc98eb9a77cc2f21380dbbf38626f44009b1d749 t/000-report-versions-tiny.t
+SHA1 6d117cd9a20bfc77a23c94a40a96b331456734bf t/author-pod-spell.t
+SHA1 d77deabc33f9864b1a620a275ae2c69e98ffb23c t/basic.t
+SHA1 9673c4d87f1c3cfd704e7d8a8ebcd6e820c2a09e t/build/Build.PL
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/build/lib/.keep
+SHA1 6714b7e7abfbb5573e17f3b4a2bbdfd249b1c84a t/build/test.pl
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/dist/dist.ini
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/dist/lib/.keep
+SHA1 6714b7e7abfbb5573e17f3b4a2bbdfd249b1c84a t/dist/test.pl
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/justdistini/dist.ini
+SHA1 6714b7e7abfbb5573e17f3b4a2bbdfd249b1c84a t/justdistini/test.pl
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/justlib/lib/.keep
+SHA1 6714b7e7abfbb5573e17f3b4a2bbdfd249b1c84a t/justlib/test.pl
+SHA1 9673c4d87f1c3cfd704e7d8a8ebcd6e820c2a09e t/makefile/Makefile.PL
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/makefile/lib/.keep
+SHA1 6714b7e7abfbb5573e17f3b4a2bbdfd249b1c84a t/makefile/test.pl
+SHA1 6714b7e7abfbb5573e17f3b4a2bbdfd249b1c84a t/none/test.pl
+SHA1 9c3627ff37f4fd5bddc34bf46cf3359eaf76a060 t/release-consistent-version.t
+SHA1 a032c41ef6887fab1b900669c2d304fab46680e2 t/release-eol.t
+SHA1 6273a18b5a53fd546202209478f61972b29fab89 t/release-has-version.t
+SHA1 0b99a1e44e21aaefcab155e8f2b4b5b723ab01fc t/release-no-smart-comments.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+SHA1 89c8573f915f90caaf8e5538d286f980062b57d0 t/release-pod-coverage.t
+SHA1 4a6bfb023e479f7f1423c059d776a45048a64871 t/release-pod-linkcheck.t
+SHA1 ab43e51ab7ed889e928279d51590ddc01c473f84 t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQEcBAEBAgAGBQJRKkDpAAoJEOd5N1CvIgQk79MH/2wZ112+pUVgYD/gzjvLZh8o
+hys3iNsPFCplJfJFJYwAPQpp9WXO490mpdmW+ibrzr3Ms/YTc2BwR7Zmqp8DwMBu
+B8AQzTqOdGBMYFAYtkwOUrKT8F2VrMEzYjTOoAIUxXNfXmCZqzfPUyeRwMNU8Ody
+rj9jbs3ZoT0IScP1bHXMHDlzb2uqZUS+m63nSJ4NKqjbJtYqbEFaCeRXXU9Or8xO
+6PLuuK81bHQLjn1oOU1+Petj+Mm2s44WreNRbTaxIpDeiommievn9uiGIWVKt4Ta
+fjiD5rZjtEg7yyJS5Oe7wR5M9rVdCOoDbR4gNDGGKTGgpemhh3iwKC9KKv5RkdA=
+=c3lP
+-----END PGP SIGNATURE-----

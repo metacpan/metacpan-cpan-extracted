@@ -1,0 +1,113 @@
+<TMPL_INCLUDE name="javascript.html.template">
+
+<h1 id="title">Service Endpoints</h1>
+<h2 id="subtitle"></h2>
+
+<div id="instructions">
+
+<div id="position">
+        Instructions &nbsp; &nbsp; &nbsp;
+        Authority Identity &nbsp; &nbsp; &nbsp;
+        Services and Namespaces &nbsp; &nbsp; &nbsp;
+        <span id="bolden">Service Endpoints</span> &nbsp; &nbsp; &nbsp;
+        View Code
+</div>
+
+</div>
+
+
+<p id="description"> 
+Donec euismod. Etiam facilisis. Suspendisse at nunc ac eros posuere pretium. Sed tempor. Nunc eget metus in dui iaculis luctus. Nunc velit. Suspendisse imperdiet, lacus non aliquam condimentum, arcu felis vestibulum purus, non ultrices magna lacus vitae dolor. Aliquam id massa ut elit pellentesque tincidunt. Donec suscipit, ligula in sagittis viverra, dolor eros condimentum est, eu lacinia lectus felis quis eros. Phasellus ac diam a metus ornare suscipit. Quisque mattis accumsan elit. Sed faucibus volutpat nisl.
+</p>
+
+<div class="">
+
+<h3> Current Service Endpoints </h3>
+
+
+<div id="ports">
+	<TMPL_VAR name="portList">
+</div>
+
+<h4> Create a new endpoint </h4>
+
+<table class="configtable" style="padding-left: 12px; margin-left: 12px;">
+<tr>
+<td> Name </td> 
+<td> <TMPL_VAR name="portName"> </td>
+<td> (<span class="options">REQUIRED</span>) </td>
+</tr>
+
+<tr>
+<td> &nbsp; </td>
+<td colspan="2"> [ Name comment ] </td>
+</tr>
+
+<tr>
+<td colspan="3"> &nbsp; </td>
+</tr>
+
+<tr>
+<td>Type </td>
+<td> <TMPL_VAR name="portType"> </td>
+<td> (<span class="options">REQUIRED</span>) </td>
+</tr>
+
+<tr>
+<td> &nbsp; </td>
+<td colspan="2">[ Port type ]</td>
+</p>
+</tr>
+
+<tr>
+<td colspan="3"> &nbsp; </td>
+</tr>
+
+<tr>
+<td colspan="2">Which protocol will this endpoint use?  &nbsp; &nbsp; <TMPL_VAR name="portProtocol"></td>
+<td> (<span class="options">REQUIRED</span>) </td>
+</tr>
+
+<tr>
+<td> &nbsp; </td>
+<td colspan="2"> [ Protocol comment ] </td>
+</tr>
+
+<tr>
+<td colspan="3"> &nbsp; </td>
+</tr>
+
+<tr>
+<td> Location </td> 
+<td> <TMPL_VAR name="portLocation"> </td>
+<td> (<span class="options">REQUIRED</span>) </td>
+</tr>
+
+
+<tr>
+<td> &nbsp; </td>
+<td colspan="2"> [ Location comment ] </td>
+</tr>
+
+<tr>
+<td colspan="3"> &nbsp; </td>
+</tr>
+
+</table>
+
+
+
+<div class="controls">
+<TMPL_VAR name="addPort"> &nbsp; <TMPL_VAR name="removePort">
+</div>
+
+<br/>
+<br/>
+
+<div class="controls">
+<TMPL_VAR name="submit">
+</div>
+
+
+</div>
+

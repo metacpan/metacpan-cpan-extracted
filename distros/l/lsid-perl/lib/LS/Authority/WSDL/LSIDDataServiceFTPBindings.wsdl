@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!-- 
+LSID FTP Binding Standard for the LSIDDataServicePortType 
+and the LSIDMetadataServicePortType 
+
+Jordi Albornoz and Ben Szekely
+13 November 2003 - Initial Draft
+-->
+<definitions xmlns:tns="http://www.omg.org/LSID/2003/DataServiceFTPBindings"
+		targetNamespace="http://www.omg.org/LSID/2003/DataServiceFTPBindings"
+		xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+		xmlns="http://schemas.xmlsoap.org/wsdl/"
+		xmlns:ftp="http://www.ibm.com/wsdl/ftp/"
+		xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+		xmlns:sns="http://www.omg.org/LSID/2003/Standard/WSDL">
+
+	<import namespace="http://www.omg.org/LSID/2003/Standard/WSDL" location="LSIDPortTypes.wsdl" />
+
+	<binding name="LSIDDataFTPBinding" type="sns:LSIDDataServicePortType">
+		<ftp:binding />
+		<operation name="getData">
+			<ftp:operation />
+			<input />
+			<output>
+				<ftp:get part="data-attachment" />
+			</output>
+		</operation>
+		<operation name="getDataByRange">
+			<ftp:operation />
+			<input />
+			<output>
+				<ftp:get part="data-attachment" />
+			</output>
+		</operation>
+	</binding>
+
+	<binding name="LSIDMetadataFTPBinding" type="sns:LSIDMetadataServicePortType">
+		<ftp:binding />
+		<operation name="getMetadata">
+			<ftp:operation />
+			<input />
+			<output>
+				<ftp:get part="metadata-attachment" />
+			</output>
+		</operation>
+	</binding>
+		
+</definitions>
+

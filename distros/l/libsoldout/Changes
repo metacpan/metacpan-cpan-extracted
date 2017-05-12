@@ -1,0 +1,8 @@
+Revision history for Perl extension libsoldout.
+
+0.01  Wed Jul 25 12:16:34 2012
+	- original version; created by h2xs 1.23 with options
+		-A -n libsoldout
+
+0.02  Wed Jul 25 13:00:00 2012
+	- second version generated for perl 5.10 and upper

@@ -1,0 +1,17 @@
+
+<div style="width: 400px;">
+<h1 id="title">LSID Metadata</h1>
+<p id="description">
+This following is the metadata for the specified LSID:
+</p>
+<center>
+<TMPL_VAR name="submit">
+</center>
+</div>
+<br/>
+<br/>
+
+<div id="graphArea">
+<TMPL_VAR name="render">
+</div>
+

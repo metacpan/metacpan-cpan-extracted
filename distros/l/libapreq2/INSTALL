@@ -1,0 +1,68 @@
+PREREQUISITES:
+
+Please see the PREREQUISITES file.  If you are building httpd-apreq-2 
+directly from svn, you can generate the list of prerequisites:
+
+            % perl build/version_check.pl
+
+
+INSTRUCTIONS:
+
+FreeBSD/Solaris users must substitute "gmake" for "make" below.
+
+Unix build, where libtool/automake/autoconf works:
+
+            % ./configure --with-apache2-apxs=/path/to/apache2/bin/apxs
+            % make
+  (optional)% make test
+            % make install
+  (optional)% make docs_install
+
+Or using the CPAN/perlish way (which includes the Apache2::Request and
+Apache2::Cookie modules):
+
+            % perl Makefile.PL --with-apache2-apxs=/path/to/apache2/bin/apxs
+            % make
+  (optional)% make test
+            % make install
+  (optional)% make docs_install
+
+Developers and other folks using httpd-apreq-2 directly from svn need to
+execute "./buildconf" prior to running "./configure".
+
+
+Win32 build:
+  C:\httpd-apreq-2> perl Makefile.PL
+  C:\httpd-apreq-2> nmake
+  C:\httpd-apreq-2> nmake test
+  C:\httpd-apreq-2> nmake docs
+  C:\httpd-apreq-2> nmake install
+
+SVN (Subversion) ACCESS
+
+Development of httpd-apreq-2 can be followed through the svn repository:
+
+  $ svn checkout http://svn.apache.org/repos/asf/httpd/apreq/trunk/ httpd-apreq-2
+
+Developers with commit access must use the https protocol instead;
+note that, if you are compiling svn from sources, you must
+supply the configure script with the appropriate switch to
+enable ssl.
+
+Subversion sources, and binaries for some platforms, may be obtained
+through the home page:
+
+     http://subversion.tigris.org/
+
+Documentation on using svn is available at
+
+     http://svnbook.red-bean.com/
+
+In particular,
+
+     http://svnbook.red-bean.com/en/1.0/apa.html
+
+contains a guide for users familiar with cvs.
+
+
+

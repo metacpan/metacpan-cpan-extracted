@@ -1,0 +1,65 @@
+lib::byversion
+
+So you have >1 Perl Installs. You have >1 Perl installs right? And you
+switch between running them how?
+
+Let me guess, somewhere you have code that sets a different value for
+PERL5LIB depending on what Perl you're using. Oh you use "perlbrew"?
+<http://grep.cpan.me/?q=PERL5LIB+dist=App-perlbrew>
+
+This is a slightly different approach:
+
+1. Set up your user-land PERL5LIB directories in a regular pattern
+differing only by "perl" version
+        $HOME/Foo/Bar/5.16.0/lib/...
+        $HOME/Foo/Bar/5.16.1/lib/...
+        $HOME/Foo/Bar/5.16.2/lib/...
+
+2. Set the following in your %ENV
+        PERL5OPT="-Mlib::byversion='$HOME/Foo/Bar/%V/lib/...'"
+
+3. Done!
+    The right PERL5LIB gets loaded based on which "perl" you use.
+
+Yes, yes, catch 22, "lib::byversion" and its dependencies need to be in
+your lib to start with.
+
+O.k. That is a problem, slightly. But assuming you can get that in each
+"perl" install somehow, you can load each "perl"'s user library
+directories magically with this module once its loaded.
+
+And "assuming you can get that in each "perl" install somehow" =~ with a
+bit of luck, this feature or something like it might just be added to
+Perl itself, as this is just a prototype idea to prove it works ( or as
+the case may be, not ).
+
+And even if that never happens, and you like this module, you can still
+install this module into all your "perl"'s and keep a separate
+"user-PERL5LIB-per-perl" without having to use lots of scripts to hold
+it together, and for System Perls, you may even be fortunate enough to
+get this module shipped by your "OS" of choice. Wouldn't that be dandy.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric
+<kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

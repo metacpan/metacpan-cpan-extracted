@@ -1,0 +1,242 @@
+2001-11-04 22:52   Brian Moseley <bcm@maz.org>
+
+	* MANIFEST, MANIFEST.SKIP: sync
+
+2001-11-04 22:51   Brian Moseley <bcm@maz.org>
+
+	* doc/dtd/web-app_2_3.dtd: add Web Application 2.3 DTD
+
+2001-11-04 19:24   Brian Moseley <bcm@maz.org>
+
+	* bundle/ChangeLog: sync
+
+2001-11-04 19:23   Brian Moseley <bcm@maz.org>
+
+	* bundle/libservlet.pm: add IO::Handle dependency and bump version
+	number
+
+2001-11-04 19:18   Brian Moseley <bcm@maz.org>
+
+	* bundle/MANIFEST.SKIP: sync
+
+2001-11-04 19:05   Brian Moseley <bcm@maz.org>
+
+	* ChangeLog, MANIFEST: sync
+
+2001-11-04 19:03   Brian Moseley <bcm@maz.org>
+
+	* ChangeLog, lib/ChangeLog, t/ChangeLog: use toplevel ChangeLog
+	after all, so lib/ChangeLog doesn't get installed as a module
+
+2001-11-04 18:56   Brian Moseley <bcm@maz.org>
+
+	* CHANGES, ChangeLog, lib/ChangeLog, t/ChangeLog: put code changes
+	into ChangeLog files in code-containing subdirectories.  put
+	summary of changes between versions in toplevel CHANGES file.
+
+2001-11-04 18:55   Brian Moseley <bcm@maz.org>
+
+	* doc/api/Servlet/Util/Principal.html: sync
+
+2001-11-04 18:53   Brian Moseley <bcm@maz.org>
+
+	* doc/index.html: bump version number
+
+2001-11-04 18:52   Brian Moseley <bcm@maz.org>
+
+	* MANIFEST, bundle/ChangeLog: sync
+
+2001-07-13 17:10   Brian Moseley <bcm@maz.org>
+
+	* doc/index.html: sync to new sourceforge location
+
+2001-07-13 16:15   Brian Moseley <bcm@maz.org>
+
+	* ChangeLog, lib/Servlet/Util/Principal.pm,
+	t/Servlet/Test/InputHandle.pm, t/Servlet/Test/OutputHandle.pm:
+	Initial revision
+
+2001-07-13 16:15   Brian Moseley <bcm@maz.org>
+
+	* MANIFEST, ChangeLog, Makefile.PL, README, doc/TODO.html,
+	doc/conversion_details.html, doc/api/Servlet/ServletContext.html,
+	doc/api/Servlet/ServletRequest.html,
+	doc/api/Servlet/ServletResponse.html,
+	doc/api/Servlet/Http/HttpServlet.html, lib/Servlet.pm,
+	lib/Servlet/GenericServlet.pm, lib/Servlet/ServletContext.pm,
+	lib/Servlet/ServletException.pm, lib/Servlet/ServletRequest.pm,
+	lib/Servlet/ServletRequestWrapper.pm,
+	lib/Servlet/ServletResponse.pm,
+	lib/Servlet/ServletResponseWrapper.pm,
+	lib/Servlet/UnavailableException.pm,
+	lib/Servlet/Http/HttpServlet.pm, lib/Servlet/Util/Exception.pm,
+	lib/Servlet/Util/Principal.pm, t/core_request_wrapper.t,
+	t/core_response_wrapper.t, t/http_servlet.t,
+	t/Servlet/Test/InputHandle.pm, t/Servlet/Test/OutputHandle.pm,
+	t/Servlet/Test/Request.pm, t/Servlet/Test/Response.pm: import 0.9.2
+	dev work
+
+2001-07-13 15:28   Brian Moseley <bcm@maz.org>
+
+	* .cvsignore, MANIFEST, MANIFEST.SKIP, Makefile.PL, NEWS, README,
+	TODO, bundle/.cvsignore, bundle/ChangeLog, bundle/MANIFEST,
+	bundle/MANIFEST.SKIP, bundle/Makefile.PL, bundle/README,
+	bundle/libservlet.pm, doc/.cvsignore, doc/TODO.html,
+	doc/conversion_details.html, doc/index.html, doc/libservlet.css,
+	doc/writing_applications.html, doc/api/Servlet.html,
+	doc/api/Servlet/Config.html, doc/api/Servlet/Filter.html,
+	doc/api/Servlet/FilterChain.html,
+	doc/api/Servlet/FilterConfig.html,
+	doc/api/Servlet/GenericServlet.html,
+	doc/api/Servlet/RequestDispatcher.html,
+	doc/api/Servlet/Servlet.html, doc/api/Servlet/ServletConfig.html,
+	doc/api/Servlet/ServletContext.html,
+	doc/api/Servlet/ServletContextAttributeEvent.html,
+	doc/api/Servlet/ServletContextAttributeListener.html,
+	doc/api/Servlet/ServletContextEvent.html,
+	doc/api/Servlet/ServletContextListener.html,
+	doc/api/Servlet/ServletException.html,
+	doc/api/Servlet/ServletInputStream.html,
+	doc/api/Servlet/ServletOutputStream.html,
+	doc/api/Servlet/ServletRequest.html,
+	doc/api/Servlet/ServletRequestWrapper.html,
+	doc/api/Servlet/ServletResponse.html,
+	doc/api/Servlet/ServletResponseWrapper.html,
+	doc/api/Servlet/SingleThreadModel.html,
+	doc/api/Servlet/UnavailableException.html,
+	doc/api/Servlet/Http/Cookie.html,
+	doc/api/Servlet/Http/HttpServlet.html,
+	doc/api/Servlet/Http/HttpServletRequest.html,
+	doc/api/Servlet/Http/HttpServletRequestWrapper.html,
+	doc/api/Servlet/Http/HttpServletResponse.html,
+	doc/api/Servlet/Http/HttpServletResponseWrapper.html,
+	doc/api/Servlet/Http/HttpSession.html,
+	doc/api/Servlet/Http/HttpSessionActivationListener.html,
+	doc/api/Servlet/Http/HttpSessionAttributesListener.html,
+	doc/api/Servlet/Http/HttpSessionBindingEvent.html,
+	doc/api/Servlet/Http/HttpSessionBindingListener.html,
+	doc/api/Servlet/Http/HttpSessionEvent.html,
+	doc/api/Servlet/Http/HttpSessionListener.html,
+	doc/api/Servlet/Util/Event.html,
+	doc/api/Servlet/Util/Exception.html, lib/Servlet.pm,
+	lib/Servlet/Config.pm, lib/Servlet/Filter.pm,
+	lib/Servlet/FilterChain.pm, lib/Servlet/FilterConfig.pm,
+	lib/Servlet/GenericServlet.pm, lib/Servlet/RequestDispatcher.pm,
+	lib/Servlet/Servlet.pm, lib/Servlet/ServletConfig.pm,
+	lib/Servlet/ServletContext.pm,
+	lib/Servlet/ServletContextAttributeEvent.pm,
+	lib/Servlet/ServletContextAttributeListener.pm,
+	lib/Servlet/ServletContextEvent.pm,
+	lib/Servlet/ServletContextListener.pm,
+	lib/Servlet/ServletException.pm, lib/Servlet/ServletInputStream.pm,
+	lib/Servlet/ServletOutputStream.pm, lib/Servlet/ServletRequest.pm,
+	lib/Servlet/ServletRequestWrapper.pm,
+	lib/Servlet/ServletResponse.pm,
+	lib/Servlet/ServletResponseWrapper.pm,
+	lib/Servlet/SingleThreadModel.pm,
+	lib/Servlet/UnavailableException.pm, lib/Servlet/Http/Cookie.pm,
+	lib/Servlet/Http/HttpServlet.pm,
+	lib/Servlet/Http/HttpServletRequest.pm,
+	lib/Servlet/Http/HttpServletRequestWrapper.pm,
+	lib/Servlet/Http/HttpServletResponse.pm,
+	lib/Servlet/Http/HttpServletResponseWrapper.pm,
+	lib/Servlet/Http/HttpSession.pm,
+	lib/Servlet/Http/HttpSessionActivationListener.pm,
+	lib/Servlet/Http/HttpSessionAttributesListener.pm,
+	lib/Servlet/Http/HttpSessionBindingEvent.pm,
+	lib/Servlet/Http/HttpSessionBindingListener.pm,
+	lib/Servlet/Http/HttpSessionEvent.pm,
+	lib/Servlet/Http/HttpSessionListener.pm, lib/Servlet/Util/Event.pm,
+	lib/Servlet/Util/Exception.pm, t/core_event.t, t/core_exception.t,
+	t/core_request_wrapper.t, t/core_response_wrapper.t,
+	t/core_servlet.t, t/http_cookie.t, t/http_event.t,
+	t/http_request_wrapper.t, t/http_response_wrapper.t,
+	t/http_servlet.t, t/Servlet/Test/Context.pm,
+	t/Servlet/Test/Dummy.pm, t/Servlet/Test/HttpRequest.pm,
+	t/Servlet/Test/HttpResponse.pm, t/Servlet/Test/InputStream.pm,
+	t/Servlet/Test/OutputStream.pm, t/Servlet/Test/Request.pm,
+	t/Servlet/Test/Response.pm, t/Servlet/Test/ServletConfig.pm:
+	Initial revision
+
+2001-07-13 15:28   Brian Moseley <bcm@maz.org>
+
+	* .cvsignore, MANIFEST, MANIFEST.SKIP, Makefile.PL, NEWS, README,
+	TODO, bundle/.cvsignore, bundle/ChangeLog, bundle/MANIFEST,
+	bundle/MANIFEST.SKIP, bundle/Makefile.PL, bundle/README,
+	bundle/libservlet.pm, doc/.cvsignore, doc/TODO.html,
+	doc/conversion_details.html, doc/index.html, doc/libservlet.css,
+	doc/writing_applications.html, doc/api/Servlet.html,
+	doc/api/Servlet/Config.html, doc/api/Servlet/Filter.html,
+	doc/api/Servlet/FilterChain.html,
+	doc/api/Servlet/FilterConfig.html,
+	doc/api/Servlet/GenericServlet.html,
+	doc/api/Servlet/RequestDispatcher.html,
+	doc/api/Servlet/Servlet.html, doc/api/Servlet/ServletConfig.html,
+	doc/api/Servlet/ServletContext.html,
+	doc/api/Servlet/ServletContextAttributeEvent.html,
+	doc/api/Servlet/ServletContextAttributeListener.html,
+	doc/api/Servlet/ServletContextEvent.html,
+	doc/api/Servlet/ServletContextListener.html,
+	doc/api/Servlet/ServletException.html,
+	doc/api/Servlet/ServletInputStream.html,
+	doc/api/Servlet/ServletOutputStream.html,
+	doc/api/Servlet/ServletRequest.html,
+	doc/api/Servlet/ServletRequestWrapper.html,
+	doc/api/Servlet/ServletResponse.html,
+	doc/api/Servlet/ServletResponseWrapper.html,
+	doc/api/Servlet/SingleThreadModel.html,
+	doc/api/Servlet/UnavailableException.html,
+	doc/api/Servlet/Http/Cookie.html,
+	doc/api/Servlet/Http/HttpServlet.html,
+	doc/api/Servlet/Http/HttpServletRequest.html,
+	doc/api/Servlet/Http/HttpServletRequestWrapper.html,
+	doc/api/Servlet/Http/HttpServletResponse.html,
+	doc/api/Servlet/Http/HttpServletResponseWrapper.html,
+	doc/api/Servlet/Http/HttpSession.html,
+	doc/api/Servlet/Http/HttpSessionActivationListener.html,
+	doc/api/Servlet/Http/HttpSessionAttributesListener.html,
+	doc/api/Servlet/Http/HttpSessionBindingEvent.html,
+	doc/api/Servlet/Http/HttpSessionBindingListener.html,
+	doc/api/Servlet/Http/HttpSessionEvent.html,
+	doc/api/Servlet/Http/HttpSessionListener.html,
+	doc/api/Servlet/Util/Event.html,
+	doc/api/Servlet/Util/Exception.html, lib/Servlet.pm,
+	lib/Servlet/Config.pm, lib/Servlet/Filter.pm,
+	lib/Servlet/FilterChain.pm, lib/Servlet/FilterConfig.pm,
+	lib/Servlet/GenericServlet.pm, lib/Servlet/RequestDispatcher.pm,
+	lib/Servlet/Servlet.pm, lib/Servlet/ServletConfig.pm,
+	lib/Servlet/ServletContext.pm,
+	lib/Servlet/ServletContextAttributeEvent.pm,
+	lib/Servlet/ServletContextAttributeListener.pm,
+	lib/Servlet/ServletContextEvent.pm,
+	lib/Servlet/ServletContextListener.pm,
+	lib/Servlet/ServletException.pm, lib/Servlet/ServletInputStream.pm,
+	lib/Servlet/ServletOutputStream.pm, lib/Servlet/ServletRequest.pm,
+	lib/Servlet/ServletRequestWrapper.pm,
+	lib/Servlet/ServletResponse.pm,
+	lib/Servlet/ServletResponseWrapper.pm,
+	lib/Servlet/SingleThreadModel.pm,
+	lib/Servlet/UnavailableException.pm, lib/Servlet/Http/Cookie.pm,
+	lib/Servlet/Http/HttpServlet.pm,
+	lib/Servlet/Http/HttpServletRequest.pm,
+	lib/Servlet/Http/HttpServletRequestWrapper.pm,
+	lib/Servlet/Http/HttpServletResponse.pm,
+	lib/Servlet/Http/HttpServletResponseWrapper.pm,
+	lib/Servlet/Http/HttpSession.pm,
+	lib/Servlet/Http/HttpSessionActivationListener.pm,
+	lib/Servlet/Http/HttpSessionAttributesListener.pm,
+	lib/Servlet/Http/HttpSessionBindingEvent.pm,
+	lib/Servlet/Http/HttpSessionBindingListener.pm,
+	lib/Servlet/Http/HttpSessionEvent.pm,
+	lib/Servlet/Http/HttpSessionListener.pm, lib/Servlet/Util/Event.pm,
+	lib/Servlet/Util/Exception.pm, t/core_event.t, t/core_exception.t,
+	t/core_request_wrapper.t, t/core_response_wrapper.t,
+	t/core_servlet.t, t/http_cookie.t, t/http_event.t,
+	t/http_request_wrapper.t, t/http_response_wrapper.t,
+	t/http_servlet.t, t/Servlet/Test/Context.pm,
+	t/Servlet/Test/Dummy.pm, t/Servlet/Test/HttpRequest.pm,
+	t/Servlet/Test/HttpResponse.pm, t/Servlet/Test/InputStream.pm,
+	t/Servlet/Test/OutputStream.pm, t/Servlet/Test/Request.pm,
+	t/Servlet/Test/Response.pm, t/Servlet/Test/ServletConfig.pm:
+	imported libservlet 0.9.1
+

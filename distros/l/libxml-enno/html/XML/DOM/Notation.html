@@ -1,0 +1,45 @@
+<HTML><HEAD><TITLE>XML::DOM::Notation - An XML NOTATION in XML::DOM</TITLE></HEAD><BODY><H1><A NAME="NAME">NAME
+
+</A></H1><P>XML::DOM::Notation - An XML NOTATION in XML::DOM
+
+<P><HR><H1><A NAME="DESCRIPTION">DESCRIPTION
+
+</A></H1><P>XML::DOM::Notation extends <A HREF="Node.html">XML::DOM::Node</A>.
+
+<P>This node represents a Notation, e.g.
+
+<PRE> &lt;!NOTATION gs SYSTEM "GhostScript"&gt;
+
+</PRE><PRE> &lt;!NOTATION name PUBLIC "pubId"&gt;
+
+</PRE><PRE> &lt;!NOTATION name PUBLIC "pubId" "sysId"&gt;
+
+</PRE><PRE> &lt;!NOTATION name SYSTEM "sysId"&gt;
+
+</PRE><H2><A NAME="METHODS">METHODS
+
+</A></H2><DL><DT><A NAME="getName_and_setName_name_"><STRONG><P>getName and setName (name)
+
+</STRONG></A><DD>Returns (or sets) the Notation name, which is the first token after the 
+NOTATION keyword.
+
+<DT><A NAME="getSysId_and_setSysId_sysId_"><STRONG><P>getSysId and setSysId (sysId)
+
+</STRONG></A><DD>Returns (or sets) the system ID, which is the token after the optional
+SYSTEM keyword.
+
+<DT><A NAME="getPubId_and_setPubId_pubId_"><STRONG><P>getPubId and setPubId (pubId)
+
+</STRONG></A><DD>Returns (or sets) the public ID, which is the token after the optional
+PUBLIC keyword.
+
+<DT><A NAME="getBase_"><STRONG><P>getBase
+
+</STRONG></A><DD>This is passed by XML::Parser in the Notation handler. 
+I don't know what it is yet.
+
+<DT><A NAME="getNodeName_"><STRONG><P>getNodeName
+
+</STRONG></A><DD>Returns the same as getName.
+
+</DL><P><HR><I><FONT SIZE="-1">Last updated: Fri Oct 22 18:47:30 1999</FONT></I></BODY></HTML>

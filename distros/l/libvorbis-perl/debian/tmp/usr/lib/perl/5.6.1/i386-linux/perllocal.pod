@@ -1,0 +1,22 @@
+=head2 Thu Apr 25 11:57:54 2002: C<Module> L<Ogg::Vorbis|Ogg::Vorbis>
+
+=over 4
+
+=item *
+
+C<installed into: /home/foof/src/projects/libvorbis-perl-0.04/debian/tmp/usr/lib/perl/5.6.1/>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.04>
+
+=item *
+
+C<EXE_FILES: pogg>
+
+=back
+

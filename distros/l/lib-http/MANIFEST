@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/lib/http.pm
+libhttp-perl/lib.pl
+libhttp-perl/libhttp-perl.pl
+libhttp-perl/libhttp.conf
+libhttp-perl/libzip.skip
+libhttp-perl/main.pl
+libhttp-perl/myMakefile.PL
+script/libhttp
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

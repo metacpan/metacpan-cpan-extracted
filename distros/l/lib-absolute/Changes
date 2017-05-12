@@ -1,0 +1,53 @@
+==================================================
+Changes from 1738-09-21 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.004 at 2012-07-05 11:51:56 +0000
+------------------------------------------
+
+  Change: b967115f405c5a5da771af6dc080f18eeb6f749b
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-07-05 07:51:45 +0000
+
+    Switched to dzil pluginbundle Author::GETTY 
+
+  Change: ba0fa74514b6ad0cc89adc263686d0e9b046bc77
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-07-04 17:19:17 +0000
+
+    Forgot to remove double ChangelogFromGit in dist.ini 
+
+  Change: d8ce130dae1964d3619247e8d59a2dc8eadf00d8
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-07-04 17:18:34 +0000
+
+    Note to myself: update your Author Pluginbundle..... 
+
+  Change: 160300c1963875eda10881933ff80f41fcb20127
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-07-04 17:16:42 +0000
+
+    Added ChangelogFromGit on dist.ini 
+
+  Change: d57ae51243b64a9e96d9413ee87ae7dd8c7ce8a1
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-07-04 17:15:12 +0000
+
+    Added .gitignore 
+
+  Change: f68729f8b9815a34ac63e2cc5792c148a52aecac
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-07-04 17:13:54 +0000
+
+    Added documentation 
+
+  Change: 57818a92218fc7e770fd3ec9f68f884652862559
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2012-07-04 17:07:22 +0000
+
+    First release, tests, documentation still missing 
+
+================
+End of releases.
+================

@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<!-- 
+LSID Standard PortTypes Library
+
+This is a WSDL file that defines a set of interfaces designed to
+be used and implemented as appropriate by LSID Resolution Services
+and LSID data retrieval services.
+
+Jordi Albornoz
+16 October 2003 - Initial Draft
+17 October 2003 - Added LSIDMetadataSubsetServicePortType, removed getAuthorityVersion
+24 October 2003 - Minor cosmetic changes
+-->
+
+<definitions xmlns:tns="http://www.omg.org/LSID/2003/Standard/WSDL"
+		targetNamespace="http://www.omg.org/LSID/2003/Standard/WSDL"
+		xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+		xmlns="http://schemas.xmlsoap.org/wsdl/">
+	
+	<message name="getAvailableServicesRequest">
+		<part name="lsid" type="xsd:anyURI" />
+	</message>
+	<message name="getAvailableServicesResponse">
+		<part name="wsdl" type="xsd:base64Binary" />
+	</message>
+
+	<message name="getDataRequest">
+		<part name="lsid" type="xsd:anyURI" />
+	</message>
+	<message name="getDataResponse">
+		<part name="data-attachment" type="xsd:base64Binary" />
+	</message>
+
+	<message name="getDataByRangeRequest">
+		<part name="lsid" type="xsd:anyURI" />
+		<part name="start" type="xsd:integer" />
+		<part name="length" type="xsd:integer" />
+	</message>
+	<message name="getDataByRangeResponse">
+		<part name="data-attachment" type="xsd:base64Binary" />
+	</message>
+
+	<message name="getMetadataRequest">
+		<part name="lsid" type="xsd:anyURI" />
+		<part name="acceptedFormats" type="xsd:string" />
+	</message>
+	<message name="getMetadataResponse">
+		<part name="format" type="xsd:string" />
+		<part name="metadata-attachment" type="xsd:base64Binary" />
+		<part name="expiration" type="xsd:dateTime" />
+	</message>
+	
+	<message name="getMetadataSubsetRequest">
+		<part name="lsid" type="xsd:anyURI" />
+		<part name="acceptedFormats" type="xsd:string" />
+		<part name="selection" type="xsd:string" />
+	</message>
+	<message name="getMetadataSubsetResponse">
+		<part name="format" type="xsd:string" />
+		<part name="metadata-attachment" type="xsd:base64Binary" />
+		<part name="expiration" type="xsd:dateTime" />
+	</message>
+
+	<portType name="LSIDAuthorityServicePortType">
+		<operation name="getAvailableServices">
+			<input message="tns:getAvailableServicesRequest" />
+			<output message="tns:getAvailableServicesResponse" />
+		</operation>
+	</portType>
+
+	<portType name="LSIDDataServicePortType">
+		<operation name="getData">
+			<input message="tns:getDataRequest" />
+			<output message="tns:getDataResponse" />
+		</operation>
+		<operation name="getDataByRange">
+			<input message="tns:getDataByRangeRequest" />
+			<output message="tns:getDataByRangeResponse" />
+		</operation>
+	</portType>
+
+	<portType name="LSIDMetadataServicePortType">
+		<operation name="getMetadata">
+			<input message="tns:getMetadataRequest" />
+			<output message="tns:getMetadataResponse" />
+		</operation>
+	</portType>
+	
+	<portType name="LSIDMetadataSubsetServicePortType">
+		<operation name="getMetadataSubset">
+			<input message="tns:getMetadataSubsetRequest" />
+			<output message="tns:getMetadataSubsetResponse" />
+		</operation>
+	</portType>
+
+</definitions>

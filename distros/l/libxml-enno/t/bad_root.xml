@@ -1,0 +1,5 @@
+<!DOCTYPE root [
+ <!ELEMENT root ANY>
+]>
+
+</bad_root>

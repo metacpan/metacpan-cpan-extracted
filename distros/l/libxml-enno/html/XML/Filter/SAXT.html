@@ -1,0 +1,80 @@
+<HTML><HEAD><TITLE>XML::Filter::SAXT - Replicates SAX events to several SAX event handlers</TITLE></HEAD><BODY><H1><A NAME="NAME">NAME
+
+</A></H1><P>XML::Filter::SAXT - Replicates SAX events to several SAX event handlers
+
+<P><HR><H1><A NAME="SYNOPSIS">SYNOPSIS
+
+</A></H1><PRE> $saxt = new XML::Filter::SAXT ( { Handler =&gt; $out0 },
+				 { DocumentHandler =&gt; $out1 },
+				 { DTDHandler =&gt; $out3,
+				   Handler =&gt; $out4 
+				 }
+			       );
+
+</PRE><PRE> $perlsax = new XML::Parser::PerlSAX ( Handler =&gt; $saxt );
+ $perlsax-&gt;parse ( [OPTIONS] );
+
+</PRE><P><HR><H1><A NAME="DESCRIPTION">DESCRIPTION
+
+</A></H1><P>SAXT is like the Unix 'tee' command in that it splits the input stream
+to several output streams. In this case, the input stream is a PerlSAX event
+producer (like XML::Parser::PerlSAX) and the output streams are PerlSAX 
+handlers.
+
+<P>The SAXT constructor takes a list of hash references. Each hash specifies
+and output handler. The hash keys can be: DocumentHandler, DTDHandler, 
+EntityResolver or Handler, where Handler is a combination of the previous three
+and acts as the default handler.
+E.g. if DocumentHandler is not specified, it will try to use Handler.
+
+<H2><A NAME="EXAMPLE">EXAMPLE
+
+</A></H2><P>In this example we use <A>XML::Parser::PerlSAX</A> to parse an XML file and
+to invoke the PerlSAX callbacks of our SAXT object. The SAXT object then
+forwards the callbacks to <A HREF="../Checker.html">XML::Checker</A>, which will 'die' if it encounters
+an error, and to <A HREF="../DOM/PerlSAX.html">XML::DOM::PerlSAX</A>, which will store the XML in an
+<A HREF="../DOM/Document.html">XML::DOM::Document</A>.
+
+<PRE> use XML::Parser::PerlSAX;
+ use XML::Filter::SAXT;
+ use XML::DOM::PerlSAX;
+ use XML::Checker;
+
+</PRE><PRE> my $checker = new XML::Checker;
+ my $builder = new XML::DOM::PerlSAX (KeepCDATA =&gt; 1);
+ my $tee = new XML::Filter::SAXT ( { Handler =&gt; $checker },
+				   { Handler =&gt; $builder } );
+
+</PRE><PRE> my $parser = new XML::Parser::PerlSAX (Handler =&gt; $tee);
+ eval
+ {
+    local $XML::Checker::FAIL = \&amp;my_fail;
+    my $dom_document = $parser-&gt;parsefile ("file.xml");
+    ... your code here ...
+ };
+ if ($@)
+ {
+    # Either XML::Parser::PerlSAX threw an exception (bad XML)
+    # or XML::Checker found an error and my_fail died.
+    ... your error handling code here ...
+ }
+
+</PRE><PRE> # XML::Checker error handler
+ sub my_fail
+ {
+   my $code = shift;
+   die XML::Checker::error_string ($code, @_)
+	if $code &lt; 200;	  # warnings and info messages are &gt;= 200
+ }
+
+</PRE><P><HR><H1><A NAME="CAVEATS">CAVEATS
+
+</A></H1><P>This is still alpha software. 
+Package names and interfaces are subject to change.
+
+<P><HR><H1><A NAME="AUTHOR">AUTHOR
+
+</A></H1><P>Send bug reports, hints, tips, suggestions to Enno Derksen at
+&lt;<I>enno@att.com</I>&gt;. 
+
+<P><HR><I><FONT SIZE="-1">Last updated: Fri Oct 22 18:47:33 1999</FONT></I></BODY></HTML>

@@ -1,0 +1,64 @@
+lib-remote
+==========
+
+
+Доброго всем! Hello all!
+
+lib::remote - pragma, functional and object interface for load and use/require modules from remote sources without installation basically throught protocols like http (LWP). One dispather on @INC - C<push @INC, sub {};> This dispather will return filehandle for downloaded content of a module from remote server.
+
+Like:
+
+    use lib '/to/any/local/lib';
+
+    use lib::remote 'http://<host>/site-perl/.../';
+    use My::Module1;
+
+lib::remote - Удаленное использование модулей. Загружает модули с удаленного сервера. Только один диспетчер в @INC - push @INC, sub {...}. Диспетчер возвращает filehandle для контента, полученного удаленно.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    libwww-perl (LWP::UserAgent)
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc lib::remote
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=lib-remote
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/lib-remote
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/lib-remote
+
+    Search CPAN
+        http://search.cpan.org/dist/lib-remote/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Mikhail Che
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

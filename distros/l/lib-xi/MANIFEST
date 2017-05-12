@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+author/requires.cpanm
+cpanfile
+example/hello.pl
+lib/lib/xi.pm
+t/000_load.t
+t/001_do_nothing.t
+t/lib/Foo.pm
+xt/install-to-extlib.t
+META.yml
+MANIFEST

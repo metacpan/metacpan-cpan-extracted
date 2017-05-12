@@ -1,0 +1,103 @@
+<!DOCTYpE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+  "http://www.w3.org/TR/REC-html40/loose.dtd">
+
+<html>
+<head>
+<title>libservlet</title>
+<link rel="stylesheet" href="./libservlet.css">
+</head>
+<body>
+<h1>Servlet API Conversion Details</h1>
+<ul>
+<li><a href="#naming conventions">Naming Conventions</a>
+<li><a href="#method signatures">Method Signatures</a>
+<li><a href="#return values">Return Values</a>
+<li><a href="#interfaces">Interfaces</a>
+<li><a href="#exception handling">Exception Handling</a>
+<li><a href="#event handling">Event Handling</a>
+<li><a href="#i/o">I/O</a>
+<li><A href="#locales">Locales</a>
+<li><a href="#character encodings and conversions">Character Encodings
+and Conversions</a>
+<li><a href="#threads">Threads</a>
+</ul>
+<hr noshade>
+<h2><a name="naming conventions">Naming Conventions</a></h2>
+<p>
+Variable and method names use the fooBar capitalization style per the
+Java (TM) Servlet API specification.
+</p>
+<p>
+<h2><a name="method signatures">Method Signatures</a></h2>
+<p>
+Java (TM) allow multiple signatures for each method, while Perl only allows
+one. Luckily, the Java (TM) API specifies few methods with multiple
+signatures, and those that do exist are easy to collapse into one
+method simply by allowing parameters to be optional and/or <em>undef</em>
+values. It turns out to be a non-issue.
+</p>
+<h2><a name="return values">Return Values</a></h2>
+<p>
+Return values are mapped from Java (TM) to the Perl API as such:
+</p>
+<dl>
+<dt><a name="item_string%2C_integer%2C_etc%2E">string, integer, etc.</a><br>
+<dd>
+These values are simple scalars, or <em>undef</em>.
+<p></p>
+<dt><a name="item_boolean">boolean</a><br>
+<dd>
+These values are either 1 or <em>undef</em>.
+<p></p>
+<dt><a name="item_arrays%2C_enumerations">arrays, enumerations</a><br>
+<dd>
+In list context, these values are arrays (possibly empty). In scalar
+context, the values are array references.
+<p></p>
+<dt><a name="item_maps">maps</a><br>
+<dd>
+In list context, these values are hashes (possibly empty). In scalar
+context, the values are hash references.
+<p></p>
+</dl>
+<h2><a name="interfaces">Interfaces</a></h2>
+<p>
+The Java (TM) version of the Servlet API is mostly comprised of
+interfaces. They cannot be instantiated directly but rather must be
+implemented by classes. Their function is to specify attributes and
+methods that must be provided by the implementation classes. Perl has
+no equivalent builtin mechanism, so we simply provide a package for
+the interface (to enable <code>isa()</code> type checking) and leave
+it to servlet container developers to provide implementations.
+</p>
+<h2><a name="exception handling">Exception Handling</a></h2>
+<p>
+The API uses <strong>Exception::Class</strong> for exceptions. It
+uses <code>die()</code> to throw them and <code>eval()</code> to catch
+them. <a
+href="./api/Servlet/Util/Exception.html"><strong>Servlet::Util::Exception</strong></a>
+inherits from <strong>Exception::Class::Base</strong> and is itself
+the base class for all exceptions used by the Servlet API, whether
+part of the API specification or provided as utilities.
+</p>
+<h2><a name="event handling">Event Handling</a></h2>
+<p>
+The API provides <strong>Servlet::Util::Event</strong> as a base class
+for event objects.
+</p>
+<h2><a name="i/o">I/O</a></h2>
+<p>
+Perl's <strong>IO::Handle</strong> provides an excellent I/O subsystem
+with almost all of the functionality needed for input and output
+streams. It does not provide seeking functionality, leaving that to
+<strong>IO::Seekable</strong>, but I don't see that being a
+problem. Also, containers will likely provide instances of
+<strong>IO::Socket</strong> as input and output handles, at least some
+of the time, and that class is not seekable.
+</p>
+<h2><a name="locales">Locales</a></h2>
+<h2><a name="character encodings and conversions">Character Encodings
+and Conversions</a></h2>
+<h2><a name="threads">Threads</a></h2>
+</body>
+</html>

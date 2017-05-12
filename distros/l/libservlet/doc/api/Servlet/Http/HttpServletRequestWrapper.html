@@ -1,0 +1,89 @@
+<HTML>
+<HEAD>
+<TITLE>Servlet::Http::HttpServletRequestWrapper - HTTP servlet request wrapper class</TITLE>
+<LINK REL="stylesheet" HREF="../../../libservlet.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Servlet::Http::HttpServletRequestWrapper - HTTP servlet request wrapper class</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  my $wrapper = Servlet::Http::HttpServletRequestWrapper-&gt;new($request);</PRE>
+<PRE>
+  my $req = $wrapper-&gt;getRequest();
+  $wrapper-&gt;setRequest($req);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Provides a convenient implementation of the HttpServletRequest
+interface that may be subclassed by developers wishing to adapt the
+request to a Servlet. This class implements the Wrapper or Decorator
+pattern. Methods default to calling through to the wrapped request object.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new($request)</CODE></A></STRONG><BR>
+<DD>
+Construct an instance with the given request object
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24request"><EM>$request</EM></A></STRONG><BR>
+<DD>
+the <STRONG>Servlet::Http::HttpServletRequest</STRONG> to be wrapped
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getRequest"><CODE>getRequest()</CODE></A></STRONG><BR>
+<DD>
+Returns the wrapped <STRONG>Servlet::Http::HttpServletRequest</STRONG>
+<P></P>
+<DT><STRONG><A NAME="item_setRequest"><CODE>setRequest($request)</CODE></A></STRONG><BR>
+<DD>
+Specify a new request object to be wrapped.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><EM>$request</EM></STRONG><BR>
+<DD>
+the <STRONG>Servlet::Http::HttpServletRequest</STRONG> to be wrapped
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../api/Servlet/Http/HttpServletRequest.html">the Servlet::Http::HttpServletRequest manpage</A>,
+<A HREF="../../../api/Servlet/ServletRequestWrapper.html">the Servlet::ServletRequestWrapper manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

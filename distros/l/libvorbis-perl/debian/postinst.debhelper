@@ -1,0 +1,7 @@
+# Automatically added by dh_installdocs
+if [ "$1" = "configure" ]; then
+	if [ -d /usr/doc -a ! -e /usr/doc/libvorbis-perl -a -d /usr/share/doc/libvorbis-perl ]; then
+		ln -sf ../share/doc/libvorbis-perl /usr/doc/libvorbis-perl
+	fi
+fi
+# End automatically added section

@@ -1,0 +1,27 @@
+---
+abstract: 'invent your own default perl setup'
+author:
+  - 'mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: lib-with-preamble
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Spec: '0'
+  PerlIO::via::dynamic: '0.02'
+  perl: '5.008001'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=lib-with-preamble
+  repository: git://git.shadowcat.co.uk/p5sagit/lib-with-preamble.git
+version: '0.001003'

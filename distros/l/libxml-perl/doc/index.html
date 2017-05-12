@@ -1,0 +1,307 @@
+<HTML>
+  <HEAD>
+    <TITLE>libxml-perl</TITLE>
+    <META NAME="keywords" CONTENT="XML SGML Perl libxml libxml-perl">
+  </HEAD>
+  <BODY>
+<TABLE WIDTH="100%">
+<TR><TD VALIGN="TOP"><font size="6">libxml-perl</font><br>
+Current&nbsp;version&nbsp;is&nbsp;@VERSION@&nbsp;&nbsp;&nbsp;&nbsp;<br>
+</TD><TD>
+libxml-perl is a collection of Perl modules,
+scripts, and documents for working with XML in Perl.  libxml-perl
+software works in combination with XML::Parser, PerlSAX, XML::DOM,
+XML::Grove, and others.</TD>
+</TABLE>
+
+<P>Questions about how to use this library should be directed to the
+<TT>comp.lang.perl.modules</TT> USENET Newsgroup.  Bug reports and
+suggestions for improvements can be sent to the
+&lt;perl-xml@activestate.com&gt; mailing list.  This mailing list is
+also the place for general discussions and development of the
+libxml-perl package.</P>
+
+<P>To join the Perl-XML mailing list, send an email message to
+ListManager@ActiveState.com with the following text in the body:
+<PRE>
+    Subscribe Perl-XML
+</PRE></P>
+
+<TABLE WIDTH="100%">
+  <TR><TD VALIGN="TOP">
+<!-- ******* LINKS ******* -->
+
+<font size="5" face="Helvetica,Arial"><B>Source</B></font><br>
+libxml-perl source is available on CPAN in the <a
+href="http://www.perl.com/CPAN/modules/by-module/XML/">XML module
+directory</a>.  This link goes through the CPAN redirector so if the
+site gives you any problems, just click it again and you will be
+redirected to a different site.<br><br>
+
+libxml-perl source is also available <a
+href="libxml-perl-@VERSION@.tar.gz">here</a>.<br><br>
+
+The libxml-perl-@VERSION@ <A HREF="libxml-perl-@VERSION@.readme">README</a><br><br>
+
+<!-- ******** MODULES ******** -->
+<font size="5" face="Helvetica,Arial"><B>Modules</B></font><br>
+
+The following modules are part of libxml-perl.  Below they are marked with their release status:<br><br>
+
+<TABLE>
+  <TR><TD VALIGN="TOP">&nbsp;&nbsp;&nbsp;&nbsp;STABLE</TD><TD>has been in use for a while with few or no outstanding bugs</TD></TR>
+  <TR><TD VALIGN="TOP">&nbsp;&nbsp;&nbsp;&nbsp;BETA</TD><TD>interfaces are stable but there may still be bugs</TD></TR>
+  <TR><TD VALIGN="TOP">&nbsp;&nbsp;&nbsp;&nbsp;ALPHA</TD><TD>interfaces are changing, there may be lots of bugs, and there may not be docs available yet</TD></TR>
+</TABLE>
+
+<font size="4" face="Helvetica,Arial"><B><A HREF="XML%3A%3AParser%3A%3APerlSAX.html">XML::Parser::PerlSAX</a></B></font><br>
+<font size="2">&nbsp;&nbsp;&nbsp;&nbsp;BETA</font><br>
+XML::Parser::PerlSAX is a PerlSAX parser using XML::Parser (which uses James Clark's Expat XML Parser).<br><br>
+
+<font size="4" face="Helvetica,Arial"><B><A HREF="XML%3A%3AHandler%3A%3AXMLWriter.html">XML::Handler::XMLWriter</a></B></font><br>
+<font size="2">&nbsp;&nbsp;&nbsp;&nbsp;BETA</font><br>
+A PerlSAX handler for writing readable XML (in contrast to Canonical
+XML, for example).  XMLWriter is also subclassable and supports
+calling start and end methods by element-names (subclassed from
+XML::Handler::Subs).  XMLWriter is similar to XML::Parser's Stream
+style.<br><br>
+
+<font size="4" face="Helvetica,Arial"><B><A HREF="XML%3A%3AHandler%3A%3ASubs.html">XML::Handler::Subs</a></B></font><br>
+<font size="2">&nbsp;&nbsp;&nbsp;&nbsp;BETA</font><br>
+A PerlSAX handler base class that calls start and end methods by
+element-names.  Subs is similar to XML::Parser's Subs style.<br><br>
+
+<font size="4" face="Helvetica,Arial"><B><A HREF="XML%3A%3AHandler%3A%3ACanonXMLWriter.html">XML::Handler::CanonXMLWriter</a></B></font><br>
+<font size="2">&nbsp;&nbsp;&nbsp;&nbsp;BETA</font><br>
+XML::Handler::CanonXMLWriter is a PerlSAX handler that outputs in <A
+HREF="http://www.jclark.com/xml/canonxml.html">Canonical
+XML</a>.<br><br>
+
+<font size="4" face="Helvetica,Arial"><B><A HREF="XML%3A%3AHandler%3A%3ASample.html">XML::Handler::Sample</a></B></font><br>
+<font size="2">&nbsp;&nbsp;&nbsp;&nbsp;BETA</font><br>
+XML::Handler::Sample is a PerlSAX handler that simply prints out the
+event names as they are parsed by a PerlSAX parser.  It can be used for
+debugging or as a template for building new handlers.
+XML::Handler::Sample contains handlers for all known parser events.<br><br>
+
+<font size="4" face="Helvetica,Arial"><B><A HREF="XML%3A%3AESISParser.html">XML::ESISParser</a></B></font><br>
+<font size="2">&nbsp;&nbsp;&nbsp;&nbsp;BETA</font><br>
+XML::ESISParser is a validating PerlSAX parser using James Clark's
+`nsgmls' SGML/XML Parser.  ESISParser supports both XML and SGML
+document instances.  Unless you need validation, you should probably
+be using XML::Parser::PerlSAX or XML::Parser.<br><br>
+
+XML::ESISParser with XML::Grove obsolete the SGML::SPGroveBuilder and SGML::Grove modules.<br><br>
+
+<font size="4" face="Helvetica,Arial"><B><A HREF="Data%3A%3AGrove.html">Data::Grove</a>, <A HREF="Data%3A%3AGrove%3A%3AParent.html">Data::Grove::Parent</A>, <A HREF="Data%3A%3AGrove%3A%3AVisitor.html">Data::Grove::Visitor</A></B></font><br>
+<font size="2">&nbsp;&nbsp;&nbsp;&nbsp;BETA</font><br>
+Data::Grove and it's helpers provide a base class for deeply nested or
+directed graph structures.  Used by XML::Grove (and others soon).<br><br>
+
+<font size="4" face="Helvetica,Arial"><B><A HREF="XML%3A%3ASAX2Perl.html">XML::SAX2Perl</A>, <A HREF="XML%3A%3APerl2SAX.html">XML::Perl2SAX</A></B></font><br>
+<font size="2">&nbsp;&nbsp;&nbsp;&nbsp;ALPHA</font><br>
+SAX2Perl and Perl2SAX are SAX Parser<->DocumentHandler filters.  These
+modules translate parse events between the Java/CORBA style SAX
+methods and PerlSAX style methods.<br><br>
+
+<b>The following modules will very likely be renamed in the next release.</b>
+
+<font size="4" face="Helvetica,Arial"><B><A HREF="XML%3A%3APatAct%3A%3AMatchName.html">XML::PatAct::MatchName</A></B></font><br>
+<font size="2">&nbsp;&nbsp;&nbsp;&nbsp;ALPHA</font><br>
+MatchName is a pattern matching module that can be used with PatAct
+action modules.  MatchName uses simple element names or element name
+lists to match names to actions.<br><br>
+
+<font size="4" face="Helvetica,Arial"><B><A HREF="XML%3A%3APatAct%3A%3AToObjects.html">XML::PatAct::ToObjects</A></B></font><br>
+<font size="2">&nbsp;&nbsp;&nbsp;&nbsp;ALPHA</font><br>
+ToObjects is a PatAct action module.  ToObjects can be used to create
+application-ready Perl objects from XML instances.<br><br>
+
+<font size="4" face="Helvetica,Arial"><B><A HREF="XML%3A%3APatAct%3A%3AAmsterdam.html">XML::PatAct::Amsterdam</A></B></font><br>
+<font size="2">&nbsp;&nbsp;&nbsp;&nbsp;ALPHA</font><br>
+Amsterdam is a PatAct action module.  Amsterdam can be used to apply a
+very simple form of style-sheet to an XML instance by using ``before''
+and ``after'' strings that are output before and after the contents of
+elements.<br><br>
+
+<font size="4" face="Helvetica,Arial"><B><A HREF="XML%3A%3APatAct%3A%3APatternTempl.html">XML::PatAct::PatternTempl</A>, <A HREF="XML%3A%3APatAct%3A%3AActionTempl.html">XML::PatAct::ActionTempl</A></B></font><br>
+<font size="2">&nbsp;&nbsp;&nbsp;&nbsp;BETA</font><br>
+PatternTempl and ActionTempl are template files that pattern/action
+module writers can copy to create new modules.  See Creating PatAct
+Modules for more information.<br><br>
+
+<!-- ******** DOCUMENTS ******** -->
+<font size="5" face="Helvetica,Arial"><B>Documents</B></font><br>
+
+<font size="4" face="Helvetica,Arial"><B><A HREF="PerlSAX.html">PerlSAX</A></B></font><br>
+This document defines a Perl binding to SAX 1.0.  PerlSAX-based parser
+modules implement and possibly extend the interface described in
+PerlSAX.<br><br>
+
+<font size="4" face="Helvetica,Arial"><B><A HREF="UsingPerlSAX.html">Using PerlSAX</A></B></font><br>
+UsingPerlSAX is a brief introduction to PerlSAX using the
+XML::Parser::PerlSAX module.<br><br>
+
+<font size="4" face="Helvetica,Arial"><B><A HREF="UsingPatActModules.html">Using PatAct Modules</A></B></font><br>
+Describes how to use pattern/action modules to transform XML
+instances.<br><br>
+
+<font size="4" face="Helvetica,Arial"><B><A HREF="CreatingPatActModules.html">Creating PatAct Modules</A></B></font><br>
+A document for module writers who are writing new pattern/ action
+modules.<br><br>
+
+<font size="4" face="Helvetica,Arial"><B><A HREF="modules.xml">modules.xml</A></B></font><br>
+modules.xml contains a listing of all Perl XML packages and their
+public modules categorized by several topics.<br><br>
+
+</TD>
+      <TD VALIGN="TOP">
+<!-- ******* NEWS ******* -->
+<font size="5" face="Helvetica,Arial"><B>News</B></font><br>
+
+<!-- **** Item **** -->
+<FONT SIZE=4 face="Helvetica,Arial"><B><A
+HREF="http://bitsko.slc.ut.us/libxml-perl/">libxml-perl-0.07</A></b></FONT><BR>
+
+<font size=2>February 22, 2000</font><BR>
+
+<TABLE>
+<TR><TD VALIGN="TOP">-</TD><TD>doc/index.html: libxml-perl site index</TD></TR>
+<TR><TD VALIGN="TOP">-</TD><TD>doc/mirror.sh: creates a libxml-perl mirror site</TD></TR>
+<TR><TD VALIGN="TOP">-</TD><TD>Fixes:
+<TABLE>
+<TR><TD VALIGN="TOP">-</TD><TD>all modules: release script didn't
+insert version numbers in Perl modules.  Reported by <a
+href="mailto:enno@att.com">Enno Derksen</a></TD></TR>
+<TR><TD VALIGN="TOP">-</TD><TD>doc/modules.xml: well-formedness errors.  Reported by <a href="mailto:dolphin@ce.cnu.ac.kr">KangChan Lee</a></TD></TR>
+</TABLE>
+</TD></TR>
+</TABLE>
+<BR>
+
+<!-- **** Item **** -->
+<FONT SIZE=4 face="Helvetica,Arial"><B><A
+HREF="http://bitsko.slc.ut.us/libxml-perl/">libxml-perl-0.06</A></b></FONT><BR>
+
+<font size=2>February 4, 2000</font><BR>
+
+<TABLE>
+<TR><TD VALIGN="TOP">-</TD><TD>all modules: add $VERSION.  Suggested
+by <a href="mailto:kraehe@copyleft.de">Michael Koehne</a></TD></TR>
+<TR><TD VALIGN="TOP">-</TD><TD>XML::Parser::PerlSAX: add
+UseAttributeOrder option and AttributeOrder and Defaulted properties
+to start_element() handler.  Suggested by <a
+href="mailto:enno@att.com">Enno Derksen</a> </TD></TR>
+<TR><TD VALIGN="TOP">-</TD><TD>XML::Parser::PerlSAX: add start_cdata,
+end_cdata, and entity_reference events</TD></TR>
+<TR><TD VALIGN="TOP">-</TD><TD>XML::PatAct::Amsterdam: added Output
+and AsString options, added support for replacing attributes</TD></TR>
+<TR><TD VALIGN="TOP">-</TD><TD>Data::Grove: add a
+Data::Grove::Characters class to act as a default grove object for
+containing characters.</TD></TR>
+<TR><TD VALIGN="TOP">-</TD><TD>Fixes:
+<TABLE>
+<TR><TD VALIGN="TOP">-</TD><TD>XML::PatAct::ToObjects: removed
+leftover debugging statement</TD></TR>
+<TR><TD VALIGN="TOP">-</TD><TD>XML::ESISParser: report record end as
+characters if no record_end() handler</TD></TR>
+<TR><TD VALIGN="TOP">-</TD><TD>XML::Parser::PerlSAX: For attribute
+list declarations, now correctly calls the attlist_decl() method and
+passes the ElementName property, it used to call entity_decl() passing
+EntityName.  Reported by <a href="mailto:enno@att.com">Enno
+Derksen</a> and <a href="mailto:colin@durbanet.co.za">Colin
+Muller</a></TD></TR>
+</TABLE>
+</TD></TR>
+</TABLE>
+<BR>
+
+<!-- **** Item **** -->
+<FONT SIZE=4 face="Helvetica,Arial"><B><A
+HREF="http://bitsko.slc.ut.us/libxml-perl/">libxml-perl-0.05</A></b></FONT><BR>
+
+<font size=2>August 16, 1999</font><BR>
+
+<TABLE>
+<TR><TD VALIGN="TOP">-</TD><TD>Major update to PerlSAX specification
+<TABLE>
+<TR><TD VALIGN="TOP">-</TD><TD>Added an introduction</TD></TR>
+<TR><TD VALIGN="TOP">-</TD><TD>Added a ``Deviations from the Java version'' section</TD></TR>
+<TR><TD VALIGN="TOP">-</TD><TD>Re-added the `<tt>set_document_locator()</tt>' handler method</TD></TR>
+<TR><TD VALIGN="TOP">-</TD><TD>Added arguments to method synopses</TD></TR>
+<TR><TD VALIGN="TOP">-</TD><TD>Attributed most of the content to the SAX 1.0 JavaDoc</TD></TR>
+<TR><TD VALIGN="TOP">-</TD><TD>Minor typos</TD></TR>
+</TABLE>
+</TD></TR>
+<TR><TD VALIGN="TOP">-</TD><TD>XML::Handler::XMLWriter: a new PerlSAX handler for writing readable XML (in contrast to Canonical XML)</TD></TR>
+<TR><TD VALIGN="TOP">-</TD><TD>XML::Handler::Subs: a new PerlSAX handler base class for calling user-defined subs</TD></TR>
+<TR><TD VALIGN="TOP">-</TD><TD>XML::PatAct::ToObjects: add <tt>CopyAttributes</tt> option, add <tt>-grove-contents</tt> action</TD></TR>
+<TR><TD VALIGN="TOP">-</TD><TD>All PatAct modules can now take parameters as either a list of key, value pairs or a hash</TD></TR>
+<TR><TD VALIGN="TOP">-</TD><TD>Fixes:
+<TABLE>
+<TR><TD VALIGN="TOP">-</TD><TD>XML::ESISParser wasn't testing handlers for what methods they support</TD></TR>
+<TR><TD VALIGN="TOP">-</TD><TD>XML::Parser::PerlSAX wasn't forwarding XML::Parser Element events</TD></TR>
+</TABLE>
+</TD></TR>
+</TABLE>
+<BR>
+
+<!-- **** Item **** -->
+<FONT SIZE=4 face="Helvetica,Arial"><B><A
+HREF="http://bitsko.slc.ut.us/libxml-perl/">libxml-perl-0.04</A></b></FONT><BR>
+
+<font size=2>August 11, 1999</font><BR>
+
+<TABLE>
+<TR><TD VALIGN="TOP">-</TD><TD>Added pattern/action modules for name matching, converting to objects, and applying simple styles -- XML::PatAct::MatchName, XML::PatAct::ToObjects, and XML::PatAct::Amsterdam.</TD></TR>
+<TR><TD VALIGN="TOP">-</TD><TD>Added ``Using PatAct Modules'' and ``Creating PatActModules'' docs.</TD></TR>
+<TR><TD VALIGN="TOP">-</TD><TD>XML::Parser::PerlSAX and XML::ESISParser were not passing a hash for `<tt>start_document()</tt>' and `<tt>end_document()</tt>' per spec.</TD></TR>
+</TABLE>
+<BR>
+
+<!-- **** Item **** -->
+<FONT SIZE=4 face="Helvetica,Arial"><B><A
+HREF="http://bitsko.slc.ut.us/libxml-perl/">libxml-perl-0.03</A></b></FONT><BR>
+
+<font size=2>May 26, 1999</font><BR>
+
+<TABLE>
+<TR><TD VALIGN="TOP">-</TD><TD>added XML::Handler::CanonXMLWriter and test</TD></TR>
+</TABLE>
+<BR>
+
+<!-- **** Item **** -->
+<FONT SIZE=4 face="Helvetica,Arial"><B><A
+HREF="http://bitsko.slc.ut.us/libxml-perl/">libxml-perl-0.02</A></b></FONT><BR>
+
+<font size=2>May 24, 1999</font><BR>
+
+<TABLE>
+<TR><TD VALIGN="TOP">-</TD><TD>renamed package from `libxml' to `libxml-perl'</TD></TR>
+<TR><TD VALIGN="TOP">-</TD><TD>added doc/modules.xml</TD></TR>
+<TR><TD VALIGN="TOP">-</TD><TD>added doc/UsingPerlSAX.pod and example files</TD></TR>
+<TR><TD VALIGN="TOP">-</TD><TD>moved PerlSAX.pod and interface-style.pod to `doc/'</TD></TR>
+<TR><TD VALIGN="TOP">-</TD><TD>renamed Data::Grove::Tied to Data::Grove::Parent</TD></TR>
+</TABLE>
+<BR>
+
+<!-- ******** end of page table -->
+</TD></TR>
+
+</TABLE>
+
+<!-- ******** CONTRIBUTORS ******** -->
+<font size="5" face="Helvetica,Arial"><B>Contributors</B></font><br>
+The following have shared their code, documents, comments, and/or suggestions for libxml-perl:<br><br>
+
+Clark Cooper<br>
+Eduard (Enno) Derksen<br>
+Michael Koehne<br>
+KangChan Lee<br>
+Ken MacLeod<br>
+Colin Muller<br>
+Eric Prud'hommeaux<br>
+Larry Wall<br>
+   
+
+</BODY>

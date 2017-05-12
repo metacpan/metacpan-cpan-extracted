@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/lib/tiny.pm
+lib/lib/tiny.pod
+lib/lib/tiny/findbin.pm
+lib/lib/tiny.pm.in
+t/00.load.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

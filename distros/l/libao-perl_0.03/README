@@ -1,0 +1,25 @@
+
+              Ao - Perl extension for Ogg Vorbis streams
+
+                 http://eyeofdog.org/foof/code/vorbis
+
+                             version 0.03
+                           24 January, 2001
+
+To install, type
+
+  # perl Makefile.PL
+  # make
+  # make test
+  # make install
+
+The test of course is optional, but if it doesn't work the
+installation probably won't.
+
+man Ao(3pm) for information on using the library, and pcmplay(1p) for
+information on the pcmplay script.  Also see the general Ogg Vorbis
+documentation available at http://www.xiph.org/ogg/vorbis/.
+
+
+Alex Shinn
+foof@debian.org

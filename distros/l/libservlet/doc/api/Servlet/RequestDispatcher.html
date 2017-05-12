@@ -1,0 +1,126 @@
+<HTML>
+<HEAD>
+<TITLE>Servlet::RequestDispatcher - request dispatcher interface</TITLE>
+<LINK REL="stylesheet" HREF="../../libservlet.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Servlet::RequestDispatcher - request dispatcher interface</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  $dispatcher-&gt;forward($request, $response);</PRE>
+<PRE>
+  $dispatcher-&gt;include($request, $response);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>A request dispatcher receives requests from the client and sends them
+to any resource (such as a servlet or HTML file) on the server. The
+servlet container creates the <STRONG>Servlet::RequestDispatcher</STRONG> object,
+which is used as a wrapper around a server resource located at a given
+path or by a particular name.</P>
+<P>This interface is intended to wrap servlets, but a servlet container
+can create dispatcher objects to wrap any type of resource.</P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_forward">forward($request, $response)</A></STRONG><BR>
+<DD>
+Forwards a request from a servlet to another resource on the
+server. This method allows one servlet to do preliminary processing of
+a request and another resource to generate the response.
+<P>For an object obtained via <CODE>getRequestDispatcher()</CODE>, the
+<STRONG>Servlet::ServletRequest</STRONG> object has its path elements and parameters
+adjusted to match the path of the target resource.</P>
+<P>This method should be called before the response has been committed to
+the client (before response body output has been flushed). If the
+response already has been committed, this method throws a
+<STRONG>Servlet::Util::IllegalStateException</STRONG>. Uncommitted output in the
+response buffer is automatically cleared before the forward.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24request"><EM>$request</EM></A></STRONG><BR>
+<DD>
+the <STRONG>Servlet::ServletRequest</STRONG> object that contains the client's
+request
+<P></P>
+<DT><STRONG><A NAME="item_%24response"><EM>$response</EM></A></STRONG><BR>
+<DD>
+the <STRONG>Servlet::ServletResponse</STRONG> object that contains the servlet's
+response
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AServletException"><STRONG>Servlet::ServletException</STRONG></A></STRONG><BR>
+<DD>
+if the target resource throws this exception
+<P></P>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIllegalStateException"><STRONG>Servlet::Util::IllegalStateException</STRONG></A></STRONG><BR>
+<DD>
+if the response has already been committed
+<P></P></DL>
+<DT><STRONG><A NAME="item_include">include($request, $response)</A></STRONG><BR>
+<DD>
+Includes the content of a resource in the response. In essence, this
+method enables programmatic server-side includes.
+<P>The <STRONG>Servlet::ServletResponse</STRONG> object's path elements and parameters
+remain unchanged from the caller's. The included servlet cannot change
+the response status code or set headers; any attempt to make a change
+is ignored.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><EM>$request</EM></STRONG><BR>
+<DD>
+the <STRONG>Servlet::ServletRequest</STRONG> object that contains the client's
+request
+<P></P>
+<DT><STRONG><EM>$response</EM></STRONG><BR>
+<DD>
+the <STRONG>Servlet::ServletResponse</STRONG> object that contains the servlet's
+response
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::ServletException</STRONG></STRONG><BR>
+<DD>
+if the target resource throws this exception
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../api/Servlet/ServletException.html">the Servlet::ServletException manpage</A>,
+<A HREF="../../api/Servlet/ServletRequest.html">the Servlet::ServletRequest manpage</A>,
+<A HREF="../../api/Servlet/ServletResponse.html">the Servlet::ServletResponse manpage</A>,
+<A HREF="../../api/Servlet/Util/Exception.html">the Servlet::Util::Exception manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

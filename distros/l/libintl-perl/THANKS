@@ -1,0 +1,35 @@
+These people have helped in the development of libintl-perl:
+
+- Joshua Miller <unrtst@cpan.com> has extended libintl-perl to provide
+  the important context-sensitive functions (pgettext() and friends).
+
+- Christian Lackas <delta@lackas.net> has given various hints on 
+  performance optimizations
+
+- Ingrid Gräfen <ingrid.graefen@imperia.net> has fixed a major performance
+  penalty on systems without POSIX::LC_MESSAGES, and she has extensively
+  tested the Perl backend for GNU xgettext under cygwin 
+
+- Bruno Haible for libiconv which was the base for many conversions and
+  for integrating my Perl backend into GNU gettext
+
+Other people have helped by sending in improvements, suggestions and
+bug reports (you will find out how to make the mail addresses valid):
+
+- DH <crazyinsomniac?yahoo.com>
+- Jo-Even Skarstein <joska?nvg.org>
+- Gerhard Stoll <gerhard_stoll?gmx.de>
+- Marc Brockschmidt <marc?marcbrockschmidt.de>
+- Laurent Bonnaud <Laurent.Bonnaud?inpg.fr>
+- Jan Kratochvil <lace?jankratochvil.net>
+- Светослав Агафонкин <slavi.agafonkin?imperia.bg>
+- Michael Bell <michael.bell?cms.hu-berlin.de>
+- David Cantrell <dcantrell?cpan.org>
+- Karl Berry <karl?freefriends.org>
+- Patrice Dumas <pertusus?free.fr>
+- Karen Etheridge <ether?cpan.org>
+- Slaven Rezić <slaven@rezic.de>
+
+Please inform me if I have forgotten your contribution.
+
+Guido Flohr

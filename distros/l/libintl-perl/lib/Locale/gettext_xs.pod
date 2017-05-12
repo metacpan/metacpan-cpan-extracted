@@ -1,0 +1,106 @@
+#! /bin/false
+
+# vim: set autoindent shiftwidth=4 tabstop=4:
+
+# Pure Perl implementation of Uniforum message translation.
+# Copyright (C) 2002-2016 Guido Flohr <guido.flohr@cantanea.com>,
+# all rights reserved.
+
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of the GNU Library General Public License as published
+# by the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Library General Public License for more details.
+
+# You should have received a copy of the GNU Library General Public
+# License along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307,
+# USA.
+
+=head1 NAME
+
+Locale::gettext_xs - XS Implementation of Uniforum Message Translation
+
+=head1 SYNOPSIS
+
+ use gettext_xs (:locale_h :libintl_h);
+
+ gettext $msgid;
+ dgettext $domainname, $msgid;
+ dcgettext $domainname, $msgid, LC_MESSAGES;
+ ngettext $msgid, $msgid_plural, $count;
+ dngettext $domainname, $msgid, $msgid_plural, $count;
+ dcngettext $domainname, $msgid, $msgid_plural, $count, LC_MESSAGES;
+ pgettext $msgctxt, $msgid;
+ dpgettext $domainname, $msgctxt, $msgid;
+ dcpgettext $domainname, $msgctxt, $msgid, LC_MESSAGES;
+ npgettext $msgctxt, $msgid, $msgid_plural, $count;
+ dnpgettext $domainname, $msgctxt, $msgid, $msgid_plural, $count;
+ dcnpgettext $domainname, $msgctxt, $msgid, $msgid_plural, $count, LC_MESSAGES;
+ textdomain $domainname;
+ bindtextdomain $domainname, $directory;
+ bind_textdomain_codeset $domainname, $encoding;
+ my $category = LC_CTYPE;
+ my $category = LC_NUMERIC;
+ my $category = LC_TIME;
+ my $category = LC_COLLATE;
+ my $category = LC_MONETARY;
+ my $category = LC_MESSAGES;
+ my $category = LC_ALL;
+
+=head1 DESCRIPTION
+
+The module B<Locale::gettext_xs> is the low-level interface to 
+message translation according to the Uniforum approach that is
+for example used in GNU gettext and Sun's Solaris.
+
+The module does not necessarily work on your system.  It depends
+on the presence of shared libraries that are not always available.
+The higher-level modules Locale::TextDomain::(3), resp. 
+Locale::Messages(3) will fall back to a pure Perl version if 
+boostrapping B<Locale::gettext_xs> fails.
+
+The interface of B<Locale::gettext_xs> is mostly identical to the pure 
+Perl version as described in Locale::gettext_pp(3), see there for details.
+Differences are outlined below.
+
+B<Locale::gettext_xs> is downwards compatible to Locale::gettext(3)
+by Phillip Vandry <vandry@Mlink.NET>.  You can use it as replacement
+for Locale::gettext(3).
+
+Please note that directory names passed to the function bindtextdomain()
+are automatically converted from Perl semantics (slash as directory
+separator) to local semantics (for example the backslash for MS-DOS).
+
+=head1 AUTHOR
+
+Copyright (C) 2002-2016 L<Guido Flohr|http://www.guido-flohr.net/>
+(L<mailto:guido.flohr@cantanea.com>), all rights reserved.  See the source
+code for details!code for details!
+
+The module is based on the work of Phillip Vandry <vandry@Mlink.NET>
+in Locale::gettext(3).
+
+=head1 SEE ALSO
+
+Locale::TextDomain(3pm), Locale::gettext_pp(3pm), Locale::gettext(3pm), 
+Locale::Messages(3pm), File::Spec(3), perl(1)
+
+=cut
+
+Local Variables:
+mode: perl
+perl-indent-level: 4
+perl-continued-statement-offset: 4
+perl-continued-brace-offset: 0
+perl-brace-offset: -4
+perl-brace-imaginary-offset: 0
+perl-label-offset: -4
+tab-width: 4
+End:
+
+=cut

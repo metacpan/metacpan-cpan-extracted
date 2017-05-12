@@ -1,0 +1,157 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+use Getopt::Long;
+use Net::LDAP::Shell::Schema qw(recurse_oc);
+use Net::LDAP::Shell::CLI qw(CLIauth);
+use Net::LDAP::Shell::Connect qw(multiConnect);
+use Net::LDAP::Shell::Util qw(debug error serverType getSchema);
+use Net::LDAP;
+
+###
+# print out the stats for a given objectclass
+
+my ($usage,$help,$opt_result,$source,$server,$password,$D,$uid,$base,$debug);
+
+$opt_result = GetOptions
+(
+	"help" => \$help,
+	"source=s" => \$source,
+	"server=s" => \$server,
+	"password=s" => \$password,
+	"D=s" => \$D,
+	"uid=s" => \$uid,
+	"base=s" => \$base,
+	"debug=i" => \$debug,
+);
+
+$usage =
+"USAGE: $0 [-help]
+";
+
+if (! $opt_result)
+{
+   pod2usage('-exitval' => 1, '-verbose' => 0);
+   exit(1);
+}
+ 
+if ($help)
+{
+   pod2usage('-exitval' => 1, '-verbose' => 2);
+   exit;
+}
+
+# init all the vars
+my (%args,$schema);
+$args{'source'} = $source || 'default';
+
+$args{'server'} = $server || undef;
+$args{'base'} = $base || 'dc=domain,dc=com';
+$args{'uid'} = $uid || '';
+$args{'password'} = $password || '';
+$args{'dn'} = $D || '';
+$args{'scope'} = 0;
+
+if ($args{'server'})
+{
+	$args{'servers'} = [ $args{'server'} ];
+}
+
+#my $ldap = Net::LDAP->new($args{'server'}) or die "no host\n";
+my %config = multiConnect(%args) or die error();
+
+$schema = getSchema($config{'ldap'});
+
+foreach my $class (@ARGV)
+{
+	my %oc = recurse_oc($schema,$class) or die "could not get OC\n";
+
+	my $var;
+
+=begin comment
+	foreach $var (sort keys %oc)
+	{
+		if (ref $oc{$var} eq 'ARRAY')
+		{
+			print "$var => [ ", join(" ", @{ $oc{$var} }), " ]\n";
+		}
+		else
+		{
+			print "$var => $oc{$var}\n";
+		}
+	}
+	#map { print "$_ => $oc{$_}\n"; } keys %oc;
+=cut
+
+
+print qq[Objectclass: ], join (' ', @{ $oc{'name'} }), qq[
+];
+if (exists $oc{'desc'})
+{
+	print qq[Description: ], join (' ', @{ $oc{'desc'} }), qq[
+];
+}
+	print qq[Superiors:   ], join (' ', @{ $oc{'sup'} }), qq[
+OID:         $oc{'oid'}
+];
+
+	delete $oc{'sup'};
+
+	foreach $var (keys %oc)
+	{
+		if ($oc{$var} =~ /ARRAY/)
+		{
+			print "\t$var\n";
+			foreach (sort { $a cmp $b } @{ $oc{$var} })
+			{
+				print "\t\t$_\n";
+			}
+		}
+	}
+
+}
+
+
+=head1 NAME
+
+   template - this is a template script and should be copied and modded
+
+=head1 SYNOPSIS
+
+   template [-help]
+
+=head1 DESCRIPTION
+
+B<template> is a stub script.
+
+=head1 OPTIONS
+
+=over 4
+
+=item help
+
+	Prints out help page.
+
+=back
+
+B<Example>
+
+	template
+
+=head1 BUGS
+
+This script shouldn't be modified, or has apparently not been documented.
+
+=head1 SEE ALSO
+
+L<Cat>
+
+=head1 AUTHOR
+
+Luke A. Kanies, luke.kanies@cat.com
+
+=for html <hr>
+
+I<$Id: ocprint,v 1.1 2002/09/08 18:20:14 luke Exp $>
+
+=cut

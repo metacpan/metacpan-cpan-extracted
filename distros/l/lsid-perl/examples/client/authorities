@@ -1,0 +1,13 @@
+# This file enables local resolution of LSID authorities.
+# For more information, see the perldoc for LS::Locator.
+#
+# id	server:port/servicepath
+
+pdb.org lsidauthority.pdb.org:8080/cgi-bin/pdb_authority.pl
+gene.ucl.ac.uk.lsid.i3c.org gene.ucl.ac.uk.lsid.i3c.org:8093/authority/
+ncbi.nlm.nih.gov.lsid.i3c.org ncbi.nlm.nih.gov.lsid.i3c.org:9090/authority/
+ensembl.org.lsid.i3c.org ensembl.org.lsid.i3c.org:9090/authority/
+geneontology.org.lsid.i3c.org geneontology.org.lsid.i3c.org:8090/authority/
+ebi.ac.uk.lsid.i3c.org ebi.ac.uk.lsid.i3c.org:8091/authority/
+lsid.i3c.org lsid.i3c.org:80/authority/
+i3c.org lsid.i3c.org:80/authority/

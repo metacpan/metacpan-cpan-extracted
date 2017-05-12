@@ -1,0 +1,88 @@
+Example of Apache httpd.conf for HUGO Authority
+
+
+The following are the relevant virtual host directives for the 
+HUGO Authority living at gene.ucl.ac.uk.lsid.biopathways.org:8093 :
+
+<VirtualHost _default_:8093>
+    ServerName gene.ucl.ac.uk.lsid.biopathways.org
+
+    <IfModule mod_rewrite.c>
+        RewriteEngine On
+        RewriteLog  logs/gene.ucl.ac.uk.lsid.biopathways.org-rewrite.log
+        RewriteLogLevel 0
+        RewriteRule /authority$ /var/www/hugo/
+        RewriteRule /authority/data$ /var/www/hugo/
+        RewriteRule /authority/metadata$ /var/www/hugo/
+    </IfModule>
+
+    ScriptAlias /authority "/var/www/hugo/hugo_authority.pl"
+    ScriptAlias /authority/metadata "/var/www/hugo/hugo_authority.pl"
+    ScriptAlias /authority/data "/var/www/hugo/hugo_authority.pl"
+
+    <Directory /var/www/hugo>
+        Options ExecCGI
+        Order allow,deny
+        Allow from all
+    </Directory>
+
+</VirtualHost>
+
+
+Similarly, it is possible to use mod_perl if the following configuration
+is used. This is untested and will require tweaking:
+
+<VirtualHost _default_:8093>
+    ServerName gene.ucl.ac.uk.lsid.biopathways.org
+
+    <Directory /var/www/hugo>
+        Options ExecCGI
+        Order allow,deny
+        Allow from all
+    </Directory>
+
+
+    PerlModule Apache
+    PerlModule Apache::Registry
+    PerlModule Apache::DBI
+
+    #
+    # Authority service
+    #
+    <LocationMatch /authority/(.)*>
+        SetHandler perl-script
+        PerlHandler Apache::Registry
+        PerlSendHeader On
+    </LocationMatch>
+
+    AliasMatch ^/authority/(.*) /var/www/hugo/hugo_authority.pl
+
+
+
+    #
+    # Metadata service
+    #
+    <LocationMatch /authority/metadata/(.)*>
+        SetHandler perl-script
+        PerlHandler Apache::Registry
+        PerlSendHeader On
+    </LocationMatch>
+
+    AliasMatch ^/authority/metadata/(.*) /var/www/hugo/hugo_authority.pl
+
+
+
+    #
+    # Data service
+    #
+    <LocationMatch /authority/data/(.)*>
+        SetHandler perl-script
+        PerlHandler Apache::Registry
+        PerlSendHeader On
+    </LocationMatch>
+
+    AliasMatch ^/authority/data/(.*) /var/www/hugo/hugo_authority.pl
+
+</VirtualHost>
+
+

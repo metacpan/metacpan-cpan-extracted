@@ -1,0 +1,30 @@
+This is the libsirc distribution, code which works with sirc, a Perl-based
+IRC client.  Included are both modules which have user-level functionality,
+and modules which are useful for programming.
+
+To build it, run:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+For more detailed instructions see "man perlmodinstall", "perldoc
+perlmodinstall", or http://www.cpan.org/modules/INSTALL.html.
+
+The documentation is embeded in the modules themselves,
+
+    perldoc Sirc/<module>.pm
+
+to read it before installation.
+
+The latest version of the distribution can be found on CPAN, or at
+http://www.argon.org/~roderick/.
+
+Roderick Schertler <roderick@argon.org>
+
+Copyright (c) 1997-2000 Roderick Schertler.  All rights reserved.  This
+program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+$Id: README,v 1.5 2001-07-27 08:50:01-04 roderick Exp $

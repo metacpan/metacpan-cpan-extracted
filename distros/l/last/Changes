@@ -1,0 +1,6 @@
+Revision history for Perl extension last.
+
+0.0.1  Fri Feb  2 20:44:25 2007
+	- original version; created by h2xs 1.23 with options
+		-AXc -n last
+

@@ -1,0 +1,125 @@
+Special Notes for Sun Solaris
+=============================
+
+Recent versions of Solaris ship with a libintl that is mostly compatible
+with GNU gettext.  Even the plural handling functions (ngettext, 
+dngettext, dcngettext, ...) and output character conversion functions
+(bind_textdomain_codeset) are included. 
+
+On my test system, the behavior of the Solaris version differs in one
+important point from the pure Perl version or the GNU gettext version:
+In a locale environment that is a regional variant of another locale
+(for example "fr_CA" is a regional variant of "fr"), both the pure Perl 
+version from libintl-perl and the C version from GNU gettext will fall
+back to translations for the superordinate message catalog ("fr") if
+no special translation for the selected locale ("fr_CA") can be found.
+This fallback mechanism is missing in the Solaris implementation.
+
+This could be considered harmless, because Solaris users are probably
+used to this behavior.  On the other hand, the pure Perl version of
+gettext in libintl-perl aims to be as compatible as possible to the
+GNU gettext implementation.  Furthermore, if the pure Perl and the 
+C/XS version behave differently, users may be unnecessarily confused.
+
+If you think you can live with that little inconsistence, you are not
+completely lost: Edit the toplevel Makefile.PL, in the function
+WriteMakefile(), change the value for the hash slot "DIR" from 
+the value depending on "$result" to simply "['gettext_xs']".  If you
+have a look at the source code of Makefile.PL, you will see that this
+has already been prepared.
+
+If you do this, the test suite will fail, because the above described
+behavior ("fr_CA" vs. "fr" ...) is checked by the tests.  In this case,
+expect the following failures:
+
+Failed Test                    Stat Wstat Total Fail  Failed  List of Failed
+-------------------------------------------------------------------------------
+./tests/03bind_textdomain_codeset_xs.t        9    2  22.22%  5 9
+./tests/03dcgettext_xs.t                      9    2  22.22%  3 7
+./tests/03dcngettext_xs.t                    83   51  61.45%  22-31 43-83
+./tests/03dgettext_xs.t                       9    2  22.22%  3 7
+./tests/03dngettext_xs.t                     83   51  61.45%  22-31 43-83
+./tests/03gettext_xs.t                        6    1  16.67%  3
+./tests/03ngettext_xs.t                      85   51  60.00%  23-32 45-85
+
+But even if you have installed GNU gettext, you may run into this error
+when trying to compile the XS version:
+
+"gettext_xs.xs", line 32: #error: "<libintl.h> is not GNU gettext.  Maybe you have to adjust your include path."
+cc: acomp failed for gettext_xs.c
+make[1]: *** [gettext_xs.o] Error 2
+make[1]: Leaving directory `/root/libintl-perl-1.15/gettext_xs'
+make: *** [subdirs] Error 2
+
+What has happened here?  Have a look at the source code of <libintl.h>
+that ships with GNU gettext:
+
+/* We define an additional symbol to signal that we use the GNU
+   implementation of gettext.  */
+#define __USE_GNU_GETTEXT 1
+
+...
+
+/* We redirect the functions to those prefixed with "libintl_".  This is
+   necessary, because some systems define gettext/textdomain/... in the C
+   library (namely, Solaris 2.4 and newer, and GNU libc 2.0 and newer).
+   If we used the unprefixed names, there would be cases where the
+   definition in the C library would override the one in the libintl.so
+   shared library.  Recall that on ELF systems, the symbols are looked
+   up in the following order:
+     1. in the executable,
+     2. in the shared libraries specified on the link command line, in order,
+     3. in the dependencies of the shared libraries specified on the link
+        command line,
+     4. in the dlopen()ed shared libraries, in the order in which they were
+        dlopen()ed.
+   The definition in the C library would override the one in libintl.so if
+   either
+     * -lc is given on the link command line and -lintl isn't, or
+     * -lc is given on the link command line before -lintl, or
+     * libintl.so is a dependency of a dlopen()ed shared library but not
+       linked to the executable at link time.
+   Since Solaris gettext() behaves differently than GNU gettext(), this
+   would be unacceptable.
+
+   The redirection happens by default through macros in C, so that &gettext
+   is independent of the compilation unit, but through inline functions in
+   C++, in order not to interfere with the name mangling of class fields or
+   class methods called 'gettext'.  */
+
+In brief: The GNU libraries libintl.so and libintl.a prefix all functions
+with "libintl_" in order to avoid symbol name conflicts with the vanilla
+Solaris verssion.  These precautions still give room to a popular
+misconfiguration: If you install GNU gettext with the default prefix
+"/usr/local", libraries will get installed in "/usr/local/lib", the
+header files - notably <libintl.h> - will get installed in 
+"/usr/local/include", so far so good.  Now set the environment variable
+LD_LIBRARY_PATH to "/usr/local/lib", so that the GNU version of libintl.so
+will be found by the dynamic loader at runtime.  Yet, if 
+"/usr/local/include" comes after "/usr/include" in your C compiler's
+include path, the above described trick does not work, the functions
+like "gettext", "dgettext" etc. will not get re-defined to "libintl_gettext",
+"libintl_dgettext" and so on.  Remember, the preprocessor trick used by
+GNU gettext will change every reference to the function gettext() into
+a reference to libintl_gettext() for gettext() into a definition for 
+libintl_gettext().  If your C compiler includes the "wrong" include file 
+(/usr/include/libintl.h) instead of the "correct" one 
+(/usr/local/include/libintl.h), your C sources will still reference
+gettext() instead of libintl_gettext().  At run-time, even if the dynamic
+loader considers the GNU version of libintl.so (in "/usr/local/lib"), it
+will not use it, because it looks for the "wrong" symbol gettext() 
+instead of libintl_gettext().
+
+Too complicated? Okay: The order for C header files for the C compiler
+(actually the preprocessor) differs from the inclusion order for 
+libraries and this must lead to trouble.  If you understand WHY, you
+will find a way to fix it.  If not, ignore the problem: Do not 
+build the problem, and be assured, that the pure Perl version is 
+fast enough.  It is very, very unlikely that using the pure Perl
+instead of the XS version of will be the bottleneck of any application
+you use.
+
+Life is complicated under the sun, ain't it? ;-)
+
+Guido
+

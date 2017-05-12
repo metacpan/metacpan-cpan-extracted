@@ -1,0 +1,100 @@
+<?xml version="1.0"?>
+<!-- 
+LSID SOAP Binding Standard for the LSIDDataServicePortType, 
+and the LSIDMetadataServicePortType, 
+
+
+Jordi Albornoz and Ben Szekely
+16 October 2003 - Initial Draft
+17 October 2003 - Added metadata subset binding
+24 October 2003 - Minor cosmetic changes
+12 November 2003 - Removed metadata subset binding and merged data methods
+-->
+
+<definitions xmlns:tns="http://www.omg.org/LSID/2003/DataServiceSOAPBindings"
+		targetNamespace="http://www.omg.org/LSID/2003/DataServiceSOAPBindings"
+		xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+		xmlns="http://schemas.xmlsoap.org/wsdl/"
+		xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+		xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+		xmlns:sns="http://www.omg.org/LSID/2003/Standard/WSDL">
+
+	<import namespace="http://www.omg.org/LSID/2003/Standard/WSDL" location="LSIDPortTypes.wsdl" />
+
+	<binding name="LSIDDataSOAPBinding" type="sns:LSIDDataServicePortType">
+		<soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http" />
+		<operation name="getData">
+			<soap:operation />
+			<input>
+				<soap:body use="literal" namespace="http://www.omg.org/LSID/2003/DataServiceSOAPBindings" />
+			</input>
+			<output>
+				<mime:multipartRelated>
+					<mime:part>
+						<soap:body use="literal" namespace="http://www.omg.org/LSID/2003/DataServiceSOAPBindings" />
+					</mime:part>
+					<mime:part>
+						<mime:content part="data-attachment" type="application/octet-stream" />
+					</mime:part>
+				</mime:multipartRelated>
+			</output>
+		</operation>
+		<operation name="getDataByRange">
+			<soap:operation />
+			<input>
+				<soap:body use="literal" namespace="http://www.omg.org/LSID/2003/DataServiceSOAPBindings" />
+			</input>
+			<output>
+				<mime:multipartRelated>
+					<mime:part>
+						<soap:body use="literal" namespace="http://www.omg.org/LSID/2003/DataServiceSOAPBindings" />
+					</mime:part>
+					<mime:part>
+						<mime:content part="data-attachment" type="application/octet-stream" />
+					</mime:part>
+				</mime:multipartRelated>
+			</output>
+		</operation>
+	</binding>
+
+	<binding name="LSIDMetadataSOAPBinding" type="sns:LSIDMetadataServicePortType">
+		<soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http" />
+		<operation name="getMetadata">
+			<soap:operation />
+			<input>
+				<soap:body use="literal" namespace="http://www.omg.org/LSID/2003/DataServiceSOAPBindings" />
+			</input>
+			<output>
+				<mime:multipartRelated>
+					<mime:part>
+						<soap:body parts="format expiration" use="literal" namespace="http://www.omg.org/LSID/2003/DataServiceSOAPBindings" />
+					</mime:part>
+					<mime:part>
+						<mime:content part="metadata-attachment" type="application/octet-stream" />
+					</mime:part>
+				</mime:multipartRelated>
+			</output>
+		</operation>
+	</binding>
+	
+	<binding name="LSIDMetadataSubsetSOAPBinding" type="sns:LSIDMetadataSubsetServicePortType">
+		<soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http" />
+		<operation name="getMetadataSubset">
+			<soap:operation />
+			<input>
+				<soap:body use="literal" namespace="http://www.omg.org/LSID/2003/DataServiceSOAPBindings" />
+			</input>
+			<output>
+				<mime:multipartRelated>
+					<mime:part>
+						<soap:body parts="format expiration selection" use="literal" namespace="http://www.omg.org/LSID/2003/DataServiceSOAPBindings" />
+					</mime:part>
+					<mime:part>
+						<mime:content part="metadata-attachment" type="application/octet-stream" />
+					</mime:part>
+				</mime:multipartRelated>
+			</output>
+		</operation>
+	</binding>
+		
+</definitions>

@@ -1,0 +1,16 @@
+8df81e43ee5bd49b4a0ed94fa753c32a  usr/lib/perl/5.6.1/i386-linux/auto/Ogg/Vorbis/Vorbis.so
+d41d8cd98f00b204e9800998ecf8427e  usr/lib/perl/5.6.1/i386-linux/auto/Ogg/Vorbis/Vorbis.bs
+c8c601fbf624c97a921f7123c9ee8069  usr/lib/perl/5.6.1/i386-linux/auto/Ogg/Vorbis/autosplit.ix
+0d4f734625ba9ade43c433315981f656  usr/lib/perl/5.6.1/i386-linux/auto/Ogg/Vorbis/.packlist
+67aee119c74338ea1724f7564b7b167d  usr/lib/perl/5.6.1/i386-linux/Ogg/Vorbis.pm
+90f66d70330839d7fab1bab1bf5c5ccd  usr/lib/perl/5.6.1/i386-linux/perllocal.pod
+707b244a7f7fa4d2f7567f4a04bd60f8  usr/share/man/man1/pogg.1p.gz
+d0060fd5a5e4d454e93899de1b77174d  usr/share/man/man3/Ogg::Vorbis.3pm.gz
+68ea04e45f57ed2182c4dfbbe46ea71a  usr/share/doc/libvorbis-perl/README
+6753bbaa478a53a7d36f851af66d7a2f  usr/share/doc/libvorbis-perl/README.Debian
+f14ae5f0da2ea30545ae19ab547b8972  usr/share/doc/libvorbis-perl/copyright
+ad70553604d040974c916234ab10c835  usr/share/doc/libvorbis-perl/changelog.gz
+1c89e90482c424a40887b7559971dad0  usr/share/doc/libvorbis-perl/changelog.Debian.gz
+d42c86885342c3ea9d8545bdd044e0b8  usr/local/man/man1/pogg.1p
+9f0e1728ad84780aad555c1f1d889e54  usr/local/man/man3/Ogg::Vorbis.3pm
+7e0b0107fc988e4ee0cc126de94d6479  usr/local/bin/pogg

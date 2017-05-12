@@ -1,0 +1,75 @@
+Change History:
+
+0.07 (enno) 9/10/1999
+- Fixed checking of NOTATION tokens in an ATTLIST. It would allow only valid
+  XML Name ($ReName) values instead of NmTokens ($ReNmToken)
+  (Thanks to Laurent Caprani <caprani@multimania.com>)
+- Added error 115: "ELEMENT [$name] already defined"
+  (Thanks to Laurent Caprani <caprani@multimania.com>)
+- Added 'Element' to the error context of error 124
+- Fixed checking of #REQUIRED attributes (error 159.)
+  I had to add another handler to XML::Checker, called 'EndAttr', to support 
+  checking of #REQUIRED attributes. 
+  It should be called after all attributes are passed with Attr().
+  If the user forgets to call this method, missing #REQUIRED attributes (i.e.
+  error 159) will not be generated.
+  XML::Checker::Parser and XML::DOM::ValParser have been updated accordingly,
+  so users of these classes don't need to make any code changes. Only people
+  using XML::Checker directly have to add a call to EndAttr().
+  (Thanks to Jim Anderson <jander@ml.com>)
+- Default attribute values were stored in ARule as $arule->{$attr}->{Default}.
+  This could wipe out other ARule fields (like Elem, Checker and Required) if
+  your XML file contained attributes with those names. Now they are stored as
+  $arule->{Default}->{$attr}.
+
+0.06 (enno) 8/10/1999
+- Added option to detect insignificant whitespace. 
+  See the section 'INSIGNIFICANT WHITESPACE' in the XML::Checker maual page
+  and the SkipInsignifWS option in XML::Checker::Parser.
+- Added Comment handler to XML::Checker for completeness. It currently
+  doesn't do anything.
+- Added t/filterInsignifWS.pl script that filters insignificant whitespace
+  using XML::DOM::ValParser (see script for USAGE)
+
+0.05 (enno) 8/2/1999
+- Fixed the regular expressions for XML tokens to include Unicode values > 127
+
+0.04 (enno) 6/29/1999
+- Fixed splitting of Enumeration tokens in ATTLIST.
+  It used to split the tokens with /\s+/, instead of /\s*\|\s*/ and it would
+  produce error 134.
+  (Thanks to Philippe Verdret <pverdret@sonovision-itep.fr>)
+- When parsing the external DTD in XML::Checker::Parser, the XML::Parser now
+  copies the ErrorContext from the XML::Checker::Parser.
+  (Thanks to Philippe Verdret <pverdret@sonovision-itep.fr>)
+- When parsing the external DTD in XML::Checker::Parser, it now prefixes the
+  System ID with 'file:' because HTTP::Request is used to retrieve the external 
+  DTD and it expects 'file:' prefixes for file URLs.
+  (Thanks to Stephane Bortzmeyer <stephane@sources.org>)
+- It no longer generates error 156: unexpected root Element [doc], expected []
+  when no DTD is available and it doesn't know what the root element is.
+- Cleaned up some warnings when running with perl -w.
+  (Thanks to Beau Simensen <altern8@dnai.com>)
+- Added CAVEATS section to XML::Checker::Parser POD regarding external DTDs.
+
+0.03 (enno) 6/23/1999
+- Fixed message 154 to print out better Buf and RE parameters.
+- Fixed the RE (regular expression) that is used to check valid element names.
+  (Thanks to Matt Sergeant <matt@sergeant.org>)
+- Added code that reads external DTDs using LWP.
+  This can be disabled by setting the XML::Checker property SkipExternalDTD.
+  (Thanks to Matt Sergeant <matt@sergeant.org> for writing the code!)
+
+0.02 (enno) 5/28/1999
+- Updated the regular expressions for the following tokens: Name, NmToken, 
+  AttValue. For now, I copied some of them from XML::DOM, but they should probably
+  be in a separate module. (Thanks to John Posner <jjp@oreilly.com>)
+- XML::DOM::EntityReference::expat_iter was using getName instead of getEntityName
+- fixed bugs in XML::Checker::EntityRef
+- XML::DOM::Notation::expat_iter was calling the Entity handler
+- implemented the XML::Checker::Entity method to check for duplicate ENTITY
+  definitions and added error 114 - ENTITY [$entity] already defined
+- modified the test scripts to pass (KeepCDATA => 1, NoExpand => 1) to XML::Parser
+
+0.01 (enno) 5/27/1999
+- First release.

@@ -1,0 +1,51 @@
+- the dvd::rip project
+  http://www.exit1.org/dvdrip/
+
+- the Sympa mailing list manager
+  http://www.sympa.org/
+
+- the public key infrastructure (PKI) OpenCA
+  http://www.openca.org/
+
+- the Lire log file analysis tool
+  http://www.logreport.org/
+
+- the GPG key-signing utility gpgsigs
+  http://www.palfrader.org/gpgsigs
+
+- (the build script for) the TortoiseCVS CVS frontend
+  http://www.tortoisecvs.org/
+
+- the pure Perl implementation of the Twofish algorithm
+  http://search.cpan.org/~guido/Crypt-Twofish_PP/
+
+- the Imperia enterprise content management system
+  http://www.imperia.net/
+
+- the Imperia mailing list archive
+  http://ml.imperia.org/
+
+- the pimp Photo Importer
+  http://www.grawert.net/software/pimp/
+
+- midcat, concatenate MIDI files to stdout
+  http://ptaff.ca/midcat/?lang=en_CA
+
+- Luci is the University of New Brunswick, Canada's enterprise website 
+  accessibility solution and requires libintl-perl via Crypt::Twofish_PP
+  http://luci.sourceforge.net/
+
+- gwine, the Gnome wine cellar management tool
+  http://home.gna.org/gwine/
+
+- gtestrunner (Test-Unit-GTestRunner), a unit test GUI
+  http://search.cpan.org/~guido/Test-Unit-GTestRunner/
+
+- hdico, search a definition in the Hachette dictionary
+  http://svn.naquadah.org/listing.php?repname=hdico&path=%2F&rev=0&sc=0
+
+- IWL, a GUI toolkit for html
+  http://search.cpan.org/~viktork/IWL/
+
+- Git, the stupid content tracker
+  http://git-scm.com/

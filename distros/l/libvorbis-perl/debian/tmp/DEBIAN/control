@@ -1,0 +1,21 @@
+Package: libvorbis-perl
+Version: 0.04-1
+Section: interpreters
+Priority: optional
+Architecture: i386
+Depends: libc6 (>= 2.2.4-4), libogg0 (>= 1.0rc3-1), libvorbis0 (>= 1.0rc3-1), perl
+Suggests: libao-perl
+Installed-Size: 97
+Maintainer: Alex Shinn <foof@debian.org>
+Description: Perl extension for Ogg Vorbis streams
+ The Ogg::Vorbis Perl module, an object-oriented interface to the
+ libvorbisfile Ogg Vorbis library.  Currently reading but not writing
+ of streams is supported.  Includes a sample mpg123-like script for
+ playing Ogg Vorbis files.
+ .
+ Ogg Vorbis is a fully Open, non-proprietary, patent-and-royalty-free,
+ general-purpose compressed audio format for high quality (44.1-48.0kHz,
+ 16+ bit, polyphonic) audio and music at fixed and variable bitrates
+ from 16 to 128 kbps/channel. This places Vorbis in the same class as
+ audio representations including MPEG-1 audio layer 3, MPEG-4 audio
+ (AAC and TwinVQ), and PAC.

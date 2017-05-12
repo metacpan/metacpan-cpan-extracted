@@ -1,0 +1,28 @@
+<TMPL_INCLUDE name="javascript.html.template">
+
+<div>
+
+</div>
+
+<h3 id="summaryTitle"><span class="lsid"><TMPL_VAR NAME="lsid"></span></h3>
+
+<p id="description">
+</p>
+
+<div style="width: 35%; margin-botton: 50px;">
+<p style="margin-bottom: 18px">
+<span class="keyTitle">Data</span>  <span style="float: right;"><TMPL_VAR NAME="saveAs"></span>
+</p>
+
+<p style="margin-bottom: 18px;">
+<span class="keyTitle">Metadata</span>  <span style="float: right;"><TMPL_VAR NAME="metadataSaveAs"></span>
+</p>
+</div>
+
+
+<TMPL_IF NAME="metadataAvailable">
+<div style="padding: 3px; border: 1px dotted #dcdcdc">
+<TMPL_VAR NAME="metadata">
+</div>
+</TMPL_IF>
+

@@ -1,0 +1,12 @@
+package net;
+use strict;
+use warnings;
+
+# Configure these for your local system
+our $httpserver  = "localhost:80";
+our $cgidir      = "/cgi-bin/lwp";
+
+# Used for proxy test
+our $ftp_proxy = "http://localhost/";
+
+1;

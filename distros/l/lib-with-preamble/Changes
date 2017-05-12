@@ -1,0 +1,14 @@
+Release history for lib::with::preamble
+
+0.001003 - 2014-10-04
+  - minor fixes for metadata and kwalitee metrics
+
+0.001002 - 2014-10-02
+  - fix failing test on MSWin32 (path separators)
+
+0.001001 - 2014-10-01
+  - fix to test for 5.21.4 (RT#99195, Father Chrysostomos)
+
+0.001000 - 2013-02-20
+  - released on an unsuspecting world ... no, wait, they always suspect me
+  - never mind

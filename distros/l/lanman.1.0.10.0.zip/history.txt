@@ -1,0 +1,541 @@
+###################################################################################################
+
+Version 0.98	01/20/1999
+
+contains the core lanmanager calls
+
+###################################################################################################
+
+Version 1.00	04/17/1999
+
+Fixed Bugs:
+
+NetUserEnum	bug with the filter argument fixed (filter constants work now)
+NetUserSetInfo	bug with primary_group_id fixed (primary group id will be set now)
+
+New:
+
+StartService
+StopService
+PauseService
+ContinueService
+InterrogateService
+ControlService
+CreateService
+DeleteService
+EnumServicesStatus
+EnumDependentServices
+ChangeServiceConfig
+
+###################################################################################################
+
+Version 1.01	04/17/1999
+
+Fixed Bugs:
+
+New:
+
+GetServiceDisplayName
+GetServiceKeyName
+LockServiceDatabase
+UnlockServiceDatabase
+QueryServiceLockStatus
+QueryServiceConfig
+QueryServiceStatus
+QueryServiceObjectSecurity
+SetServiceObjectSecurity
+
+###################################################################################################
+
+Version 1.02	05/12/1999
+
+Fixed Bugs:
+
+New:
+
+I_NetLogonControl2
+LogonControlRediscover
+LogonControlTCQuery
+LogonControlTransportNotify
+LogonControlFindUser
+I_NetGetDCList
+
+###################################################################################################
+
+Version 1.03	08/06/1999
+
+Fixed Bugs:
+
+NetGroupEnum		(error 234 - more data available)
+NetGroupGetUsers	(error 234 - more data available)
+NetLocalGroupEnum	(error 234 - more data available)
+NetLocalGroupGetMembers	(error 234 - more data available)
+NetShareGetInfo		(runtime exception if there is not security on the share)
+
+New:
+
+LsaQueryInformationPolicy
+LsaSetInformationPolicy
+LsaQueryAuditLogPolicy
+LsaQueryAuditEventsPolicy
+LsaSetAuditEventsPolicy
+LsaQueryPrimaryDomainPolicy
+LsaSetPrimaryDomainPolicy
+LsaQueryPdAccountPolicy
+LsaQueryAccountDomainPolicy
+LsaSetAccountDomainPolicy
+LsaQueryServerRolePolicy
+LsaSetServerRolePolicy
+LsaQueryReplicaSourcePolicy
+LsaSetReplicaSourcePolicy
+LsaQueryDefaultQuotaPolicy
+LsaSetDefaultQuotaPolicy
+LsaQueryAuditFullPolicy
+LsaSetAuditFullPolicy
+LsaQueryDnsDomainPolicy
+LsaSetDnsDomainPolicy
+LsaEnumerateTrustedDomains
+LsaLookupNames
+LsaLookupSids
+LsaEnumerateAccountsWithUserRight
+LsaEnumerateAccountRights
+LsaAddAccountRights
+LsaRemoveAccountRights
+
+ReadEventLog
+GetEventDescription
+GetEventDescription
+BackupEventLog
+ClearEventLog
+ReportEvent
+GetNumberOfEventLogRecords
+GetOldestEventLogRecord
+
+###################################################################################################
+
+Version 1.04	11/17/1999
+
+Fixed Bugs:
+
+NetShareEnum		- access violation (error 0xc0000005) if you are not an administrator
+NetShareGetInfo 	- access violation (error 0xc0000005) if you are not an administrator
+NetServerGetInfo	- access violation (error 0xc0000005) if you are not an administrator
+NetSessionEnum		- access violation (error 0xc0000005) if you are not an administrator
+NetSessionGetInfo	- access violation (error 0xc0000005) if you are not an administrator
+NetWkstaGetInfo		- access violation (error 0xc0000005) if you are not an administrator
+
+Message "Wrong build number ..." in install.pl fixed if you install the module with 
+ActivePerl 518 or above
+
+New:
+
+BuildSecurityDescriptor	- builds a security descriptor structure to set permissions on shares or 
+			  services
+
+PPM ready installation (Win32-Lanman.ppd)
+
+###################################################################################################
+
+Version 1.04a	11/30/1999
+
+Fixed Bugs:
+
+NetShareEnum		- error 50 if the server is not NT
+NetShareGetInfo 	- error 50 if the server is not NT
+NetServerGetInfo	- access violation (error 0xc0000005) if the server is not NT
+NetWkstaGetInfo		- error 998 if the server is not NT
+
+New:
+
+
+###################################################################################################
+
+Version 1.05	01/25/2000
+
+Fixed Bugs:
+
+NetEnumerateTrustedDomains	- returns the right error code now
+
+New:
+
+Version information is available now in the lanman.pll and lanman.dll files.
+
+It's not longer necessary to put two backslashes in front of a server name. The module will preface
+all server names with two backslashes if they are missing.
+
+Jenda Krynicky made a better layout and removed some mistakes in the lanman.pm. Thanks again.
+
+The following Windows Terminal Server APIs are supportted:
+
+WTSEnumerateServers
+WTSOpenServer
+WTSCloseServer
+WTSEnumerateSessions
+WTSEnumerateProcesses
+WTSTerminateProcess
+WTSQuerySessionInformation
+WTSQueryUserConfig
+WTSSetUserConfig
+WTSSendMessage
+WTSDisconnectSession
+WTSLogoffSession
+WTSShutdownSystem
+WTSWaitSystemEvent
+
+SV_TYPE_CLUSTER_NT	- new constant for NetServerEnum
+SV_TYPE_DCE		- new constant for NetServerEnum
+SV_TYPE_TERMINALSERVER	- new constant for NetServerEnum
+
+Removed:
+
+The constants
+FILTER_PROXY_ACCOUNT,
+KERB_ETYPE_DES_CBC_MD5_EXP,
+KERB_ETYPE_DES_PLAIN_EXP,
+KERB_LOGON_EMAIL_NAMES,
+KERB_LOGON_SUBUATH and
+KERB_LOGON_UPDATE_STATISTICS
+have been removed because they are no longer supported in the platform sdk.
+
+###################################################################################################
+
+Version 1.05a	03/29/2000
+
+Fixed Bugs:
+
+WTSQuerySessionInformation			- second definition removed from lanman.cpp
+WTSInfoClassAll					- second definition removed from lanman.pm
+WTSSetUserConfig				- setting some properties fixed
+ReadEventLog					- reads events from the eventlog or events from a 
+						  file saved with BackupEventLog; memory leaks fixed
+QueryServiceObjectSecurity			- error 6 - invalid handle
+ChangeServiceConfig				- several properties of a sevice may be changed now
+						  without to 
+						  call QueryServiceConfig before
+
+New:
+
+###################################################################################################
+
+Version 1.06	06/22/2000
+
+Fixed Bugs:
+
+GetLastError					- stack adjustment corrected
+
+New:
+
+OWNER_SECURITY_INFORMATION			- constant added to retrieve/set security
+GROUP_SECURITY_INFORMATION			- constant added to retrieve/set security
+DACL_SECURITY_INFORMATION			- constant added to retrieve/set security
+SACL_SECURITY_INFORMATION			- constant added to retrieve/set security
+PROTECTED_DACL_SECURITY_INFORMATION		- constant added to retrieve/set security
+						 (not tested)
+PROTECTED_SACL_SECURITY_INFORMATION		- constant added to retrieve/set security
+						 (not tested)
+UNPROTECTED_DACL_SECURITY_INFORMATION		- constant added to retrieve/set security
+						 (not tested)
+UNPROTECTED_SACL_SECURITY_INFORMATION		- constant added to retrieve/set security
+						 (not tested)
+DFS_STORAGE_STATE_ACTIVE			- constant added to retrieve/set dfs state
+
+SV_TYPES		 			- returns a hash with the SV_* constants
+SERVICE_STATES					- returns a hash with the service states
+SERVICE_TYPES					- returns a hash with the service types
+WTS_STATES					- returns a hash with the wts event states
+USER_ENUM_FILTERS				- returns a hash with the user enum filter values
+
+SidToString					- converts a binary sid to a textual form like 
+						  S-1-...
+StringToSid					- converts a text sid to binary
+
+NetConnectionEnum				- enums connections to a share or from a computer
+NetRemoteComputerSupports			- retrieves the optional features the remote server
+						  supports
+
+NetGetJoinableOUs				- W2K api
+NetGetJoinInformation				- W2K api
+NetJoinDomain					- W2K api
+NetRenameMachineInDomain			- W2K api
+NetUnjoinDomain					- W2K api
+NetValidateName					- W2K api
+NetRegisterDomainNameChangeNotification		- W2K api
+NetUnregisterDomainNameChangeNotification	- W2K api
+NetDfsAddFtRoot					- W2K api
+NetDfsRemoveFtRoot				- W2K api
+NetDfsRemoveFtRootForced			- W2K api
+NetDfsAddStdRoot				- W2K api
+NetDfsAddStdRootForced				- W2K api
+NetDfsRemoveStdRoot				- W2K api
+NetDfsManagerInitialize				- W2K api
+NetDfsGetClientInfo				- W2K api
+NetDfsSetClientInfo				- W2K api
+NetDfsGetDcAddress				- W2K api
+
+###################################################################################################
+
+Version 1.07	10/07/2000
+
+Fixed Bugs:
+
+New:
+
+Support for Perl 5.6
+
+###################################################################################################
+
+Version 1.08	08/25/2000
+
+Fixed Bugs:
+
+NetRemoteComputerSupports			- returns the correct supported options now
+NetValidateName					- returns the correct result now
+NetValidateName					- returns the correct result now
+NetDfsAdd					- bug with preceding backslashes in the server 
+						  parameter corrected
+NetGroupGetUsers				- returns all group users now
+
+New:
+
+SERVICE_NO_CHANGE				- constant added to support services
+SERVICE_CONTROL_NETBINDADD			- constant added to support services
+SERVICE_CONTROL_NETBINDREMOVE			- constant added to support services
+SERVICE_CONTROL_NETBINDENABLE			- constant added to support services
+SERVICE_CONTROL_NETBINDDISABLE			- constant added to support services
+SERVICE_CONTROL_DEVICEEVENT			- constant added to support services
+SERVICE_CONTROL_HARDWAREPROFILECHANGE		- constant added to support services
+SERVICE_CONTROL_POWEREVENT			- constant added to support services
+SERVICE_RUNS_IN_SYSTEM_PROCESS			- constant added to support services
+SERVICE_CONFIG_FAILURE_ACTIONS			- constant added to support services
+SERVICE_CONFIG_FAILURE_ACTIONS			- constant added to support services
+SERVICE_ADAPTER					- constant added to support services
+SERVICE_RECOGNIZER_DRIVER			- constant added to support services
+SERVICE_TYPE_ALL				- constant added to support services
+SC_MANAGER_ALL_ACCESS				- constant added to support services
+SC_MANAGER_CONNECT				- constant added to support services
+SC_MANAGER_CREATE_SERVICE			- constant added to support services
+SC_MANAGER_ENUMERATE_SERVICE			- constant added to support services
+SC_MANAGER_LOCK					- constant added to support services
+SC_MANAGER_MODIFY_BOOT_CONFIG			- constant added to support services
+SC_MANAGER_QUERY_LOCK_STATUS			- constant added to support services
+SC_ACTION_NONE					- constant added to support services
+SC_ACTION_REBOOT				- constant added to support services
+SC_ACTION_RESTART				- constant added to support services
+SC_ACTION_RUN_COMMAND				- constant added to support services
+SC_STATUS_PROCESS_INFO				- constant added to support services
+
+ChangeServiceConfig2				- W2K api
+QueryServiceConfig2				- W2K api
+QueryServiceStatusEx				- W2K api
+EnumServicesStatusEx				- W2K api
+
+Documentation for the W2K api completed.
+
+###################################################################################################
+
+Version 1.0.8.1	09/16/2000
+
+Fixed Bugs:
+
+NetUserEnum					- returns the correct result now
+NetUserGetGroups				- returns the correct result now
+NetUserSetGroups				- returns the correct result now
+
+New:
+
+###################################################################################################
+
+Version 1.0.9.0	05/24/2001
+
+The location of the html doc (lanman.html) was changed. It will installed in the folder
+<perldir>\html\site\lib\win32.
+
+Fixed Bugs:
+
+NetUserGetInfo					- returns the user flags as unicode string
+NetUserSetInfo					- destruction of user wts settings fixed
+NetLocalGroupGetMembers				- if an account was moved from the domain to the AD
+						  or was removed in a account domain 
+						  NetLocalGroupGetMembers returns only the account 
+						  sid; in earlier versions NetLocalGroupGetMembers 
+						  failed with an error 2220 (NERR_GroupNotFound)
+NetDfsRemove					- the server parameter may not begin with 
+						  backslashes; this is in contrast with the msdn 
+						  documentation and seems to be a bug in the dfs 
+						  implementation; however, a server name without 
+						  backslashes will be passed to the NT function
+NetDfsEnum					- memory leak fixed
+NetDfsGetInfo					- memory leak fixed
+NetDfsGetClientInfo				- memory leak fixed
+NetFileEnum					- memory leak fixed
+NetQueryDisplayInformation			- memory leak fixed
+NetLocalGroupEnum				- memory leak fixed
+NetDfsLocalGroupGetMembers			- memory leak fixed
+NetGroupEnum					- memory leak fixed
+NetGroupGetMembers				- memory leak fixed
+LsaQueryInformationPolicy			- memory leak fixed
+LsaEnumerateTrustedDomains			- memory leak fixed
+LsaLookupNames					- memory leak fixed
+LsaLookupSids					- memory leak fixed
+NetReplExportDirEnum				- memory leak fixed
+NetReplImportDirEnum				- memory leak fixed
+NetScheduleJobEnum				- memory leak fixed
+NetServerEnum					- memory leak fixed
+NetServerTransportEnum				- memory leak fixed
+EnumServicesStatus				- memory leak fixed
+EnumDependentServices				- memory leak fixed
+QueryServiceConfig				- memory leak fixed
+QueryServiceConfig2				- memory leak fixed
+EnumservicesStatusEx				- memory leak fixed
+NetSessionEnum					- memory leak fixed
+NetDfsEnum					- memory leak fixed
+NetShareEnum					- memory leak fixed
+NetConnectionEnum				- memory leak fixed
+WTSEnumerateServers				- memory leak fixed
+WTSEnumerateSessions				- memory leak fixed
+WTSEnumerateProcesses				- memory leak fixed
+NetUseEnum					- memory leak fixed
+NetUserEnum					- memory leak fixed
+NetUserGetGroups				- memory leak fixed
+NetUserGetLocalGroups				- memory leak fixed
+NetWkstaTransportEnum				- memory leak fixed
+NetWkstaUserEnum				- memory leak fixed
+
+New constants:
+
+CONNDLG_CONN_POINT				- constant added to support WNetConnectionDialog 
+						  call
+CONNDLG_HIDE_BOX				- constant added to support WNetConnectionDialog 
+						  call
+CONNDLG_NOT_PERSIST				- constant added to support WNetConnectionDialog 
+						  call
+CONNDLG_PERSIST					- constant added to support WNetConnectionDialog 
+						  call
+CONNDLG_RO_PATH					- constant added to support WNetConnectionDialog 
+						  call
+CONNDLG_USE_MRU					- constant added to support WNetConnectionDialog 
+						  call
+CONNECT_INTERACTIVE				- constant added to support WNetUseConnection call
+CONNECT_LOCALDRIVE				- constant added to support WNetUseConnection call
+CONNECT_PROMPT					- constant added to support WNetUseConnection call
+CONNECT_REDIRECT				- constant added to support WNetUseConnection call
+CONNECT_UPDATE_PROFILE				- constant added to support WNetAddConnection call
+DISC_UPDATE_PROFILE				- constant added to support WNetDisconnectDialog 
+						  call
+DISC_NO_FORCE					- constant added to support WNetDisconnectDialog
+						  call
+REMOTE_NAME_INFO_LEVEL				- constant added to support WNetGetUniversalName
+						  call
+RESOURCE_CONTEXT				- constant added to support WNetEnumResource call
+RESOURCE_RECENT					- constant added to support WNetEnumResource call
+RESOURCEUSAGE_ALL				- constant added to support WNetEnumResource call
+UNIVERSAL_NAME_INFO_LEVEL			- constant added to support WNetGetUniversalName 
+						  call
+WNNC_*						- constants added to support WNetGetNetworkInformation
+						  call
+
+New functions:
+
+LsaSetTrustedDomainInformation
+LsaSetTrustedDomainInfo
+LsaSetTrustedDomainNameInfo
+LsaSetTrustedPosixOffsetInfo
+LsaSetTrustedPasswordInfo
+LsaRetrievePrivateData
+LsaStorePrivateData
+NetLocalGroupAddMembersBySid
+NetLocalGroupDelMembersBySid
+NetLocalGroupSetMembersBySid
+WNetAddConnection
+WNetCancelConnection
+WNetEnumResources
+WNetConnectionDialog
+WNetDisconnectDialog
+WNetGetConnection
+WNetGetNetworkInformation
+WNetGetProviderName
+WNetGetResourceInformation
+WNetGetResourceParent
+WNetGetUniversalName
+WNetGetUser
+WNetUseConnection
+NetUserCheckPassword
+GuidToString
+StringToGuid
+
+Removed:
+
+The constants
+ACCESS_SYSTEM_SECURITY
+DELETE
+GENERIC_ALL
+GENERIC_EXECUTE
+GENERIC_READ
+GENERIC_WRITE
+MAXIMUM_ALLOWED
+PROTECTED_DACL_SECURITY_INFORMATION
+PROTECTED_SACL_SECURITY_INFORMATION
+READ_CONTROL
+SYNCHRONIZE
+SPECIFIC_RIGHTS_ALL
+STANDARD_RIGHTS_ALL
+STANDARD_RIGHTS_REQUIRED
+WRITE_DAC
+WRITE_OWNER
+has been removed because they are not used by the module.
+
+###################################################################################################
+
+Version 1.0.9.1	01/10/2002
+
+Fixed Bugs:
+
+NetLocalGroupEnum				- does not run in an infinite loop furthermore
+NetLocalGroupGetMembers				- does not run in an infinite loop furthermore
+NetGroupEnum					- does not run in an infinite loop furthermore
+NetGroupGetUsers				- does not run in an infinite loop furthermore
+NetMessageNameEnum				- does not run in an infinite loop furthermore
+ReadEventLog					- out of memory bug fixed
+GetEventDescription				- bug fixed if more than one dll is registered for 
+						  an event
+
+$Version variable changed to $VERSION in lanman.pm (because of the CPAN indexer)
+
+New:
+
+###################################################################################################
+
+Version 1.0.9.2	02/01/2002
+
+Fixed Bugs:
+
+Bug fixed which caused that Perl hangs and eats up memory if you previously have called a function from 
+the modul. The bug seem to appear only with NT4 SP6 and Perl 5.6.1. 
+
+New:
+
+###################################################################################################
+
+Version 1.0.10.0	01/10/2003
+
+Fixed Bugs:
+
+The following constants are exported by the lanman and the win32 modules:
+
+DACL_SECURITY_INFORMATION
+GROUP_SECURITY_INFORMATION
+OWNER_SECURITY_INFORMATION
+SACL_SECURITY_INFORMATION
+
+To avoid the export of these constants, you may use the following statement:
+
+use Win32::Lanman qw( !:WIN32_MOD );
+
+New:
+
+Support for Perl 5.8.
+
+Removed:
+
+Perl 5.003_07 is not longer supported.
+

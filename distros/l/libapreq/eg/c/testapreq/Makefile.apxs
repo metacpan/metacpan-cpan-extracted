@@ -1,0 +1,10 @@
+APXS = apxs
+
+MY_CFLAGS = -I/usr/local/include/libapreq
+MY_LDFLAGS = -L/usr/local/include -lapreq
+
+SRC = mod_testapreq.c
+
+libtestapreq.so: $(SRC)
+	LD_RUN_PATH=$(LD_RUN_PATH) $(APXS) -c -o $@ $(MY_CFLAGS) $(MY_LDFLAGS) $(SRC)
+

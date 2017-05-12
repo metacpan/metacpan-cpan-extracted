@@ -1,0 +1,87 @@
+=head1 Using PerlSAX
+
+Working with PerlSAX involves using two classes (packages), a PerlSAX
+parser that generates parsing events and a class that you write that
+will receive those parsing events, the ``handler''.  This guide will
+use the XML::Parser::PerlSAX parser that uses Clark Cooper's
+XML::Parser module.
+
+The handler class implements the PerlSAX handler methods that you are
+interested in.  The following example, MyHandler.pm, prints a message
+every time an element starts or ends:
+
+    package MyHandler;
+
+    sub new {
+        my ($type) = @_;
+        return bless {}, $type;
+    }
+
+    sub start_element {
+        my ($self, $element) = @_;
+
+        print "Start element: $element->{Name}\n";
+    }
+
+    sub end_element {
+        my ($self, $element) = @_;
+
+        print "End element: $element->{Name}\n";
+    }
+
+    1;
+
+To use your handler you will need to have a script, myhandler.pl, that
+loads and creates your handler and the parser, and then calls the
+parser to parse the XML instance and send events to your handler:
+
+    use XML::Parser::PerlSAX;
+    use MyHandler;
+
+    my $my_handler = MyHandler->new;
+    my $parser = XML::Parser::PerlSAX->new( Handler => $my_handler );
+
+    foreach my $instance (@ARGV) {
+        $parser->parse(Source => { SystemId => $instance });
+    }
+
+Given this XML instance, myhandler.xml:
+
+    <?xml version="1.0"?>
+
+    <article>
+    <title>Using PerlSAX</title>
+    <paragraph>Working with PerlSAX ...</paragraph>
+    </article>
+
+Running myhandler.pl like this:
+
+    perl myhandler.pl myhandler.xml
+
+will produce this output:
+
+    Start element: article
+    Start element: title
+    End element: title
+    Start element: paragraph
+    End element: paragraph
+    End element: article
+
+=head2 For More Information
+
+PerlSAX.pod describes the PerlSAX interface.  Each parser module
+describes it's individual capabilities.  XML::Parser::PerlSAX is the
+most commonly used PerlSAX implementation.
+
+The files described in this doc are in the `examples' directory.  A
+more complete implementation of the very simple handler above is in
+the module XML::Handler::Sample.  Other, more complex handlers are in
+the XML::Handler directory as well.
+
+Another hands-on doc for PerlSAX is the XML-Parser-and-PerlSAX.pod.
+This doc describes the difference between and the purpose of PerlSAX
+with respect to XML::Parser.
+
+This document was inspired by and uses the code examples from David
+Megginson's ``Quick Start for SAX Application Writers.''
+<http://www.megginson.com/SAX/quickstart.html>

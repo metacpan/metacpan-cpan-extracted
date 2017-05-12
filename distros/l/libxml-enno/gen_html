@@ -1,0 +1,24 @@
+#!/usr/bin/ksh
+#
+# This script generates the .html files in html/ from the .pm and .pod files
+# in the lib/ directory
+#
+# podtohtml came with PodToHTML-0.04 (available at CPAN)
+# (I wasn't satisfied with pod2html)
+#
+# by Enno Derksen, 10/15/1999
+#--------------------------------------------------------------------------------
+
+# Read pods from 'html', write HTML files in 'lib/XML'
+podtohtml -d html lib/XML
+
+# To generate a complete HTML tree including all the pods in your @INC,
+# use 'podtohtml -I -d html lib/XML"
+
+# podtohtml prints the following message when it parses an original XML::Parser
+# pod. I took the '=begin man' block out of the lib/XML/Parser.pod that comes
+# with distribution, so you won't see it unless you plug in your own version.
+# Just ignore the warning.
+#
+#    /home1/enno/src/perl/libxml-enno/lib/XML/Parser.pod:begin man
+#    .ds PI PI

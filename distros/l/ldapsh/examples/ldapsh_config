@@ -1,0 +1,6 @@
+[ldap]
+servers: ldap.domain.com
+base: dc=domain,dc=com
+
+[main]
+default: ldap

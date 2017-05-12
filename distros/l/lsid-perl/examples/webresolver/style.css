@@ -1,0 +1,58 @@
+
+/* Overall layout */
+
+body {
+	color: #333333;
+	margin: 0px;
+	border:0;
+}
+
+
+pre {
+	padding: 0 30px 10px 20px;
+	margin: 0;
+	text-align:justify;
+}
+
+p {
+	padding: 2px;
+	margin: 0px;
+}
+
+#main {
+	border: 2px solid #000000; 
+	background: #ffffff;
+	color: #333333;
+	height:80%;
+}
+
+#description {
+
+	font-family: arial, sans-serif;
+	text-indent: 25px;
+}
+
+#title {
+	font-family: arial, sans-serif;
+	margin-top: 0px;
+}
+
+.keyTitle {
+	font-family: arial, sans-serif;
+	font-weight: bold;
+	font-size: larger;
+}
+
+.exampleList {
+
+	font-size: xx-small;
+}
+
+.lsid {
+
+	font-family: arial, sans-serif;
+	font-weight: normal;
+	font-size: larger;
+	padding-left: 4px;
+	padding-right: 4px;
+}

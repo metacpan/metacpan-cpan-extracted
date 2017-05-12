@@ -1,0 +1,59 @@
+libapreq - Generic Apache Request Library
+http://httpd.apache.org/apreq/
+
+This package contains modules for manipulating client request data via
+the Apache API with Perl and C.  Functionality includes:
+
+ - parsing of application/x-www-form-urlencoded data
+ - parsing of multipart/form-data 
+ - parsing of HTTP Cookies
+
+See libapreq.pod for the C API documentation and
+eg/c/ for examples.
+
+The Perl modules are simply a thin xs layer on top of libapreq,
+making them a lighter and faster alternative to CGI.pm and
+CGI::Cookie.  See the Apache::Request and Apache::Cookie documentation
+for more details and eg/perl/ for examples.
+
+The Perl interface was designed by Lincoln Stein (lstein@cshl.org),
+originally implemented as a pure Perl Apache::Request module.
+The C implementation has a similar look-and-feel, including structures
+modeled from Lincoln's Perl design.
+
+IMPORTANT NOTE: To install the Perl modules, your mod_perl installation
+MUST includes support for Apache::Table.  This means that mod_perl should
+be built using the EVERYTHING=1, or at minimum PERL_TABLE_API=1.  If you
+see errors like this (during compilation of libapreq)
+
+        Error: 'Apache::Table' not in typemap in Request.xs,
+
+your mod_perl must be rebuilt to include Apache::Table support.
+
+The Perl API includes a test suite based on Apache::Test.
+Type "make test" to run the tests, and be sure Apache::Test
+is installed prior to running "perl Makefile.PL".
+
+IMPORTANT NOTE:  The test suite in libapreq-1.1 was based
+on Apache::test, which is now in the process of being phased
+out of mod_perl-1.X.  libapreq's new tests require Apache::Test 
+version 1.03 or greater.  Please read the INSTALL file for more details.
+
+Portions of the C code are based on examples from:
+     Writing Apache Modules with Perl and C,
+     Lincoln Stein & Doug MacEachern,
+     O'Reilly & Associates, Sebastapol, CA, 1998,
+     ISBN 1-56592-567-X. 
+     http://www.modperl.com/
+
+Development of this package, version 0.32 was sponsored by:
+Covalent Technologies Inc. http://www.covalent.net/
+
+Development of this package, versions 0.01-0.31 was sponsored by:
+Critical Path Inc. http://www.cp.net/ 
+
+Support for the Perl interface is available from:
+modperl@apache.org
+
+Support for the C interface is available from:
+apreq-dev@httpd.apache.org

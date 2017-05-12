@@ -1,0 +1,22 @@
+- web_set_locale returns the language and the country for lang/country
+  combinations (eg. de-AT) in the language field.  Correct?
+
+- add conversion modules for other Unicode encodings than UTF-8 
+  (UTF-16, UCS-*)
+
+- Better support for Windows, the locale detection stuff does not
+  really work there.  Any help would be appreciated.
+
+- Check whether other locale categories than LC_MESSAGES work.
+
+- Avoid call to __load_domain in Locale::gettext_pp, use a cache table
+  first
+
+- The pure Perl version of gettext will always look for message catalogs
+  in /usr/share/locale/{LANGUAGE}/LC_MESSAGES after the directory
+  specified by bindtextdomain().  This can lead to undesired results.
+  But I think the C version from libintl does the same, correct?
+
+- Allow to dynamically expand the list of supported conversions
+
+- Allow to dynamically restrict the list of suppported conversions

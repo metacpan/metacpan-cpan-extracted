@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<!-- 
+LSID SOAP Binding Standard for LSIDAssigningServicePortType
+
+Jordi Albornoz
+23 October 2003 - Initial Draft
+24 October 2003 - Minor cosmetic changes
+-->
+
+<definitions xmlns:tns="http://www.omg.org/LSID/2003/Assigning/StandardSOAPBinding"
+		targetNamespace="http://www.omg.org/LSID/2003/Assigning/StandardSOAPBinding"
+		xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+		xmlns="http://schemas.xmlsoap.org/wsdl/"
+		xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+		xmlns:sns="http://www.omg.org/LSID/2003/Standard/Assigning/WSDL">
+
+	<import namespace="http://www.omg.org/LSID/2003/Standard/Assigning/WSDL" location="LSIDAssigningPortType.wsdl" />
+
+	<binding name="LSIDAssigningSOAPBinding" type="sns:LSIDAssigningServicePortType">
+		<soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http" />
+		<operation name="assignLSID">
+			<soap:operation />
+			<input>
+				<soap:body use="literal" namespace="http://www.omg.org/LSID/2003/Assigning/StandardSOAPBinding" />
+			</input>
+			<output>
+				<soap:body use="literal" namespace="http://www.omg.org/LSID/2003/Assigning/StandardSOAPBinding" />
+			</output>
+		</operation>
+		<operation name="assignLSIDFromList">
+			<soap:operation />
+			<input>
+				<soap:body use="literal" namespace="http://www.omg.org/LSID/2003/Assigning/StandardSOAPBinding" />
+			</input>
+			<output>
+				<soap:body use="literal" namespace="http://www.omg.org/LSID/2003/Assigning/StandardSOAPBinding" />
+			</output>
+		</operation>
+		<operation name="getLSIDPattern">
+			<soap:operation />
+			<input>
+				<soap:body use="literal" namespace="http://www.omg.org/LSID/2003/Assigning/StandardSOAPBinding" />
+			</input>
+			<output>
+				<soap:body use="literal" namespace="http://www.omg.org/LSID/2003/Assigning/StandardSOAPBinding" />
+			</output>
+		</operation>
+		<operation name="getLSIDPatternFromList">
+			<soap:operation />
+			<input>
+				<soap:body use="literal" namespace="http://www.omg.org/LSID/2003/Assigning/StandardSOAPBinding" />
+			</input>
+			<output>
+				<soap:body use="literal" namespace="http://www.omg.org/LSID/2003/Assigning/StandardSOAPBinding" />
+			</output>
+		</operation>
+		<operation name="assignLSIDForNewRevision">
+			<soap:operation />
+			<input>
+				<soap:body use="literal" namespace="http://www.omg.org/LSID/2003/Assigning/StandardSOAPBinding" />
+			</input>
+			<output>
+				<soap:body use="literal" namespace="http://www.omg.org/LSID/2003/Assigning/StandardSOAPBinding" />
+			</output>
+		</operation>
+		<operation name="getAllowedPropertyNames">
+			<soap:operation />
+			<input>
+				<soap:body use="literal" namespace="http://www.omg.org/LSID/2003/Assigning/StandardSOAPBinding" />
+			</input>
+			<output>
+				<soap:body use="literal" namespace="http://www.omg.org/LSID/2003/Assigning/StandardSOAPBinding" />
+			</output>
+		</operation>
+		<operation name="getAuthoritiesAndNamespaces">
+			<soap:operation />
+			<input>
+				<soap:body use="literal" namespace="http://www.omg.org/LSID/2003/Assigning/StandardSOAPBinding" />
+			</input>
+			<output>
+				<soap:body use="literal" namespace="http://www.omg.org/LSID/2003/Assigning/StandardSOAPBinding" />
+			</output>
+		</operation>
+	</binding>
+
+</definitions>

@@ -1,0 +1,95 @@
+Known restrictions and bugs:
+
+
+Almost all calls declared as obsolete in the win32 documentation are not 
+implemented. The exceptions are:
+
+NetFileClose
+NetLocalGroupAddMember
+NetLocalGroupDelMember
+NetShareEnum
+NetUseAdd
+NetUseDel
+NetUseEnum
+NetUseGetInfo
+
+##################################################################################
+
+NetAlertRaise 
+NetAlertRaiseEx
+
+I don't know how to call these functions and I did not find an example.
+
+##################################################################################
+
+NetStatisticsGet
+
+Returns always error code 50 (request not supported).
+
+##################################################################################
+
+NetStatisticsGet2
+
+Call does not exist. It must be a mistake in the documentation.
+
+##################################################################################
+
+NetHandleGetInfo
+
+No lib file for netapi.dll available. I tried to load with GetProcAddress, but it 
+seems to be not a valid win32 dll.
+
+##################################################################################
+
+ServerGetInfo
+WkstaGetInfo
+
+Calls at level 402 and 403 are not supported. Error code 124.
+
+##################################################################################
+
+NetWkstaGetInfo
+
+If you call NetWkstaGetInfo as a normal user, you won't get the langroup. It seems
+to be a bug in NetWkstaGetInfo. If call it with level 101, the langroup pointer
+points to an invalid memory.
+
+Calls at level 402 and 403 are not supported. Error code 124.
+
+##################################################################################
+
+NetApiBufferAllocate
+NetApiBufferFree
+NetApiBufferReallocate
+NetApiBufferSize
+
+These calls are not necessary.
+
+##################################################################################
+
+LsaQueryInformationPolicy(..., PolicyMachinePasswordInformation, ...)
+LsaSetInformationPolicy(..., PolicyMachinePasswordInformation, ...)
+LsaQueryTrustedDomainInfo(..., ..., TrustedControllersInformation, ...)
+LsaQueryTrustedDomainInfo(..., ..., TrustedDomainInformationBasic, ...)
+LsaQueryTrustedDomainInfo(..., ..., TrustedDomainInformationEx, ...)
+LsaQueryTrustedDomainInfo(..., ..., TrustedDomainAuthInformation, ...)
+LsaQueryTrustedDomainInfo(..., ..., TrustedDomainFullInformation, ...)
+
+Currently not supported by NT.
+
+##################################################################################
+
+WTSShutdownSystem
+
+Shuts down only the local machine not the WTS server like you'd expect. It seems 
+to be a bug in the call.
+
+##################################################################################
+
+ChangeServiceConfig2
+
+You cannot set the the failed_actions parameter in the config hash. If you do so,
+the call fails with an error.
+
+
+

@@ -1,0 +1,15 @@
+This package was debianized by Alex Shinn <foof@debian.org> on
+Tue, 24 Oct 2000 01:35:40 -0400.
+
+It was downloaded from http://eyeofdog.org/foof/code/vorbis/
+
+Upstream Author(s): Alex Shinn <foof@debian.org>
+
+Copyright:
+
+This library is Free Software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either the GPLv2 or the
+Artistic License.
+
+On Debian systems both of these licenses can be found in
+/usr/share/common-licenses/.

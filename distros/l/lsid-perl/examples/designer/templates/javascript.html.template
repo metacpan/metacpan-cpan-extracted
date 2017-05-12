@@ -1,0 +1,229 @@
+<script type="text/javascript">
+<!--
+function doPopup() {
+
+	if(document.services == null)
+		return;
+
+	mappingsPopup = document.services.mappingsPopup;
+
+	if(mappingsPopup) {
+
+		namespaces = document.services.namespaces;
+
+		for( i = 0; i < namespaces.options.length; i++) {
+
+			mappingsPopup.options[i + 1] = new Option(namespaces.options[i].text);
+		}
+	}
+}
+
+function doRemoveNamespace(doc) {
+
+	namespaces = document.services.namespaces;
+
+	i = 0;
+	while(i < namespaces.options.length) {
+
+		if(namespaces.options.item(i).selected) {
+
+			mappingsPopup = document.services.mappingsPopup;
+
+			for(j = 0; j < mappingsPopup.options.length; j++) {
+
+				if(mappingsPopup.options[j].value == namespaces.options[i].value)
+					mappingsPopup.options[j] = null;
+			}
+
+			namespaces.options[i] = null;
+		}
+		else {
+			i++;
+		}
+	}
+}
+
+function doAddNamespace(doc) {
+
+	namespaces = document.services.namespaces;
+	newNamespace = document.services.newNamespace;
+
+	mappingsPopup = document.services.mappingsPopup;
+
+	if(newNamespace.value == "") return;
+
+	for(i = 0; i < namespaces.options.length; i++) {
+
+		if(namespaces.options[i].value == newNamespace.value) return;
+	}
+
+	namespaces.options[namespaces.options.length] = new Option(newNamespace.value);
+	mappingsPopup.options[mappingsPopup.options.length] = new Option(newNamespace.value);
+	
+	newNamespace.value = "";
+}
+
+function doRemoveMapping(doc) {
+
+	mappings = document.services.mappings;
+
+	i = 0;
+	while(i < mappings.options.length) {
+
+		if(mappings.options.item(i).selected) {
+
+			mappings.options[i] = null;
+		}
+		else {
+			i++;
+		}
+	}
+}
+
+function doAddMapping(doc) {
+
+	mappings = document.services.mappings;
+	newMapping = document.services.newMapping;
+
+	if(newMapping.value == "") return;
+
+	mappingsPopup = document.services.mappingsPopup;
+
+	if(mappingsPopup.options[0].selected) return;
+
+	for(i = 0; i < mappings.options.length; i++) {
+
+		if(mappings.options[i].value == newMapping.value) return;
+	}
+
+
+	selection = null;
+
+	while(selection == null && i < mappingsPopup.options.length) {
+
+		if(mappingsPopup.options[i].selected) {
+			selection = mappingsPopup.options[i];
+		}
+		else {
+			i++;
+		}
+	}
+
+	if(selection == null)
+		return;
+
+	newOption = new Option(newMapping.value + "=> " + selection.value);
+
+	mappings.options[mappings.options.length] = newOption;
+
+	newMapping.value = "";
+}
+
+function doAddPort(doc) {
+
+	portName = document.ports.portName;
+	portLocation = document.ports.portLocation;
+	portProtocol = document.ports.portProtocol;
+
+	// Allow a blank name
+	//if(portName.value == "") return;
+	if(portLocation.value == "") return;
+
+	portType = document.ports.portType;
+
+	if(portType.options[0].selected == true) return;
+	i = 0;
+	type = null;
+	while( i < portType.options.length && type == null) {
+
+		if(portType.options[i].selected) 
+			type = portType.options[i];
+		else
+			i++;
+	}
+
+	if(type == null) 
+		return ;
+
+	i = 0;
+	protocol = null;
+
+	if(portProtocol.options[0].selected == true) return;
+	while( i < portProtocol.options.length && protocol == null) {
+
+		if(portProtocol.options[i].selected)
+			protocol = portProtocol.options[i];
+		else
+			i++;
+	}
+
+	if(protocol == null)
+		return ;
+
+
+
+	p = document.ports.portList;
+
+	newOption = new Option(portName.value + "  =>  " + protocol.value + "://" + portLocation.value + "  =>  " + type.text);
+
+	p.options[p.options.length] = newOption;
+
+	portName.value = "";
+	portLocation.value = "";
+
+}
+
+function doRemovePort(doc) {
+
+	p = document.ports.portList;
+
+	i = 0;
+	while(i < p.options.length) {
+
+		if(p.options.item(i).selected) {
+
+			p.options[i] = null;
+		}
+		else {
+			i++;
+		}
+	}
+}
+
+function doSubmit() {
+
+	mappings = null;
+	namespaces = null;
+
+	if(document.services) {
+
+		mappings = document.services.mappings;
+		namespaces = document.services.namespaces;
+	}
+
+	p = null;
+	if(document.ports)
+		p = document.ports.portList;
+
+	if(mappings) {
+
+		for( i = 0; i < mappings.options.length; i++) 
+			mappings.options[i].selected = true;
+	}
+
+	if(namespaces) {
+
+		for( i = 0;  i < namespaces.options.length; i++)
+			namespaces.options[i].selected = true;
+	}
+
+	if(p) {
+
+		for( i = 0;  i < p.options.length; i++)
+			p.options[i].selected = true;
+	}
+
+	return 0;
+}
+//-->
+</script>

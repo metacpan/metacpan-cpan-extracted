@@ -1,0 +1,25 @@
+0.004   2017-01-11 (PERLANCAR)
+
+	- Derp, only show debug message under debug=1.
+
+
+0.003   2017-01-11 (PERLANCAR)
+
+	- No functional changes.
+
+        - [doc] Explain why prove -M won't work, add examples for testing
+          scripts.
+
+        - [debugging] Add debug message: lib::filter import arguments.
+
+
+0.002   2016-07-08 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Fix documentation about allow_core.
+
+
+0.001   2016-07-08 (PERLANCAR)
+
+        - First release.

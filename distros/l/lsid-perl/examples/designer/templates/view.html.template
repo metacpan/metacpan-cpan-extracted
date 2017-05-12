@@ -1,0 +1,27 @@
+<TMPL_INCLUDE name="javascript.html.template">
+
+<h1 id="title">View your Authority's Code</h1>
+<h2 id="subtitle"></h2>
+
+<div id="instructions">
+
+<div id="position">
+        Instructions &nbsp; &nbsp; &nbsp;
+        Authority Identity &nbsp; &nbsp; &nbsp;
+        Services and Namespaces &nbsp; &nbsp; &nbsp;
+        Service Endpoints &nbsp; &nbsp; &nbsp;
+        <span id="bolden">View Code</span>
+</div>
+
+
+</div>
+
+
+<div style="text-align: center; margin-top: 8px; margin-bottom: 8px;">
+<TMPL_INCLUDE name="view_menu.html.template">
+<br/>
+<br/>
+<TMPL_VAR name="submit">
+</div>
+
+<TMPL_VAR name="code">

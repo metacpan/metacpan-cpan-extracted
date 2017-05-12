@@ -1,0 +1,76 @@
+=head1 Creating PatAct Modules
+
+This document is targeted towards the module writer creating a new
+pattern or action module or readers who want to understand what is
+going on inside a pattern or action module.  If you are only
+interesting in using PatAct modules, please see ``Using PatAct
+Modules.''
+
+There are two types of modules involved in processing a pattern-action
+list the pattern module and the action module.  Pattern modules are
+created by users and passed to the `new()' method of action modules,
+otherwise all pattern module methods are used only by the action
+module.  Action modules are PerlSAX handlers (see PerlSAX.pod in
+libxml-perl).  Action modules are responsible for initializing the
+pattern module, receiving PerlSAX events, calling the `match()' method
+in the pattern module for each element, and applying actions for
+matching elements.
+
+The interface the user uses to call the drivers is described in
+``Using PatAct Modules''.
+
+In general, the pattern-action modules perform their work on an
+element-by-element basis, but the action modules are called with
+PerlSAX events for all parse events (characters, processing
+instructions, etc.).
+
+=head1 Pattern Modules
+
+Pattern modules have this interface, where PATTERN is the pattern or
+query implementation:
+
+  use XML::PatAct::PATTERN;
+
+  $matcher = XML::PatAct::PATTERN->new(Patterns => $patterns [, OPTIONS]);
+  $matcher->initialize($actor);
+  $index = $matcher->match($element, $names, $nodes);
+  $matcher->finalize();
+
+A pattern module instance is created with the pattern list that will
+be used or processing as well as any additional options a pattern
+module may define.  `$patterns' is the original array reference passed
+in by the user to the action module, so it is made up of pairs of
+PATTERN => ACTION.  The pattern matcher should ignore the ACTION
+items.
+
+`initialize()' is called before any calls to `match()'.  `$actor' is
+the action module that is calling the pattern module.  `initialize()'
+is normally called from the `start_document()' PerlSAX event.
+
+`match()' performs a single matching against the pattern list and
+returns the index of the matching pattern or undef if no pattern
+matches.  `$element' is the element to match.  `$names' and `$nodes'
+are array references containing the names and nodes (hashes) of this
+element and all parent elements up to the element where processing
+started.
+
+`finalize()' is called at the end of processing and may be used to
+release state information.  `finalize()' is normally called from the
+`end_document()' PerlSAX event.
+
+Here is a template for creating a pattern module:
+
+@include ../lib/XML/PatAct/PatternTempl.pm
+
+=head1 Action Modules
+
+Action modules are PerlSAX handlers (see PerlSAX.pod in libxml-perl).
+Action modules are responsible for initializing the pattern module,
+receiving PerlSAX events, calling the `match()' method in the pattern
+module for each element, and applying actions for matching elements.
+Action modules must also maintain arrays of element names and element
+nodes to be passed to the `match()' method.
+
+Here is a template for creating an action module:
+
+@include ../lib/XML/PatAct/ActionTempl.pm

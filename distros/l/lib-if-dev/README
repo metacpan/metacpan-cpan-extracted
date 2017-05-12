@@ -1,0 +1,33 @@
+NAME
+    lib::if::dev - Use lib/ if we're in a dev root
+
+VERSION
+    This document describes version 0.002 of lib::if::dev - released
+    February 24, 2013 as part of lib-if-dev.
+
+SYNOPSIS
+        # does a 'use lib "lib/"' if exists Makefile.PL, Build.PL, or dist.ini
+        use lib::if::dev;
+
+DESCRIPTION
+    If you're running a script from your development root (or anything else
+    for that matter), it's often fun to figure out how to include lib/ in
+    your command both so that you don't need to remember to do a "-Ilib" or
+    have to remember to remove 'use lib "lib"' statements before releasing.
+
+    This package aims to solve that (for one value of "solve").
+
+    If your current directory contains a directory "lib" and one or more of
+    Makefile.PL, Build.PL, or dist.ini, then this package pushes 'lib/' onto
+    @INC.
+
+AUTHOR
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2012 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

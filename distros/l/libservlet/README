@@ -1,0 +1,28 @@
+
+libservlet - the Perl Servlet API
+=================================
+
+The Servlet API for Perl (libservlet) is a formulation of the Java
+(TM) Servlet API in Perl. The current version of the API is 2.3, and
+the current release of libservlet is version 0.9.1.
+
+libservlet requires perl 5.6 and the Exception::Class and IO::Handle
+modules.
+
+The web site for libservlet is located at
+<http://www.maz.org/libservlet/>. You can find a local copy inside
+this source distribution at <./doc/index.html>.
+
+For comments, questions, bug reports etc, join the mailing list for
+servlet application and container developers by sending an empty
+message to mailto:libservlet-subscribe@maz.org.
+
+Copyright (c) 2001 Brian Moseley <bcm@maz.org>
+
+You may distribute under the terms of either the GNU General Public
+License or the Artistic License, as specified in the Perl README
+file.
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.

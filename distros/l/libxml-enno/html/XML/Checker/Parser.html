@@ -1,0 +1,168 @@
+<HTML><HEAD><TITLE>XML::Checker::Parser - an XML::Parser that validates at parse time</TITLE></HEAD><BODY><H1><A NAME="NAME">NAME
+
+</A></H1><P>XML::Checker::Parser - an XML::Parser that validates at parse time
+
+<P><HR><H1><A NAME="SYNOPSIS">SYNOPSIS
+
+</A></H1><PRE> use XML::Checker::Parser;
+
+</PRE><PRE> my %expat_options = (KeepCDATA =&gt; 1, 
+		      Handlers =&gt; [ Unparsed =&gt; \&amp;my_Unparsed_handler ]);
+ my $parser = new XML::Checker::Parser (%expat_options);
+
+</PRE><PRE> eval {
+     local $XML::Checker::FAIL = \&amp;my_fail;
+     $parser-&gt;parsefile ("fail.xml");
+ };
+ if ($@) {
+     # Either XML::Parser (expat) threw an exception or my_fail() died.
+     ... your error handling code here ...
+ }
+
+</PRE><PRE> # Throws an exception (with die) when an error is encountered, this
+ # will stop the parsing process.
+ # Don't die if a warning or info message is encountered, just print a message.
+ sub my_fail {
+     my $code = shift;
+     die XML::Checker::error_string ($code, @_) if $code &lt; 200;
+     XML::Checker::print_error ($code, @_);
+ }
+
+</PRE><P><HR><H1><A NAME="DESCRIPTION">DESCRIPTION
+
+</A></H1><P>I hope the example in the SYNOPSIS says it all, just use 
+<A HREF="Parser.html">XML::Checker::Parser</A> as if it were an XML::Parser. 
+See <A HREF="../Parser.html">XML::Parser</A> for the supported (expat) options.
+
+<P>You can also derive your parser from XML::Checker::Parser instead of 
+from XML::Parser. All you should have to do is replace:
+
+<PRE> package MyParser;
+ @ISA = qw( XML::Parser );
+
+</PRE><P>with:
+
+<PRE> package MyParser;
+ @ISA = qw( XML::Checker::Parser );
+
+</PRE><P><HR><H1><A NAME="XML_Checker_Parser_constructor">XML::Checker::Parser constructor
+
+</A></H1><PRE> $parser = new XML::Checker::Parser (SkipExternalDTD =&gt; 1, SkipInsignifWS =&gt; 1);
+
+</PRE><P>The constructor takes the same parameters as <A HREF="../Parser.html">XML::Parser</A> with two additions,
+the SkipExternalDTD and SkipInsignifWS properties.
+
+<P>By default, it will try to load external DTDs using LWP. You can disable this
+by setting SkipExternalDTD to 1. See <A HREF="#External_DTDs">External DTDs</A> for details.
+
+<P>By default, it will treat insignificant whitespace as regular Char data.
+By setting SkipInsignifWS to 1, the user Char handler will not be called
+if insignificant whitespace is encountered. 
+See <A HREF="../Checker.html#INSIGNIFICANT_WHITESPACE">XML::Checker/INSIGNIFICANT_WHITESPACE</A> for details.
+
+<P><HR><H1><A NAME="External_DTDs">External DTDs
+
+</A></H1><P>XML::Checker::Parser will try to load and parse external DTDs that are 
+referenced in DOCTYPE definitions unless you set the <B>SkipExternalDTD</B>
+option to 1 (the default setting is 0.) 
+See <A HREF="#CAVEATS">CAVEATS</A> for details on what is not supported by XML::Checker::Parser.
+
+<P><A HREF="../Parser.html">XML::Parser</A> (version 2.27 and up) does a much better job at reading external 
+DTDs, because recently external DTD parsing was added to expat.
+Make sure you set the <A HREF="../Parser.html">XML::Parser</A> option <B>ParseParamEnt</B> to 1 and the 
+XML::Checker::Parser option <B>SkipExternalDTD</B> to 1. 
+(They can both be set in the XML::Checker::Parser constructor.)
+
+<P>When external DTDs are parsed by XML::Checker::Parser, they are
+located in the following order:
+
+<UL><LI><P>With the %URI_MAP, which can be set using <B>map_uri</B>.
+This hash maps external resource ids (like system ID's and public ID's)
+to full path URI's.
+It was meant to aid in resolving PUBLIC IDs found in DOCTYPE declarations 
+after the PUBLIC keyword, e.g.
+
+<PRE>  &lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"&gt;
+
+</PRE><P>However, you can also use this to force <A HREF="../Checker.html">XML::Checker</A> to read DTDs from a
+different URL than was specified (e.g. from the local file system for
+performance reasons.)
+
+<LI><P>on the Internet, if their system identifier starts with a protocol 
+(like http://...)
+
+<LI><P>on the local disk, if their system identifier starts with a slash 
+(absolute path)
+
+<LI><P>in the SGML_SEARCH_PATH, if their system identifier is a 
+relative file name. It will use @SGML_SEARCH_PATH if it was set with
+<B>set_sgml_search_path()</B>, or the colon-separated $ENV{SGML_SEARCH_PATH},
+or (if that isn't set) the list (".", "$ENV{'HOME'}/.sgml", "/usr/lib/sgml",
+"/usr/share/sgml"), which includes the
+current directory, so it should do the right thing in most cases.
+
+</UL><H2><A NAME="Static_methods_related_to_External_DTDs">Static methods related to External DTDs
+
+</A></H2><DL><DT><A NAME="set_sgml_search_path_dir1_dir2_"><STRONG><P>set_sgml_search_path (dir1, dir2, ...)
+
+</STRONG></A><DD>External DTDs with relative file paths are looked up using the @SGML_SEARCH_PATH,
+which can be set with this method. If @SGML_SEARCH_PATH is never set, it
+will use the colon-separated $ENV{SGML_SEARCH_PATH} instead. If neither are set
+it uses the list: ".", "$ENV{'HOME'}/.sgml", "/usr/lib/sgml",
+"/usr/share/sgml".
+
+<P>set_sgml_search_path is a static method.
+
+<DT><A NAME="map_uri_pubid_uri_"><STRONG><P>map_uri (pubid =&gt; uri, ...)
+
+</STRONG></A><DD>To define the location of PUBLIC ids, as found in DOCTYPE declarations 
+after the PUBLIC keyword, e.g.
+
+<PRE>  &lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN"&gt;
+
+</PRE><P>call this method, e.g.
+
+<PRE>  XML::Checker::Parser::map_uri (
+	"-//W3C//DTD HTML 4.0//EN" =&gt; "file:/user/html.dtd");
+
+</PRE><P>See <A HREF="#External_DTDs">External DTDs</A> for more info.
+
+<P>XML::Checker::Parser::map_uri is a static method.
+
+</DL><P><HR><H1><A NAME="Switching_user_handlers_at_parse_time">Switching user handlers at parse time
+
+</A></H1><P>You should be able to use setHandlers() just as in <A HREF="../Parser.html">XML::Parser</A>.
+(Using setHandlers has not been tested yet.)
+
+<P><HR><H1><A NAME="Error_handling">Error handling
+
+</A></H1><P>XML::Checker::Parser routes the fail handler through 
+XML::Checker::Parser::fail_add_context() before calling your fail handler
+(i.e. the global fail handler: $XML::Checker::FAIL. 
+See <A HREF="../Checker.html#ERROR_HANDLING">XML::Checker/ERROR_HANDLING</A>.)
+It adds the (line, column, byte) information from <A HREF="../Parser.html">XML::Parser</A> to the 
+error context (unless it was the end of the XML document.)
+
+<P><HR><H1><A NAME="Supported_XML_Parser_handlers">Supported XML::Parser handlers
+
+</A></H1><P>Only the following <A HREF="../Parser.html">XML::Parser</A> handlers are currently routed through
+<A HREF="../Checker.html">XML::Checker</A>: Init, Final, Char, Start, End, Element, Attlist, Doctype,
+Unparsed, Notation.
+
+<P><HR><H1><A NAME="CAVEATS">CAVEATS
+
+</A></H1><P>When using XML::Checker::Parser to parse external DTDs 
+(i.e. with SkipExternalDTD =&gt; 0),
+expect trouble when your external DTD contains parameter entities inside 
+declarations or conditional sections. The external DTD should probably have
+the same encoding as the orignal XML document.
+
+<P><HR><H1><A NAME="AUTHOR">AUTHOR
+
+</A></H1><P>Send bug reports, hints, tips, suggestions to Enno Derksen at
+&lt;<I>enno@att.com</I>&gt;.
+
+<P><HR><H1><A NAME="SEE_ALSO">SEE ALSO
+
+</A></H1><P><A HREF="../Checker.html">XML::Checker</A> (<A HREF="../Checker.html#SEE_ALSO">XML::Checker/SEE_ALSO</A>), <A HREF="../Parser.html">XML::Parser</A>
+<P><HR><I><FONT SIZE="-1">Last updated: Fri Oct 22 18:47:21 1999</FONT></I></BODY></HTML>

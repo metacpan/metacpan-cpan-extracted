@@ -1,0 +1,89 @@
+<HTML>
+<HEAD>
+<TITLE>Servlet::Http::HttpServletResponseWrapper - HTTP servlet response wrapper class</TITLE>
+<LINK REL="stylesheet" HREF="../../../libservlet.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Servlet::Http::HttpServletResponseWrapper - HTTP servlet response wrapper class</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  my $wrapper = Servlet::Http::HttpServletResponseWrapper-&gt;new($response);</PRE>
+<PRE>
+  my $reqs= $wrapper-&gt;getResponse();
+  $wrapper-&gt;setResponse($res);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Provides a convenient implementation of the HttpServletResponse
+interface that may be subclassed by developers wishing to adapt the
+response to a Servlet. This class implements the Wrapper or Decorator
+pattern. Methods default to calling through to the wrapped response object.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new($response)</CODE></A></STRONG><BR>
+<DD>
+Construct an instance with the given response object
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24response"><EM>$response</EM></A></STRONG><BR>
+<DD>
+the <STRONG>Servlet::Http::HttpServletResponse</STRONG> to be wrapped
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getResponse"><CODE>getResponse()</CODE></A></STRONG><BR>
+<DD>
+Returns the wrapped <STRONG>Servlet::Http::HttpServletResponse</STRONG>
+<P></P>
+<DT><STRONG><A NAME="item_setResponse"><CODE>setResponse($response)</CODE></A></STRONG><BR>
+<DD>
+Specify a new response object to be wrapped.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><EM>$response</EM></STRONG><BR>
+<DD>
+the <STRONG>Servlet::Http::HttpServletResponse</STRONG> to be wrapped
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../api/Servlet/Http/HttpServletResponse.html">the Servlet::Http::HttpServletResponse manpage</A>,
+<A HREF="../../../api/Servlet/ServletResponseWrapper.html">the Servlet::ServletResponseWrapper manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

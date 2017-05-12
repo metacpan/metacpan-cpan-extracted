@@ -1,0 +1,213 @@
+<HTML>
+<HEAD>
+<TITLE>Servlet::ServletInputStream - servlet input stream interface</TITLE>
+<LINK REL="stylesheet" HREF="../../libservlet.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Servlet::ServletInputStream - servlet input stream interface</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  my $byte = $stream-&gt;read();</PRE>
+<PRE>
+  my $numbytes = $stream-&gt;read(\$buffer);
+  my $numbytes = $stream-&gt;read(\$buffer, $offset, $length);</PRE>
+<PRE>
+  my $numbytes = $stream-&gt;readLine(\$buffer, $offset, $length);</PRE>
+<PRE>
+  $stream-&gt;skip($numbytes);</PRE>
+<PRE>
+  if ($stream-&gt;markSupported()) {
+      $stream-&gt;mark($limit);
+      $stream-&gt;reset();
+  }</PRE>
+<PRE>
+  $stream-&gt;close();</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Provides an input stream for reading binary data from a client
+request. With some protocols, such as HTTP POST and PUT, the stream
+can be used to read data sent from the client.</P>
+<P>An input stream object is normally retrieved via
+<A HREF="../../api/Servlet/ServletRequest.html#getinputstream">getInputStream in the Servlet::ServletRequest manpage</A>.</P>
+<P><STRONG>NOTE:</STRONG> While this is an abstract class in the Java API, the Perl API
+provides it as an interface. The main difference is that the Perl
+version has no constructor. Also, it merges the methods declared in
+<STRONG>java.io.InputStream</STRONG> and <STRONG>javax.servlet.ServletInputStream</STRONG> into a
+single interface.</P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_close"><CODE>close()</CODE></A></STRONG><BR>
+<DD>
+Closes the stream and releases any system resources associated with
+the stream.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIOException"><STRONG>Servlet::Util::IOException</STRONG></A></STRONG><BR>
+<DD>
+if an input exception occurs
+<P></P></DL>
+<DT><STRONG><A NAME="item_mark"><CODE>mark($limit)</CODE></A></STRONG><BR>
+<DD>
+Marks the current position in the stream. A subsequent call to
+<A HREF="#item_reset"><CODE>reset()</CODE></A> repositions the stream at the last marked position so that
+subsequent reads re-read the same bytes.
+<P>The <EM>$limit</EM> argument tells the stream to allow that many bytes to be
+read before the mark position is invalidated. If more than <EM>$limit</EM>
+bytes are read, a call to <A HREF="#item_reset"><CODE>reset()</CODE></A> will have no effect.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24limit"><EM>$limit</EM></A></STRONG><BR>
+<DD>
+the maximum number of bytest hat can be read before the marked
+position becomes invalid
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::Util::IOException</STRONG></STRONG><BR>
+<DD>
+if marking is not supported
+<P></P></DL>
+<DT><STRONG><A NAME="item_markSupported"><CODE>markSupported()</CODE></A></STRONG><BR>
+<DD>
+Returns true if the stream supports <A HREF="#item_mark"><CODE>mark()</CODE></A> and <A HREF="#item_reset"><CODE>reset()</CODE></A>, or false
+if it does not.
+<P></P>
+<DT><STRONG><A NAME="item_read"><CODE>read()</CODE></A></STRONG><BR>
+<DD>
+<DT><STRONG>read(\$buffer, $length)</STRONG><BR>
+<DD>
+<DT><STRONG>read(\$buffer, $length, $offset)</STRONG><BR>
+<DD>
+If no arguments are specified, returns the next byte of data from the
+stream, or <EM>undef</EM> if no byte is available because the end of the stream
+has been reached.
+<P>If arguments are specified, reads up to <EM>$length</EM> bytes from the
+stream, stores them in <EM>$buffer</EM>, and returns the number of bytes
+read (or <EM>undef</EM> if no bytes are available because the end of the
+stream has been reached).</P>
+<P>If <EM>$offset</EM> is specified, the read data is placed <EM>$offset</EM> bytes
+from the beginning of <EM>$buffer</EM>. If <EM>$offset</EM> is negative, it will
+be counted backwardsd from the end of the string. If <EM>$offset</EM> is
+positive and greater than the length of <EM>$buffer</EM>, the scalar will be
+padded to the required size with <EM>``\0''</EM> bytes before the result of
+the read is appended.</P>
+<P>Blocks until input data is available, the end of the stream is
+detected, or an exception is thrown.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%5C%24buffer"><EM>\$buffer</EM></A></STRONG><BR>
+<DD>
+a reference to a scalar buffer into which the data is read
+<P></P>
+<DT><STRONG><A NAME="item_%24length"><EM>$length</EM></A></STRONG><BR>
+<DD>
+the maximum number of bytes to read
+<P></P>
+<DT><STRONG><A NAME="item_%24offset"><EM>$offset</EM></A></STRONG><BR>
+<DD>
+the location in <EM>$buffer</EM> where data is written
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::Util::IOException</STRONG></STRONG><BR>
+<DD>
+if an input exception occurs
+<P></P>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AUndefReferenceException"><STRONG>Servlet::Util::UndefReferenceException</STRONG></A></STRONG><BR>
+<DD>
+if <EM>$buffer</EM> is specified as <EM>undef</EM>
+<P></P></DL>
+<DT><STRONG><A NAME="item_readLine">readLine(\$buffer, $offset, $length)</A></STRONG><BR>
+<DD>
+Reads the input stream one line at a time. Starting at an offset,
+reads bytes into the buffer until it reads a certain number of
+bytes or reaches a newline character, which it reads into the array as
+well. Returns the number of bytes read, or -1 if it reaches the end of
+the input stream before reading the maximum number of bytes.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24buffer"><EM>$buffer</EM></A></STRONG><BR>
+<DD>
+a reference to a scalar into which data is read
+<P></P>
+<DT><STRONG><EM>$offset</EM></STRONG><BR>
+<DD>
+an integer specifying the byte at which the method begins reading
+<P></P>
+<DT><STRONG><EM>$length</EM></STRONG><BR>
+<DD>
+an integer specifying the maximum number of bytes to read
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::Util::IOException</STRONG></STRONG><BR>
+<DD>
+if an input exception occurs
+<P></P></DL>
+<DT><STRONG><A NAME="item_reset">reset</A></STRONG><BR>
+<DD>
+Repositions the stream to the position at the time <A HREF="#item_mark"><CODE>mark()</CODE></A> was last
+called on the stream.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::Util::IOException</STRONG></STRONG><BR>
+<DD>
+if the stream has not been marked, the mark has been invalidated,
+or marking is not supported
+<P></P></DL>
+<DT><STRONG><A NAME="item_skip"><CODE>skip($num)</CODE></A></STRONG><BR>
+<DD>
+Skips over and discards <EM>$num</EM> bytes of data from the stream and
+returns the number of bytes skipped, or -1 if no bytes were skipped.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24num"><EM>$num</EM></A></STRONG><BR>
+<DD>
+the number of bytes to skip
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::Util::IOException</STRONG></STRONG><BR>
+<DD>
+if an input exception occurs
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../api/Servlet/ServletRequest.html">the Servlet::ServletRequest manpage</A>,
+<A HREF="../../api/Servlet/Util/Exception.html">the Servlet::Util::Exception manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

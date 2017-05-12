@@ -1,0 +1,5 @@
+Make Term::ReadKey Optional
+
+Fix ls to Date::Manip is optional
+
+Fix Term::ReadKey stuff so it can use the stub when necessary

@@ -1,0 +1,41 @@
+---
+abstract: 'locate .git root at compile time and use as lib path'
+author:
+  - 'Victor Efimov <efimov@reg.ru>'
+build_requires:
+  Capture::Tiny: 0
+  File::Path: 0
+  File::Temp: 0.16
+  Module::Build: 0.3601
+  Test::Deep: 0
+  Test::More: 0
+  Test::Pod: 1.22
+  Test::Spec: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132661'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: lib-gitroot
+no_index:
+  directory:
+    - inc
+provides:
+  lib::gitroot:
+    file: lib/lib/gitroot.pm
+    version: 0.004
+requires:
+  Carp: 0
+  File::Spec: 0
+  Modern::Perl: 0
+  lib: 0
+  perl: 5.010000
+resources:
+  bugtracker: https://github.com/regru/lib-gitroot/issues
+  homepage: https://github.com/regru/lib-gitroot
+  repository: git://github.com/regru/lib-gitroot.git
+version: 0.004

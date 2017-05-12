@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:               libPam-Perl
+version:            0.008
+abstract:           Base module for writing Pam Modules in Perl
+author:
+    - Ben Hildred<bhildred@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    Authen::PAM:  0
+requires:
+    Authen::PAM:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

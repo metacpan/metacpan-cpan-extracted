@@ -1,0 +1,7 @@
+Revision history for lib::ini
+
+0.002   14/09/2012
+        * Ignore erroneous prereqs picked from tests
+
+0.001   12/09/2012
+        * Initial upload to CPAN

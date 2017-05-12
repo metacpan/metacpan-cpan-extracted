@@ -1,0 +1,171 @@
+$Id: README,v 1.10 2003/10/21 16:01:54 kmacleod Exp $
+
+
+			     libxml-perl
+
+	   Collection of Perl modules for working with XML.
+
+
+INTRODUCTION
+
+    libxml-perl is a collection of smaller Perl modules, scripts, and
+    documents for working with XML in Perl.  libxml-perl software
+    works in combination with XML::Parser, PerlSAX, XML::DOM,
+    XML::Grove and others.
+
+    See the file Changes for user-visible changes and ChangeLog for
+    detailed changes.  See the `examples' directory for examples.  POD
+    style documentation is included in all non-alpha modules and
+    scripts.  You should also be able to use the 'perldoc' utility to
+    extract documentation from the module files directly.  HTML
+    formatted docs are available at the libxml-perl home page
+    <http://bitsko.slc.ut.us/libxml-perl/>.
+
+    Newer versions of this module can be found on CPAN at
+    <http://www.perl.com/CPAN/modules/by-module/XML/>.  To join the
+    Perl-XML mailing list, send an email message to
+    ListManager@ActiveState.com with the following text in the body:
+    Subscribe Perl-XML
+
+    View the Perl XML FAQ at
+    <http://www.perlxml.com/faq/perl-xml-faq.html>.
+
+    Copyright (C) 1998 Ken MacLeod and others
+    This library is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+
+MODULES
+
+    The following modules are marked with their release status:
+
+    STABLE -- has been in use for a while with few or no outstanding
+              bugs
+    BETA   -- interfaces are stable but there may still be bugs
+    ALPHA  -- interfaces are changing, there may be lots of bugs, and
+              there may not be docs available yet
+
+    XML::Parser::PerlSAX       STABLE
+        XML::Parser::PerlSAX is a PerlSAX parser using XML::Parser
+        (which uses James Clark's Expat XML Parser).
+
+    XML::Handler::Sample       STABLE
+        XML::Handler::Sample is a PerlSAX handler that simply prints
+        out the event names as they are parsed by a PerlSAX parser.
+        It can be used for debugging or as a template for building new
+        handlers.  XML::Handler::Sample contains handlers for all
+        known parser events.
+
+    XML::ESISParser            STABLE
+        XML::ESISParser is a validating PerlSAX parser using James
+        Clark's `nsgmls' SGML/XML Parser.  ESISParser supports both
+        XML and SGML document instances.  Unless you need validation,
+        you should probably be using XML::Parser::PerlSAX or
+        XML::Parser.
+
+        XML::ESISParser with XML::Grove obsolete the
+        SGML::SPGroveBuilder and SGML::Grove modules.
+
+    XML::Handler::XMLWriter    STABLE
+        A PerlSAX handler for writing readable XML (in contrast to
+        Canonical XML, for example).  XMLWriter is also subclassable
+        and supports calling start and end methods by element-names
+        (subclassed from XML::Handler::Subs).  XMLWriter is similar to
+        XML::Parser's Stream style.
+
+    XML::Handler::Subs         STABLE
+        A PerlSAX handler base class that calls start and end methods
+        by element-names.  Subs is similar to XML::Parser's Subs
+        style.
+
+    XML::Handler::CanonXMLWriter STABLE
+        A PerlSAX handler that outputs in Canonical XML
+        <http://www.jclark.com/xml/canonxml.html>.  This module is
+        generally only used for debugging.
+
+    Data::Grove                STABLE
+    Data::Grove::Parent        STABLE
+    Data::Grove::Visitor       STABLE
+        Data::Grove and it's helpers provide a base class for deeply
+        nested or directed graph structures.  Used by XML::Grove (and
+        others soon).
+
+    XML::SAX2Perl              ALPHA
+    XML::Perl2SAX              ALPHA
+        SAX2Perl and Perl2SAX are SAX Parser<->DocumentHandler
+        filters.  These modules translate parse events between the
+        Java/CORBA style SAX methods and PerlSAX style methods.
+
+    XML::PatAct::MatchName     ALPHA
+        MatchName is a pattern matching module that can be used with
+        PatAct action modules.  MatchName uses simple element names or
+        element name lists to match names to actions.
+
+    XML::PatAct::ToObjects     ALPHA
+        ToObjects is a PatAct action module.  ToObjects can be used to
+        create application-ready Perl objects from XML instances.
+
+    XML::PatAct::Amsterdam     ALPHA
+        Amsterdam is a PatAct action module.  Amsterdam can be used to
+        apply a very simple form of style-sheet to an XML instance by
+        using ``before'' and ``after'' strings that are output before
+        and after the contents of elements.
+
+    XML::PatAct::PatternTempl  BETA
+    XML::PatAct::ActionTempl   BETA
+        PatternTempl and ActionTempl are template files that
+        pattern/action module writers can copy to create new modules.
+        See Creating PatAct Modules for more information.
+
+DOCUMENTS
+
+    sax-2.0.html, sax-2.0-adv.html
+        PerlSAX 2.0 bindings.  Maintained by Robin Berjon and the
+        XML-Perl mailing list.
+
+    PerlSAX
+        This document defines a Perl binding to SAX 1.0.  PerlSAX-
+        based parser modules implement and possibly extend the
+        interface described in PerlSAX.
+
+    UsingPerlSAX
+        A brief introduction to PerlSAX using the XML::Parser::PerlSAX
+        module.
+
+    UsingPatActModules
+        Describes how to use pattern/action modules to transform XML
+        instances.
+
+    CreatingPatActModules
+        A document for module writers who are writing new pattern/
+        action modules.
+
+    modules.xml
+        modules.xml contains a listing of all Perl XML packages and
+        their public modules categorized by several topics.
+
+
+INSTALLATION
+
+    In order to use this package you will need Perl version 5.005 or
+    better.  Several other modules may also be required to use some
+    modules in libxml-perl, including XML::Parser, XML::DOM, and
+    XML::Grove.  These are all available in the XML module directory
+    on CPAN.
+
+<http://www.perl.com/CPAN/modules/by-module/XML/>
+
+    You install libxml-perl, as you would install any perl module
+    library, by running these commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    If you want to install a private copy of libxml-perl in your home
+    directory, then you should try to produce the initial Makefile
+    with something like this command:
+
+        perl Makefile.PL PREFIX=~/perl
+

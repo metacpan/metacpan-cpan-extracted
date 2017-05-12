@@ -1,0 +1,41 @@
+This directory contains examples demonstrating the use of the Perl LSID
+Client/Server stack.
+
+Two example authorities are provided, i3c_authority is much simpler for
+a novice to understand. hugo_authority uses a MySQL database backend and
+dynamically generates metadata from it.
+
+
+
+
+client/ - A simple example client that will resolve and LSID.
+
+assigning/ - A sample LSID Assigning Service Client and Server
+
+tools/ - A collection of files to help in developing your own services
+
+i3c_authority/ - A simple file based authority for the i3c LSIDs. This uses the new
+                 authority framework.
+
+hugo_authority/ - A database driven authority example. This uses the new authority
+                  framework as well as the RDF::SimpleDocument object to return 
+                  metadata dynamically generated from the database.
+
+http_metadata/ - A HTTP/CGI metadata service implementation of the simple i3c.org authority. 
+		 This is an external metadata service as opposed to the internal services in
+		 the other example authorities.
+
+proxy_resolver/ - An implementation of an LSID Resolver that accepts ANY LSID and attempts
+		  to proxy the request between the client and actual authority.
+
+webresolver/ - A web form based LSID resolution service
+
+designer/ - A web form based authority generation service
+
+configs/ - Contains example configuration files for the client
+
+
+compatibility/ - The simple LSID authority using the old (but still usable)
+                 direct calls in to the LSID stack
+
+

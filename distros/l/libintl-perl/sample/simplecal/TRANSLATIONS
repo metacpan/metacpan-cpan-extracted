@@ -1,0 +1,41 @@
+This package is internationalized with libintl-perl.  It can be configured
+to speak in different languages.  If your language is still missing, you
+should take a look into the file "README-NLS" (section "The Translator's
+View") where you will find instructions for contributing a translation
+into your language to this package.
+
+You can see the translation status of this package for various languages
+in the following table.  If your language is completely missing in the
+table, your translation will be welcomed as a contribution to the
+project.
+
+Translation Status for "simplecal"
+==================================
+
+Language            | Code  | Status | Current Translator 
+--------------------+-------+---+----+---------------------------------
+Arabic              | ar    | O | C  | Guido Flohr
+Arabic/Saudi Arabia | ar_SA | O | C  | Guido Flohr
+Dutch               | nl    | O | C  | Guido Flohr
+French              | fr    | O | C  | Guido Flohr
+German              | de    | A | C  | Guido Flohr
+German/Austria      | de_AT | O | C  | Guido Flohr
+Irish               | ga    | O | C  | Guido Flohr
+Italian             | it    | O | C  | Guido Flohr 
+Portuguese          | pt    | O | C  | Guido Flohr
+Portuguese/Brazil   | pt_BR | O | C  | Guido Flohr
+Russian             | ru    | O | C  | Guido Flohr
+
+Legend: The status is displayed in two columns.  The left column informs
+you whether somebody is already in charge of that translation, the right
+columns reflects the status of the translation itself.
+
+Left:  (O) - Orphaned:  The translation needs a new maintainer.  You?
+       (A) - Assigned:  The translation already has a maintainer.
+
+Right: (C) - Complete:  All messages are translated.
+       (M) - Mostly:    Most (all important) messages are translated.
+       (P) - Partially: The translation is only partially done.
+       (-) - Missing:   No translation is currently available.
+
+Messages for missing translations will be displayed in English.

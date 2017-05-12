@@ -1,0 +1,70 @@
+.TH "apreq_value_t" 3 "25 Nov 2010" "Version 2.13" "libapreq2" \" -*- nroff -*-
+.ad l
+.nh
+.SH NAME
+apreq_value_t \- libapreq's pre-extensible string type  
+
+.PP
+.SH SYNOPSIS
+.br
+.PP
+\fC#include <apreq.h>\fP
+.PP
+.SS "Data Fields"
+
+.in +1c
+.ti -1c
+.RI "char * \fBname\fP"
+.br
+.ti -1c
+.RI "\fBapr_size_t\fP \fBnlen\fP"
+.br
+.ti -1c
+.RI "\fBapr_size_t\fP \fBdlen\fP"
+.br
+.ti -1c
+.RI "char \fBdata\fP [1]"
+.br
+.in -1c
+.SH "Detailed Description"
+.PP 
+libapreq's pre-extensible string type 
+.PP
+\fBExamples: \fP
+.in +1c
+.PP
+\fB/home/issac/asf/svn/v2_13/include/apreq.h\fP.
+.SH "Field Documentation"
+.PP 
+.SS "char* \fBapreq_value_t::name\fP"
+.PP
+value name 
+.PP
+\fBExamples: \fP
+.in +1c
+\fB/home/issac/asf/svn/v2_13/include/apreq.h\fP.
+.SS "\fBapr_size_t\fP \fBapreq_value_t::nlen\fP"
+.PP
+length of name 
+.PP
+\fBExamples: \fP
+.in +1c
+\fB/home/issac/asf/svn/v2_13/include/apreq.h\fP.
+.SS "\fBapr_size_t\fP \fBapreq_value_t::dlen\fP"
+.PP
+length of data 
+.PP
+\fBExamples: \fP
+.in +1c
+\fB/home/issac/asf/svn/v2_13/include/apreq.h\fP.
+.SS "char \fBapreq_value_t::data\fP[1]"
+.PP
+value data 
+.PP
+\fBExamples: \fP
+.in +1c
+\fB/home/issac/asf/svn/v2_13/include/apreq.h\fP.
+
+.SH "Author"
+.PP 
+Generated automatically by Doxygen for libapreq2 from the source code.

@@ -1,0 +1,24 @@
+---
+abstract: 'add vendor libraries to the module search path (@INC)'
+author:
+  - 'Bob Kleemann <bobk@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.016, CPAN::Meta::Converter version 2.133380'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: lib-vendor
+requires:
+  File::Spec: '0'
+  FindBin: '0'
+  perl: v5.10.0
+  strict: '0'
+resources:
+  bugtracker: https://github.com/rkleemann/lib-vendor/issues
+  repository: git://github.com/rkleemann/lib-vendor.git
+version: 0.14.163

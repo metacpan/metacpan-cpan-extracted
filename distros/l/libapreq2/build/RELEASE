@@ -1,0 +1,119 @@
+Instructions for the apreq Release Manager (RM)
+
+FreeBSD/Solaris note: use gmake!
+
+1. Create a realease branch:
+
+    svn cp https://svn.apache.org/repos/asf/httpd/apreq/trunk \
+           https://svn.apache.org/repos/asf/httpd/apreq/branches/v2_12
+
+
+2. On the BRANCH
+    Edit STATUS, marking the release date
+
+       /** @page STATUS
+
+       2.12 released on <one week from today's date>.
+
+   Also add the release date to the top @section in CHANGES:
+
+       /** @page CHANGES
+
+       @section v2_12 Changes with libapreq2-2.12 (released ...).
+
+   And #undef the APREQ_VERSION_IS_DEV macro definition
+   in include/apreq_version.h:
+
+       *  This symbol will be #undef'd for releases. 
+       */
+       #undef APREQ_IS_DEV_VERSION
+
+       % svn commit -m "2.12 release started" STATUS CHANGES include/apreq_version.h
+
+3. On TRUNK:
+    Update CHANGES and STATUS to reflect the start of a new develoment cycle,
+    and run this to update the package version numbers throughout the tree:
+
+    % build/update_version.pl 2.13
+
+    % svn commit -m "2.13 cycle"
+
+4. Prep the package for CPAN by running:
+
+        % make release
+
+   This will generate a libapreq2-2.12.tar.gz candidate in the 
+   current directory.   You should keep this source tree
+   intact to tag the final release.
+
+
+5. Test the generated file with
+
+        % make release_test
+
+   Make sure all perl tests pass.
+
+6. Sign it via gpg:
+
+        % gpg --detach-sign --armor libapreq2-2.12.tar.gz
+
+   or pgp:
+
+        % pgp -sba libapreq2-2.12.tar.gz
+
+7. Upload the release candidate to people.apache.org/~username
+   and post a candidate announcement to apreq-dev@. Also, it is 
+   strongly recommended that the RM crosspost the candidate 
+   announcement to the modperl@ list, to solicit feedback
+   from a much larger audience.
+
+   Subject: [RELEASE CANDIDATE] libapreq2 2.12 RC\d+
+
+8. Give the mailing list participants 48-72 hours to comment and
+   vote on the candidate.  If there is a "majority consensus" 
+   (three +1 and more +1s than -1s) among the httpd pmc members, the RM 
+   may proceed with the release.
+
+
+9. Tag the Release -- from the BRANCH
+
+    svn mv https://svn.apache.org/repos/asf/httpd/apreq/branches/v2_12 \
+           https://svn.apache.org/repos/asf/httpd/apreq/tags/v2_12
+
+10. Upload (scp) the package and signature to www.apache.org
+   for distribution:
+
+        % scp libapreq2-2.12.tar.gz* \
+          $USER@people.apache.org:/www/www.apache.org/dist/httpd/libapreq/
+
+   Ask another developer to confirm the uploaded signature is ok.
+
+        % gpg --verify libapreq2-2.12.tar.gz.asc
+        % pgp libapreq2-2.12.tar.gz.asc
+
+   Check that your public key is among those listed in the
+   /www/www.apache.org/dist/httpd/KEYS file.   If not, you
+   need to commit the necessary change to KEYS the httpd-dist repos.
+   Then update the website's copy using "cvs co KEYS" in the 
+   /www/www.apache.org/dist/httpd/ directory.
+
+11. Verify or get soeone to Verify that you have CPAN karma.
+    Note, discuss getting a group kind of like AMPL in mod_perl land.
+    (Currently, joes@ and pgollucci@ are active and have karma)
+
+12. Upload the package to CPAN. Doublecheck that the md5 checksum
+   received from PAUSE is correct.
+
+13. Wait ~12-24 hours for the ASF mirrors to pick up the new package, then
+   update the apreq homepage to list the new release in the News section
+   Be sure to update the libapreq2 documentation. For instructions on updating 
+   the httpd website, see build/WEBSITE.  IMPORTANT: YOU MUST UPDATE
+   download.html TO POINT AT THE NEW RELEASE PACKAGE!
+
+14. Mail the announcement from your people.apache.org account by piping the 
+    "CPAN Upload" email acknowledgement (from PAUSE) through build/announcement.pl:
+
+    % build/announcement.pl $USER@apache.org < CPAN_ack | ssh $USER@people.apache.org "sendmail -oi -t -odq"
+
+15. Drink Beer!
+

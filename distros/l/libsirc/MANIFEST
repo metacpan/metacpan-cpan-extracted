@@ -1,0 +1,15 @@
+  $Id: MANIFEST,v 1.5 2000-07-27 12:04:19-04 roderick Exp $
+
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+Sirc/Autoop.pm
+Sirc/Chantrack.pm
+Sirc/Kick.pm
+Sirc/LckHash.pm
+Sirc/LimitMan.pm
+Sirc/Util.pm
+Sirc/URL.pm
+test.t

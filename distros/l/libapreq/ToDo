@@ -1,0 +1,41 @@
+o We need to go through a deprecation cycle release for all api's
+  that will change in apreq2.
+
+o Apache::Test is required early in Makefile.PL, so we can't rely on
+  CPAN.pm's prereq_pm to fetch it if not available. Therefore we need
+  to use Module::Install, which handles this kind of situations gracefully.
+
+o look for 'XXX' in the source, they mark some bits of code that need work
+
+o multipart_buffer_headers punts on headers more than 5k (which could
+  happen with a really long form input name, for example). better than
+  the old behavior of locking up, but we could be clever and actually
+  handle this.
+
+o should probably handle Apache::Request->param http://blah.com/?foo
+  like CGI.pm does (turn it into a param named "keywords")
+
+o mmap upload files ?
+
+o improve/automate build process for dtcl
+
+o $r->status reportedly returns success when a large upload is
+  cancelled by the user (clicks stop) before the upload is complete.
+  See http://marc.theaimsgroup.com/?l=apache-modperl&m=105561094424410&w=2
+  The problem is likely to show up in fill_buffer's return value,
+  but since we never check it...?  It would be nice if we had an 
+  "interrupted upload" test to work from.
+
+o solve the memory leak for:
+  my $r = shift;
+  $r = Apache::Request->new($r);
+  as discussed at:
+  http://marc.theaimsgroup.com/?t=102615343600005&r=1&w=2
+
+o The behavior of our mfd parser is inconsistent wrt empty file uploads:
+  An active upload_hook isn't called with a 0-byte file upload.
+
+o Our Makefile.PL is lame.
+
+o Investigate sporadic segfaults related to new upload code in Request.xs
+  and older (pre-5.8.0) perls.

@@ -1,0 +1,4 @@
+XML::Checker ERROR-101: undefined ELEMENT [doc]
+	Context: line 1, column 0, byte 0
+XML::Checker ERROR-101: undefined ELEMENT [elem]
+	Context: line 3, column 1, byte 47

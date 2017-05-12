@@ -1,0 +1,43 @@
+ldapsh has two types of commands, just like a normal Unix shell: Built-in commands
+and external commands.
+
+Built-in commands can be listed by running 'builtins' at the ldapsh command
+line.
+
+External commands are slightly harder to list, just like in a normal Unix shell.
+There is currently no way to list them from inside the shell, but it's
+relatively easy to get a full list from a normal Unix shell.  By default 
+they are all located at Net::LDAP::Shell::Commands, so you can list, 
+for instance, /usr/local/lib/perl/site_perl/5.6.1/Net/LDAP/Shell/Commands, to
+get a list of current commands.
+
+You can set up ldapsh to search other directories, just like a normal Unix shell.
+At this time you can only change it during runtime, but if you want the ability
+to store that information, please send me a patch or email me the feature
+request.
+
+All commands accept a --help flag to get a usage statement.
+
+The current list of available builtin commands is:
+
+builtins
+cd
+config
+debugging
+exit
+export
+pwd
+quit
+reload
+
+The current list of available external commands is:
+
+cat
+clone
+edit
+ls
+new
+rm
+search
+
+$Id: COMMANDS,v 1.1 2002/09/08 18:20:13 luke Exp $

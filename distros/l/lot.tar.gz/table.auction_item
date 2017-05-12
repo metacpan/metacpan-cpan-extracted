@@ -1,0 +1,15 @@
+#------------------------------------------------------------------------------
+#
+# Modification History
+#
+# Auth    Date       Description
+# ------  ---------  ----------------------------------------------------------
+# mwk     17 Oct 01  Wrote this
+#------------------------------------------------------------------------------ 
+CREATE TABLE auction_item (
+  itemid       BIGINT(20) unsigned default NULL auto_increment,
+  description  BLOB NOT NULL default '',
+  reserve      BIGINT(20) unsigned not null default 0,
+  expiry_date  DATETIME not null default '',
+  PRIMARY KEY (itemid)
+)

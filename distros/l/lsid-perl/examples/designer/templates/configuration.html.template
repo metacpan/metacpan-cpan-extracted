@@ -1,0 +1,132 @@
+<TMPL_INCLUDE name="javascript.html.template">
+
+<h1 id="title">Authority Identity</h1>
+<h2 id="subtitle"></h2>
+
+
+<div id="instructions" >
+
+<div id="position">
+        Instructions &nbsp; &nbsp; &nbsp; &nbsp;
+        <span id="bolden">Authority Identity</span> &nbsp; &nbsp; &nbsp;
+        Services and Namespaces &nbsp; &nbsp; &nbsp;
+        Service Endpoints &nbsp; &nbsp; &nbsp;
+        View Code
+</div>
+
+</div>
+
+
+<p id="description"> 
+<br/>
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Curabitur interdum mauris quis metus. Quisque laoreet arcu. In tellus purus, pretium vel, egestas eget, congue ac, urna. Maecenas consequat. Vestibulum euismod, eros vel pulvinar auctor, libero risus tempor ipsum, non mollis mi tortor eu metus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Morbi ut tortor at erat vehicula congue. Quisque augue. Curabitur consectetuer sem id nibh. Nunc elementum auctor metus.
+
+<br/>
+<br/>
+
+Please fill in the following fields:
+</p>
+
+
+<table class="configtable" style="padding-top: 12px; padding-left: 10px; margin-top: 12px; margin-left: 10px;">
+<tr>
+<td> Service Name </td> 
+<td> <TMPL_VAR name="authorityName"> </td>
+<td> (<span class="options">REQUIRED</span>) </td>
+</tr>
+
+<tr>
+<td> &nbsp; </td>
+<td  colspan="2"> <p class="comment">A short name for your authority service. </p> </td>
+</tr>
+
+<tr>
+<td colspan="3"> &nbsp; </td>
+</tr>
+
+<tr>
+<td> Authority Identifier </td> 
+<td> <TMPL_VAR name="authorityID"> </td>
+<td> (<span class="options">REQUIRED</span>) </td>
+</tr>
+
+<tr>
+<td> &nbsp; </td> 
+<td colspan="2">  <p class="comment"> The DNS hostname for the authority component of your LSIDs. <br/> 
+<br/>
+Example: if your LSIDs look like <code>urn:lsid:<b>myauthority.org</b>:namespace:object</code>, 
+then place <b>myauthority.org</b> in this field. 
+</p> </td>
+</tr>
+
+<tr>
+<td colspan="3"> &nbsp; </td>
+</tr>
+
+
+<tr>
+<td> Authority Endpoint </td>
+<td> <TMPL_VAR name="defaultLocation"> </td>
+<td> (<span class="options">REQUIRED</span>) </td>
+</tr>
+
+<tr>
+<td> &nbsp; </td> 
+<td colspan="2">  <p class="comment"> The DNS hostname of the physical endpoint for the LSID authority. <br/>
+<br/>
+Examples include <b>myauthority.org:80</b> or <b>lsid.myauthority.org:8080</b> <br/>
+<br/>
+Typically is the same as the authority identifier with the network port appended.
+</p> </td>
+</tr>
+
+<tr>
+<td colspan="3"> &nbsp; </td>
+</tr>
+
+
+</table>
+
+<div class="">
+
+
+<p class="comment">
+</p>
+
+</div>
+
+<div id="services">
+
+<h3>Define your services</h3>
+
+<p class=""> LSID Authorities are a combination of <b>three</b> services:
+authority, data and metadata. We suggest that you always use the
+<b>Authority Service</b> and add data and metadata services as needed.
+</p>
+
+<p class=""> 
+	Which services will you use? <br/>
+	<br/>
+	<TMPL_VAR name="services">
+	<br/>
+	<br/>
+</p>
+
+
+<p class=""> 
+	Check the following box to allow plain HTTP requests serve LSIDs. This is an <b>optional feature</b> 
+	as a SOAP interface is provided by default.  However, it can make integrating LSIDs in to 
+	existing applications simpler. <br/>
+	<br/>
+	<TMPL_VAR name="useHTTPService"> (<span class="options">OPTIONAL</span>)
+</p>
+
+
+</div> <!-- services -->
+
+
+
+<div class="controls">
+<TMPL_VAR name="submit">
+</div>
+

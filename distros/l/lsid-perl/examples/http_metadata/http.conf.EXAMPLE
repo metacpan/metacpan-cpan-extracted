@@ -1,0 +1,32 @@
+Example of Apache httpd.conf for i3c Authority
+
+
+The following are the relevant virtual host directives for the 
+i3c Authority living at lsid.biopathways.org:80 :
+
+<VirtualHost _default_:80>
+    ServerName lsid.biopathways.org
+
+    <IfModule mod_rewrite.c>
+        RewriteEngine On
+        RewriteLog  logs/lsid.biopathways.org-rewrite.log
+        RewriteLogLevel 0
+        RewriteRule /authority$ /var/www/i3c/
+        RewriteRule /authority/data$ /var/www/i3c/
+        RewriteRule /authority/metadata$ /var/www/i3c/
+    </IfModule>
+
+    ScriptAlias /authority "/var/www/i3c/i3c_authority.pl"
+    ScriptAlias /metadata "/var/www/i3c/i3c_authority.pl"
+    ScriptAlias /data "/var/www/i3c/i3c_authority.pl"
+
+    <Directory /var/www/i3c>
+        Options ExecCGI
+        Order allow,deny
+        Allow from all
+    </Directory>
+
+</VirtualHost>
+
+
+

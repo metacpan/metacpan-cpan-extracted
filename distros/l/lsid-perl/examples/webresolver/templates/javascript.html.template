@@ -1,0 +1,29 @@
+<SCRIPT>
+
+function copyValue( form, itemName ) {
+
+        if(form.lsid == null)
+                return;
+
+        i = 0;
+        sourceItem = null;
+
+        while(i < form.elements.length && sourceItem == null) {
+
+                if(itemName == form.elements[i].name) {
+
+                        sourceItem = form.elements[i];
+                }
+                else {
+
+                        i++;
+                }
+        }
+
+        if(sourceItem == null)
+                return;
+
+        form.lsid.value = sourceItem.value;
+}
+
+</SCRIPT>

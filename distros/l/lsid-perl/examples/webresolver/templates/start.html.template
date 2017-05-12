@@ -1,0 +1,29 @@
+<TMPL_INCLUDE name="javascript.html.template">
+
+<h1 id="title">LSID Web Resolver</h1>
+
+<p id="description">
+This web based LSID resolution service allows you to view the <b>data</b> and <b>metadata</b>
+of an LSID with your web browser. This service will display the metadata, formatted as a 
+standard webpage, for any LSID you enter.
+</p>
+
+<p>
+
+<b>Enter an LSID</b>: &nbsp; &nbsp; <TMPL_VAR name="lsid"> <TMPL_VAR name="submit"> 
+</p>
+
+<p>
+Here are some example LSIDs for you to try:
+</p>
+
+<ul class="exampleList">
+<TMPL_LOOP NAME="examples">
+	<li>
+	  <TMPL_VAR NAME="text"> <TMPL_VAR NAME="button">
+	</li>
+</TMPL_LOOP>
+
+</ul>
+
+

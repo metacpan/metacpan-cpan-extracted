@@ -1,0 +1,28 @@
+Changes for lib::projectroot
+
+1.005   2016-02-17T11:02:19
+    - new options extra_with_local
+
+1.004   2015-07-07T13:52:26
+    - $ROOT is now a package global, so we can read it from the outside
+
+
+1.003   2015-05-04T22:16:08
+    - allow extra=.. as the only argument
+
+
+1.002   2015-05-04T22:04:25 (never released to CPAN)
+    - load extra via import
+    - fix some english grammar errors (spotted by sixtease)
+
+
+1.001   2014-12-08T19:40:24
+    - fixed testlib to work on more OSes (as reported by cpantesters)
+    - fixed link in POD
+
+
+1.000	2014-12-07T14:54:54
+	- first inital release
+	- see http://prepan.org/module/nY4oajhgzJN for some pre-release discussions
+
+

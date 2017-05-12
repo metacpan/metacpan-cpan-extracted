@@ -1,0 +1,96 @@
+# French translations for SimpleCal.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: SimpleCal\n"
+"Report-Msgid-Bugs-To: Edit the file PACAKGE to change this.\n"
+"POT-Creation-Date: 2013-01-14 18:14+0200\n"
+"PO-Revision-Date: 2003-07-28 04:07+0200\n"
+"Last-Translator: Guido Flohr <Guido.Flohr@cantanea.com>\n"
+"Language-Team: French <guido.flohr@cantanea.com>\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../lib/SimpleCal.pm:26
+msgid "January"
+msgstr "janvier"
+
+#: ../lib/SimpleCal.pm:28
+msgid "February"
+msgstr "février"
+
+#: ../lib/SimpleCal.pm:30
+msgid "March"
+msgstr "mars"
+
+#: ../lib/SimpleCal.pm:32
+msgid "April"
+msgstr "avril"
+
+#: ../lib/SimpleCal.pm:34
+msgid "May"
+msgstr "mai"
+
+#: ../lib/SimpleCal.pm:36
+msgid "June"
+msgstr "juin"
+
+#: ../lib/SimpleCal.pm:38
+msgid "July"
+msgstr "juillet"
+
+#: ../lib/SimpleCal.pm:40
+msgid "August"
+msgstr "août"
+
+#: ../lib/SimpleCal.pm:42
+msgid "September"
+msgstr "septembre"
+
+#: ../lib/SimpleCal.pm:44
+msgid "October"
+msgstr "octobre"
+
+#: ../lib/SimpleCal.pm:46
+msgid "November"
+msgstr "novembre"
+
+#: ../lib/SimpleCal.pm:48
+msgid "December"
+msgstr "décembre"
+
+#: ../lib/SimpleCal.pm:70
+msgid "Sun"
+msgstr "di"
+
+#: ../lib/SimpleCal.pm:71
+msgid "Mon"
+msgstr "lu"
+
+#: ../lib/SimpleCal.pm:72
+msgid "Tue"
+msgstr "ma"
+
+#: ../lib/SimpleCal.pm:73
+msgid "Wed"
+msgstr "me"
+
+#: ../lib/SimpleCal.pm:74
+msgid "Thu"
+msgstr "je"
+
+#: ../lib/SimpleCal.pm:75
+msgid "Fri"
+msgstr "ve"
+
+#: ../lib/SimpleCal.pm:76
+msgid "Sat"
+msgstr "sa"
+
+#~ msgid "Welcome to {package}!\n"
+#~ msgstr "Bienvenu à {package}!\n"
+
+#~ msgid "Bye.\n"
+#~ msgstr "À toute à l'heure!\n"

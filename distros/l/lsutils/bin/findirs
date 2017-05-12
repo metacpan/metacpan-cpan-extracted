@@ -1,0 +1,45 @@
+#!/usr/bin/perl
+use strict;
+use LEOCHARRE::CLI2 ':all','om:a';
+our $VERSION = sprintf "%d.%02d", q$Revision: 1.2 $ =~ /(\d+)/g;
+
+
+
+my $ABS_DIR = argv_cwd();
+
+my @alldirs = split( /\n/, `find "$ABS_DIR" -mindepth 1 -type d `);
+
+my @sorted =  sort { (stat($b))[9] <=> (stat($a))[9] } @alldirs;
+if ($opt_o ){ @sorted = reverse @sorted }
+
+unless( $opt_a ){
+   @sorted = grep { !/\/\./ } @sorted;
+}
+
+if ($opt_m){
+   @sorted = splice @sorted, 0, $opt_m;
+}
+
+print "$_\n" for @sorted;
+
+
+
+
+
+
+
+
+sub usage {
+   qq{$0 [OPTION].. PATH..
+find newest modified dirs in hierarchy
+
+   -h          help
+   -o          oldest instead of newest
+   -m number   max to show
+   -a          show hidden also
+
+Usage examples
+
+   $0 ./
+
+}}

@@ -1,0 +1,13 @@
+Beta quality code.
+
+Installer does not fully work.
+
+ln -s ....auto/Authen/PAM/Module.so /lib/security/pam_perl.so
+
+Assumes that it is not called from perl or an application linked against perl, or from a multi-threaded application. Research is in progress to correct these assumptions.
+
+Now in final name space.
+
+Your module must be under our name space.
+
+More detail on assumptions: the perl interpreter has global initialization and destruction. This module calls them for every pamh.

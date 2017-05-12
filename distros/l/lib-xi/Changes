@@ -1,0 +1,57 @@
+Revision history for Perl extension lib::xi
+
+1.03 2014-01-25T02:44:40Z
+    - Fix more UUV warnings (#4)
+
+1.02 2013-11-20T11:50:29Z
+    - Fix UUV warnings (#3)
+
+1.01 2013-07-26T17:11:36Z
+    - Fix an issue that File::Spec was not loaded (#1)
+
+1.00 2013-04-25T05:29:18Z
+    - Use Module::Build instead of Module::Install
+    - Respect @INC
+
+0.13 2012-10-20 21:04:29
+    - ignore Log::Agent, used in Storable
+    - Upgraded Module::Install.
+
+0.12 2011-10-25 17:28:16
+    - Give a module name to cpanm, not a file name
+
+0.11 2011-10-25 17:15:54
+    - Add verbose mode enabled by -v
+
+0.10 2011-10-07 10:12:55
+    - Ignore some non-CPAN modules by default
+
+0.09 2011-03-23 09:55:03
+    - Not to depend on File::Which
+
+0.08 2011-03-21 16:03:45
+    - Make $install_dir absolute based on where the script is
+
+0.07 2011-03-21 11:30:18
+    - Fix the order of $install_dir in @INC
+    - Fix dependencies
+
+0.06 2011-03-19 15:48:04
+    - Fix the error handling to fall back to the normal error
+
+0.05 2011-03-19 15:15:12
+    - Disable some lazy loading
+    - Improve docs
+
+0.04 2011-03-19 13:59:34
+    - Make loading time short by lazy loading
+
+0.03 2011-03-19 12:46:15
+    - Fix Makefile.PL to make CPAN testers happy
+
+0.02 2011-03-18 21:09:31
+    - Fix the case where $install_dir is omitted
+
+0.01 2011-03-18 11:09:14 
+    - original version; created by dim
+      at Fri Mar 18 10:52:22 2011.

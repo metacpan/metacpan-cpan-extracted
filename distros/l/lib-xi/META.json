@@ -1,0 +1,81 @@
+{
+   "abstract" : "Installs missing modules on demand",
+   "author" : [
+      "Fuji, Goro (gfx) <gfuji@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.11.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "lib-xi",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::cpanminus" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "lib::xi" : {
+         "file" : "lib/lib/xi.pm",
+         "version" : "1.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gfx/p5-lib-xi/issues"
+      },
+      "homepage" : "https://github.com/gfx/p5-lib-xi",
+      "repository" : {
+         "url" : "git://github.com/gfx/p5-lib-xi.git",
+         "web" : "https://github.com/gfx/p5-lib-xi"
+      }
+   },
+   "version" : "1.03",
+   "x_contributors" : [
+      "Fuji Goro <fuji.goro@dena.jp>",
+      "Fuji, Goro <g.psy.va@gmail.com>",
+      "Fuji, Goro <goro-fuji@cookpad.com>",
+      "Ben Booth <benwbooth@gmail.com>"
+   ]
+}

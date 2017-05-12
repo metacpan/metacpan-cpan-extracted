@@ -1,0 +1,11 @@
+/.build
+/lib-byversion-*
+/META.json
+/MYMETA.json
+/META.yml
+/MYMETA.yml
+/blib/
+/pm_to_blib
+/tmp/
+/Makefile
+/Makefile.old

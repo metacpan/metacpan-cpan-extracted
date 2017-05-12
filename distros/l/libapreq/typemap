@@ -1,0 +1,55 @@
+#  Copyright 2000-2004  The Apache Software Foundation
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+
+
+Apache::Request		T_APROBJ
+Apache::Cookie		T_COOKIEOBJ
+Apache::Upload		T_PTROBJ
+Apache			T_APACHEOBJ
+const char *		T_PV
+ApreqInputStream        T_APREQIN
+
+OUTPUT
+
+T_APREQIN
+        {
+            GV *gv = newGVgen("$Package");
+            if ( do_open(gv, "<&", 2, FALSE, 0, 0, $var) )
+                sv_setsv($arg, sv_bless(newRV_noinc((SV*)gv), 
+                                        gv_stashpv("$Package",1)));
+            else
+                $arg = &PL_sv_undef;
+            (void)hv_delete(GvSTASH(gv), GvNAME(gv), GvNAMELEN(gv), G_DISCARD);
+        }
+
+T_APACHEOBJ
+	sv_setref_pv($arg, \"${ntype}\", (void*)$var);
+
+T_COOKIEOBJ
+	sv_setref_pv($arg, \"${ntype}\", (void*)$var);
+
+T_APROBJ
+	sv_setref_pv($arg, \"${ntype}\", (void*)$var);
+
+INPUT
+
+T_APACHEOBJ
+	r = sv2request_rec($arg, \"$ntype\", cv)
+
+T_COOKIEOBJ
+	c = sv_2cookie(aTHX_ $arg)
+
+T_APROBJ
+	req = sv_2apreq(aTHX_ $arg)
+

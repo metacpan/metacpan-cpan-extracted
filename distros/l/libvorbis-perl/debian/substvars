@@ -1,0 +1,2 @@
+perl:Depends=perl
+shlibs:Depends=libc6 (>= 2.2.4-4), libogg0 (>= 1.0rc3-1), libvorbis0 (>= 1.0rc3-1)

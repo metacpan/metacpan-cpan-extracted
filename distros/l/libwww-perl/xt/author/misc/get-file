@@ -1,0 +1,23 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use LWP::UserAgent;
+
+my $file = shift || "";
+my $to = $file;
+$to =~ s|.*/||;  # only basename
+$to = "index.html" unless length $to;
+
+
+my $ua = LWP::UserAgent->new;
+#$ua->agent("get-file/0.1");
+#$ua->from('aas@sn.no');
+
+my $res = $ua->request(HTTP::Request->new("GET", "http://localhost:8080/$file"), "$to");
+
+#print $res->request->as_string;
+print $res->as_string;
+
+print "Content saved in $to\n" if $res->is_success;

@@ -1,0 +1,5 @@
+XML::Checker ERROR-101: undefined ELEMENT [a]
+XML::Checker ERROR-101: undefined ELEMENT [b]
+XML::Checker ERROR-153: Element should be EMPTY, found text [
+]
+XML::Checker ERROR-153: Element should be EMPTY, found text [ ]

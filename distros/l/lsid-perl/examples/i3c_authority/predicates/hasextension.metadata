@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<rdf:RDF
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+>
+	<rdf:Description rdf:about="urn:lsid:biopathways.org:predicates:hasextension">
+		<rdfs:label>File Extension</rdfs:label>
+		<rdf:type rdf:resource="http://www.daml.org/2001/03/daml+oil#DatatypeProperty"/>
+		<rdfs:domain rdf:resource="urn:lsid:biopathways.org:types:format"/>
+		<dc:title>The File Extension Predicate</dc:title>
+		<rdfs:comment>The predicate refers to the extension given to local files of the format</rdfs:comment>
+	</rdf:Description>
+</rdf:RDF>

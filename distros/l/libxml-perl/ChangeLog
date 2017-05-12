@@ -1,0 +1,284 @@
+2003-10-21  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* t/stream.t: fixed test 11 for Perl >= 5.6
+
+2001-07-23  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* lib/XML/SAX2Perl.pm (startElement): typo; reported by
+	mhershb@mcdermott.com (Mark A. Hershberger)
+
+2000-03-30  Ken MacLeod  <ken@localhost.localdomain>
+
+	* doc/index.html (Contributors): added Clark Cooper
+
+	* MANIFEST (doc/sax-2.0.html, doc/sax-2.0-adv.html): added
+
+2000-03-20  Ken MacLeod  <ken@localhost.localdomain>
+
+	* lib/Data/Grove/Visitor.pm (_children_accept_name): add return
+	@return; reported by Laurent CAPRANI <caprani@multimania.com>
+
+2000-03-07  Ken MacLeod  <ken@localhost.localdomain>
+
+	* doc/sax-2.0.html, doc/sax-2.0-adv.html: added
+
+2000-03-02  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* lib/XML/ESISParser.pm: add -E0 to NSGMLS_FLAGS to not limit the
+	number of errors reported; suggested by Charles Thayer
+	<thayer@mediabridge.com>
+	(parse_fh): report line and line number on command character
+	errors; also suggested by Charles
+
+2000-02-22  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* doc/index.html (Contributors): added Michael Koehne, KangChan
+	Lee, and Colin Muller
+
+	* doc/mirror.sh, doc/index.html: added
+
+2000-02-17  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* doc/modules.xml: fixed several well-formedness errors; reported
+	by KangChan Lee <dolphin@ce.cnu.ac.kr>
+
+1999-12-22  Ken MacLeod  <ken@jess>
+
+	* lib/Data/Grove.pm, lib/Data/Grove/Parent.pm,
+	lib/Data/Grove/Visitor.pm, lib/XML/Handler/XMLWriter.pm,
+	lib/XML/Handler/CanonXMLWriter.pm, lib/XML/Handler/Subs.pm,
+	lib/XML/SAX2Perl.pm, lib/XML/Perl2SAX.pm, lib/XML/ESISParser.pm,
+	lib/XML/Parser/PerlSAX.pm, lib/XML/PatAct/Amsterdam.pm,
+	lib/XML/PatAct/MatchName.pm, lib/XML/PatAct/ToObjects.pm: added
+	$VERSION
+
+	* lib/XML/Parser/PerlSAX.pm (_handle_start): support
+	UseAttributeOrder option
+	(_handle_attlist): Changed EntityName to ElementName (re 9/28
+	entry)
+
+1999-09-28  Ken MacLeod  <ken@jess>
+
+	* lib/XML/Parser/PerlSAX.pm (_handle_attlist): typo: was calling
+	entity_decl
+
+1999-09-09  Ken MacLeod  <ken@jess>
+
+	* lib/XML/Parser/PerlSAX.pm: add start_cdata, end_cdata, and
+	entity_reference events
+
+1999-08-28  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* lib/XML/PatAct/Amsterdam.pm: added Output and AsString options,
+	added support for attribute replacement
+
+	* t/amsterdam.t: added
+
+1999-08-18  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* lib/Data/Grove.pm: added Data::Grove::Characters
+
+	* lib/XML/ESISParser.pm (parse_fh): report newline as characters
+	if no record_end() handler
+
+	* lib/XML/PatAct/ToObjects.pm (_parse_action): removed debugging
+	statement
+
+1999-08-16  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* README: updated
+
+	* doc/modules.xml (libxml-perl): updated
+
+	* doc/PerlSAX.pod (Parameters): missing '>'
+
+	* release 0.05
+
+	* lib/XML/Parser/PerlSAX.pm (_handle_init): call set_document_locator
+
+	* lib/XML/PatAct/ActionTempl.pm, lib/XML/PatAct/Amsterdam.pm,
+	lib/XML/PatAct/MatchName.pm, lib/XML/PatAct/PatternTempl.pm (new):
+	Accept both key, value pairs and hash options
+
+	* lib/XML/PatAct/ToObjects.pm (new): 
+
+	* lib/XML/Handler/Subs.pm: added
+
+	* t/subs.t: added
+
+	* t/stream.t: added
+
+1999-08-15  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* lib/XML/Handler/XMLWriter.pm: added
+
+	* lib/XML/Handler/Sample.pm: Placed in public domain
+
+1999-08-14  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* doc/PerlSAX.pod: added an introduction, a ``Deviations from the Java version'' section, added `set_document_locator()' handler method
+
+	* lib/XML/PatAct/ToObjects.pm: add CopyAttributes option, add
+	-grove-contents action
+
+1999-08-12  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* lib/XML/ESISParser.pm (parse_fh): dynamically test event handler
+	existance
+
+	* lib/XML/Parser/PerlSAX.pm (parse): wasn't capturing XML::Parser
+	Element events
+
+1999-08-10  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* README, doc/modules.xml: updated with PatAct modules
+
+	* lib/XML/PatAct/ActionTempl.pm, lib/XML/PatAct/Amsterdam.pm,
+	lib/XML/PatAct/MatchName.pm, lib/XML/PatAct/PatternTempl.pm,
+	lib/XML/PatAct/ToObjects.pm: added
+
+	* t/xp_sax.t, t/canon_xml_writer.t: added CVS ID
+
+	* t/schema.t: added
+
+	* examples/schema.xml, examples/schema.pl: added
+
+	* doc/UsingPatActModules.pod, doc/CreatingPatActModules.pod: added
+
+	* lib/XML/Parser/PerlSAX.pm (_handle_extern_ent): change "Perl
+	SAX" to "PerlSAX" in doc
+
+1999-08-09  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* lib/XML/ESISParser.pm (parse_fh): was not passing an empty hash
+
+	* lib/XML/Parser/PerlSAX.pm (_handle_init, _handle_final): was not
+	passing an empty hash
+
+1999-05-26  Ken MacLeod  <kmacleod@serpentina.terrapinlabs.com>
+
+	* lib/XML/Handler/CanonXMLWriter.pm, t/canon_xml_writer.t: added
+
+1999-05-23  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* lib/Data/Grove/Tied.pm: renamed to Parent.pm
+
+	* README (DOCUMENTS): added
+	renamed libxml to libxml-perl
+
+	* libxml.spec: renamed libxml-perl.spec
+
+1999-05-17  Ken MacLeod  <kmacleod@serpentina.terrapinlabs.com>
+
+	* libxml.spec: files in `doc/' go into top-dir of /usr/doc/$PKG
+
+	* PerlSAX.pod: moved to doc/PerlSAX.pod
+
+1999-05-09  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* doc/modules.xml: added
+
+1999-05-08  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* doc/UsingPerlSAX.pod, examples/MyHandler.pm,
+	examples/myhandler.pl, examples/myhandler.xml: added
+
+1999-05-07  Ken MacLeod  <kmacleod@serpentina.terrapinlabs.com>
+
+	* lib/XML/ESISParser.pm, lib/Data/Grove.pm,
+	lib/XML/Handler/Sample.pm: added POD
+
+1999-05-06  Ken MacLeod  <kmacleod@serpentina.terrapinlabs.com>
+
+	* lib/Data/Grove/Visitor.pm: remove XML::Grove extensions and make
+	generic
+
+	* lib/XML/Parser/SAXPerl.pm: renamed PerlSAX.pm
+
+	* lib/XML/Handler/Sample.pm: added
+
+	* examples/perlsax-test.pl: added
+
+	* examples/esis-test.pl: updated for new XML::ESISParser, moved
+	handler (Receiver) to XML::Handler::Sample, added command line
+	option for SGML
+
+1999-04-30  Ken MacLeod  <kmacleod@serpentina.terrapinlabs.com>
+
+	* Makefile.PL: added PREREQ_PM for XML::Parser
+
+1999-04-15  Ken MacLeod  <kmacleod@serpentina.terrapinlabs.com>
+
+	* lib/Data/Grove/Visitor.pm (accept): change XML:: to Data::
+
+	* lib/Data/Grove.pm (new): %{ shift } was being read as %shift
+
+1999-02-18  Ken MacLeod  <kmacleod@outlaw.cycletime.com>
+
+	* lib/Data/Grove/Visitor.pm: was XML::Grove::Visitor
+
+	* lib/Data/Grove/Tied.pm: was XML::Grove::Node
+
+	* lib/Data/Grove.pm: created from XML::Grove
+
+1999-02-15  Ken MacLeod  <kmacleod@outlaw.cycletime.com>
+
+	* lib/XML/Parser/SAXPerl.pm (parse): add comments
+
+	* lib/XML/ESISParser.pm: major changes for support of both XML and
+	SGML, and ongoing Perl SAX updates
+
+	* SAX.pod (end_document): noted that the return value of
+	end_document() is the return value of parse()
+
+	* README: added reference to FAQ, added module statuses, more
+	cleary described ESISParser, require Perl 5.005
+
+1999-02-13  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* lib/XML/ESISParser.pm: start move to Perl SAX
+
+1999-02-12  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* lib/XML/SAX2Perl.pm, lib/XML/Perl2SAX.pm, lib/XML/ESISParser.pm:
+	update to new Perl SAX
+
+	* lib/XML/Parser/SAXPerl.pm (new): allow hash or key/value pairs
+
+1999-02-12  Ken MacLeod  <kmacleod@outlaw.cycletime.com>
+
+	* interface-style.pod: note still undecided items
+
+	* lib/XML/Parser/SAXPerl.pm: fixes shown by xp_sax.t
+
+	* t/xp_sax.t: added
+
+	* lib/XML/Parser/SAXPerl.pm: added pod
+	many changes for Perl SAX and XML::Parser::Expat
+
+1999-02-11  Ken MacLeod  <kmacleod@outlaw.cycletime.com>
+
+	* SAX.pod: suggestions from Eric Prud'hommeaux and Enno Derksen
+
+	* interface-style.pod: suggestions from Larry Wall
+
+1999-02-01  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* MANIFEST: updated
+
+	* lib/XML/Parser/SAXPerl.pm: modified more towards Perl SAX
+
+	* SAX.pod: added
+
+1999-01-31  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* interface-style.pod: added
+
+1998-12-10  Ken MacLeod  <kmacleod@chelonia.bigplanet.com>
+
+	* lib/XML/Parser/SAXPerl.pm: added
+
+1998-12-08  Ken MacLeod  <kmacleod@chelonia.bigplanet.com>
+
+	* MANIFEST: added
+

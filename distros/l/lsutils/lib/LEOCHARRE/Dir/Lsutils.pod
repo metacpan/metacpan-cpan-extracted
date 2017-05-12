@@ -1,0 +1,163 @@
+=pod
+
+=head1 NAME
+
+=head1 SYNOPSIS
+
+LEOCHARRE::Dir::Lsutils
+
+=head1 DESCRIPTION
+
+
+=head1 SUBROUTINES
+
+None are exported by default.
+
+
+=head1 sort_by_stat()
+
+First argument is stat position.
+Second argument is list or array ref to paths on disk.
+Any paths not on disk, we warn and continue.
+Returns array ref in scalar context, list in list context.
+
+The stat position is one of:
+
+   # 0 dev      device number of filesystem
+   # 1 ino      inode number
+   # 2 mode     file mode  (type and permissions)
+   # 3 nlink    number of (hard) links to the file
+   # 4 uid      numeric user ID of file’s owner
+   # 5 gid      numeric group ID of file’s owner
+   # 6 rdev     the device identifier (special files only)
+   # 7 size     total size of file, in bytes
+   # 8 atime    last access time in seconds since the epoch
+   # 9 mtime    last modify time in seconds since the epoch
+   # 10 ctime    inode change time in seconds since the epoch (*)
+   # 11 blksize  preferred block size for file system I/O
+   # 12 blocks   actual number of blocks allocated
+
+
+=head2 sort_by_ctime()
+
+Argument is list or array ref to paths on disk.
+Returns sorted by inode change time. (creation time?)
+Returns array ref or list depending on context.
+
+=head2 sort_by_atime()
+
+Argument is list or array ref to paths on disk.
+Returns sorted by last access time.
+Returns array ref or list depending on context.
+
+=head2 sort_by_mtime()
+
+Argument is list or array ref to paths on disk.
+Returns sorted by last modify time.
+Returns array ref or list depending on context.
+
+
+
+
+
+=head2 most_by_stat()
+
+Argument is stat num, and list or aref of paths.
+In scalar context, returns path with highest value of stat num selected.
+In list contextx, returns path and the value of the stat num selected.
+
+
+For example if you want to know which of the paths you have has the greater 'size'.
+
+   my @files = ('/home/myself/one.pdf', '/home/myself/two.pdf' );
+   
+   my $biggest_file 
+      = most_by_stat( 7, @files);
+   
+   my ($biggest_file, $size_of_biggest_file) 
+      = most_by_stat( 7, @files);
+   
+   my $biggest_file 
+      = most_by_stat( 7, \@files);
+   
+   my ($biggest_file, $size_of_biggest_file) 
+      = most_by_stat( 7, [@files]); 
+
+Make sure to look at the shortcuts biggest(), newest(), oldest(), smallest().
+
+
+=head2 least_by_stat()
+
+Reverse of most_by_stat().
+
+=head2 biggest()
+
+Argument is list or aref of paths.
+Returns on with biggest size.
+
+In list context, first value returned is path, second is the value of size.
+
+
+   my @files = ('/home/myself/one.pdf', '/home/myself/two.pdf' );
+   
+   my $biggest_file 
+      = biggest(@files);
+   
+   my ($biggest_file, $size_of_biggest_file) 
+      = biggest(@files);
+   
+   my $biggest_file 
+      = biggest(\@files);
+   
+   my ($biggest_file, $size_of_biggest_file) 
+      = biggest([ @files]); 
+
+=head2 smallest()
+
+Reverse of biggest().
+
+=head2 newest()
+
+Just like biggest(), only it selects the one with largest ctime, that is.. the
+file who's inode is newest (therefore largest value, created latest).
+
+   my @files = ('/home/myself/one.pdf', '/home/myself/two.pdf' );
+   
+   my $newest_on_disk = newest( @files );
+   my $newest_on_disk = newest( \@files );
+   
+   my ($newest_on_disk, $ctime ) = newest( @files ); 
+
+=head1 oldest()
+
+Revese of newest().
+
+
+
+
+
+
+
+
+=head1 CAVEATS
+
+This is for posix.
+
+
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+
+=cut
+

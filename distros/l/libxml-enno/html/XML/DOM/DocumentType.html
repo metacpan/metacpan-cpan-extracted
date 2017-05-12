@@ -1,0 +1,172 @@
+<HTML><HEAD><TITLE>XML::DOM::DocumentType - An XML document type (DTD) in XML::DOM</TITLE></HEAD><BODY><H1><A NAME="NAME">NAME
+
+</A></H1><P>XML::DOM::DocumentType - An XML document type (DTD) in XML::DOM
+
+<P><HR><H1><A NAME="DESCRIPTION">DESCRIPTION
+
+</A></H1><P>XML::DOM::DocumentType extends <A HREF="Node.html">XML::DOM::Node</A>.
+
+<P>Each Document has a doctype attribute whose value is either null or a
+DocumentType object. The DocumentType interface in the DOM Level 1 Core
+provides an interface to the list of entities that are defined for the
+document, and little else because the effect of namespaces and the
+various XML scheme efforts on DTD representation are not clearly
+understood as of this writing. 
+The DOM Level 1 doesn't support editing DocumentType nodes.
+
+<P><B>Not In DOM Spec</B>: This implementation has added a lot of extra 
+functionality to the DOM Level 1 interface. 
+To allow editing of the DocumentType nodes, see XML::DOM::ignoreReadOnly.
+
+<H2><A NAME="METHODS">METHODS
+
+</A></H2><DL><DT><A NAME="getName_"><STRONG><P>getName
+
+</STRONG></A><DD>Returns the name of the DTD, i.e. the name immediately following the
+DOCTYPE keyword.
+
+<DT><A NAME="getEntities_"><STRONG><P>getEntities
+
+</STRONG></A><DD>A NamedNodeMap containing the general entities, both external
+and internal, declared in the DTD. Duplicates are discarded.
+For example in:
+
+<PRE> &lt;!DOCTYPE ex SYSTEM "ex.dtd" [
+  &lt;!ENTITY foo "foo"&gt;
+  &lt;!ENTITY bar "bar"&gt;
+  &lt;!ENTITY % baz "baz"&gt;
+ ]&gt;
+ &lt;ex/&gt;
+
+</PRE><P>the interface provides access to foo and bar but not baz.
+Every node in this map also implements the Entity interface.
+
+<P>The DOM Level 1 does not support editing entities, therefore
+entities cannot be altered in any way.
+
+<P><B>Not In DOM Spec</B>: See XML::DOM::ignoreReadOnly to edit the DocumentType etc.
+
+<DT><A NAME="getNotations_"><STRONG><P>getNotations
+
+</STRONG></A><DD>A NamedNodeMap containing the notations declared in the DTD.
+Duplicates are discarded. Every node in this map also
+implements the Notation interface.
+
+<P>The DOM Level 1 does not support editing notations, therefore
+notations cannot be altered in any way.
+
+<P><B>Not In DOM Spec</B>: See XML::DOM::ignoreReadOnly to edit the DocumentType etc.
+
+</DL><H2><A NAME="Additional_methods_not_in_the_DOM_Spec">Additional methods not in the DOM Spec
+
+</A></H2><H3>Creating and setting the DocumentType
+
+</H3><P>A new DocumentType can be created with:
+
+<PRE>	$doctype = $doc-&gt;createDocumentType ($name, $sysId, $pubId, $internal);
+
+</PRE><P>To set (or replace) the DocumentType for a particular document, use:
+
+<PRE>	$doc-&gt;setDocType ($doctype);
+
+</PRE><H3>getSysId and setSysId (sysId)
+
+</H3><P>Returns or sets the system id.
+
+<H3>getPubId and setPubId (pudId)
+
+</H3><P>Returns or sets the public id.
+
+<H3>setName (name)
+
+</H3><P>Sets the name of the DTD, i.e. the name immediately following the
+DOCTYPE keyword. Note that this should always be the same as the element
+tag name of the root element.
+
+<H3>getAttlistDecl (elemName)
+
+</H3><P>Returns the AttlistDecl for the Element with the specified name, or undef.
+
+<H3>getElementDecl (elemName)
+
+</H3><P>Returns the ElementDecl for the Element with the specified name, or undef.
+
+<H3>getEntity (entityName)
+
+</H3><P>Returns the Entity with the specified name, or undef.
+
+<H3>addAttlistDecl (elemName)
+
+</H3><P>Adds a new AttDecl node with the specified elemName if one doesn't exist yet.
+Returns the AttlistDecl (new or existing) node.
+
+<H3>addElementDecl (elemName, model)
+
+</H3><P>Adds a new ElementDecl node with the specified elemName and model if one doesn't 
+exist yet.
+Returns the AttlistDecl (new or existing) node. The model is ignored if one
+already existed.
+
+<H3>addEntity (parameter, notationName, value, sysId, pubId, ndata)
+
+</H3><P>Adds a new Entity node. Don't use createEntity and appendChild, because it should
+be added to the internal NamedNodeMap containing the entities.
+
+<P>Parameters:
+ <I>parameter</I>	 whether it is a parameter entity (%ent;) or not (&amp;ent;).
+ <I>notationName</I> the entity name.
+ <I>value</I>        the entity value.
+ <I>sysId</I>        the system id (if any.)
+ <I>pubId</I>        the public id (if any.)
+ <I>ndata</I>        the NDATA declaration (if any, for general unparsed entities.)
+
+<P>SysId, pubId and ndata may be undefined.
+
+<P>DOMExceptions:
+
+<DL><DT><A NAME="_INVALID_CHARACTER_ERR_"><STRONG><P>* INVALID_CHARACTER_ERR
+
+</STRONG></A><DD>Raised if the notationName does not conform to the XML spec.
+
+</DL><H3>addNotation (name, base, sysId, pubId)
+
+</H3><P>Adds a new Notation object. 
+
+<P>Parameters:
+ <I>name</I>   the notation name.
+ <I>base</I>   the base to be used for resolving a relative URI.
+ <I>sysId</I>  the system id.
+ <I>pubId</I>  the public id.
+
+<P>Base, sysId, and pubId may all be undefined.
+(These parameters are passed by the XML::Parser Notation handler.)
+
+<P>DOMExceptions:
+
+<DL><DT><A NAME="_INVALID_CHARACTER_ERR_"><STRONG><P>* INVALID_CHARACTER_ERR
+
+</STRONG></A><DD>Raised if the notationName does not conform to the XML spec.
+
+</DL><H3>addAttDef (elemName, attrName, type, default, fixed)
+
+</H3><P>Adds a new attribute definition. It will add the AttDef node to the AttlistDecl
+if it exists. If an AttDef with the specified attrName already exists for the
+given elemName, this function only generates a warning.
+
+<P>See XML::DOM::AttDef::new for the other parameters.
+
+<H3>getDefaultAttrValue (elem, attr)
+
+</H3><P>Returns the default attribute value as a string or undef, if none is available.
+
+<P>Parameters:
+ <I>elem</I>    The element tagName.
+ <I>attr</I>    The attribute name.
+
+<H3>expandEntity (entity [, parameter])
+
+</H3><P>Expands the specified entity or parameter entity (if parameter=1) and returns
+its value as a string, or undef if the entity does not exist.
+(The entity name should not contain the '%', '&amp;' or ';' delimiters.)
+
+<P><HR><I><FONT SIZE="-1">Last updated: Fri Oct 22 18:47:26 1999</FONT></I></BODY></HTML>

@@ -1,0 +1,109 @@
+Revision history for the libsirc distribution.
+
+0.12
+
+    - Sirc::URL is a new module which provides an easy way to view URLs
+      which appear on the screen.
+
+    - Sirc::Util:
+
+    	- addcmd() is an enhanced version of sirc's.  It lets you define
+    	  commands whose names contain non-alphanumeric characters.
+
+    	- addhelp() is an enhanced version of sirc's.  It both adds the
+    	  new command to the main help topic (or "set" topic), and
+    	  provides a way to add help without hardcoding the format that
+    	  help entries use.
+
+	- arg_count_error() supplies the subroutine name if it's undef.
+
+	- settable_boolean() allows you to supply a validator function.
+
+	- settable_str() is a new function, similar to settable_int().
+
+0.11  Fri Jun 02 15:38:29 EDT 2000
+
+    - Tweak /limitman algorithm to try to keep the slaves a constant
+      distance in time from the master.
+
+    - Cut default /limitman timings in half.
+
+0.10  Fri Jun 02 18:56:59 EDT 2000
+
+    - Add Sirc::LimitMan.
+
+    - Add %Chan_limit and limit hook to Sirc::Chantrack.
+
+    - Add by_server() and newtimer() to Sirc::Util.
+
+0.09
+
+    - Add missing '1' to the end of Autoop.pm.  It was working by
+      happenstance in real life but not when run from 'make test' (due
+      to the dummy addhook()).
+
+0.08  Tue May 18 22:39:27 EDT 1999
+
+    - Allow ops to control your autovoice_delay by sending you specially
+      formatted /msgs.
+
+0.07  Mon May 03 23:28:27 EDT 1999
+
+    - Fix Sirc::Autoop's %Autovoice not to +v people who didn't have it
+      before you arrived.  Instead, they're noted as being -v.
+
+    - Have Sirc::Util::settable_int set the variable to 0 if it's undef,
+      else /set won't work on it.
+
+0.06  Fri Jan 08 18:06:52 EST 1999
+
+    - Move the version from Makefile.PL to Sirc::Util.  Use it to put
+      the library name and version in $::add_ons.
+
+    - Move ban_pattern() from Sirc::Kick to Sirc::Util.
+
+    - Add Sirc::Util::mask_to_re().
+
+    - Have Sirc::Autoop's %Autovoice work based on ban_pattern rather
+      than nick.
+
+0.05  Wed Dec 23 00:41:50 EST 1998
+
+    - Oops, Sirc::LckHash wasn't in the MANIFEST.  One should always run
+      a disttest or at least a distcheck!
+
+0.04  Wed Dec 23 00:01:35 EST 1998
+
+    - Add Sirc::LckHash, a class tied hash class which downcases the
+      keys.  This used to be in Sirc::Util as Tie::LckHash.
+
+    - Add %Autovoice to Sirc::Autoop.
+
+    - Don't allow importation Sirc::Autoop's variables which are also
+      /settable, as setting them directly (rather than via doset) causes
+      the /set output to be wrong.
+
+0.03  Fri Nov 27 11:48:45 EST 1998
+
+    - Add voice capabilities to Sirc::Chantrack and Sirc::Autoop.
+
+    - Allow $Autoop_delay to be a code ref which calculates the delay.
+      Default to having the delay be 3, 5, 7 or 9 seconds.
+
+    - Add autoop_verbose setting, default off.  Right now this controls
+      the "Queueing +o" message.
+
+0.02  Thu Oct 22 23:13:22 EDT 1998
+
+    - Add Sirc::Autoop and Sirc::Kick modules.
+
+    - Add timer() to Sirc::Utils.  This is like main::timer except the
+      code arg can be a code reference.
+
+    - Still no documentation, sorry.  UTS, L.
+
+0.01  Tue Dec 16 19:00:00 EST 1997
+
+    - Initial version.
+
+$Id: Changes,v 1.10 2001-07-27 08:56:05-04 roderick Exp $

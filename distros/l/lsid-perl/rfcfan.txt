@@ -1,0 +1,181 @@
+LSID Foreign Authority Publication Service 
+------------------------------------------------------------------ 
+
+Authors 
+------- 
+Sean Martin (sjmm@us.ibm.com) 
+Dan Smith (smithdan@us.ibm.com) 
+Ben Szekely (bhszekel@us.ibm.com) 
+
+Definitions 
+----------- 
+
+Foreign Authority: 
+                   A LSID Authority Service that points to metadata for LSIDs for which it is 
+                   not the actual authority as defined by the "authority string" in any LSID. 
+                   These metadata services are provided independantly and generally in addition 
+                   to those already provided by the actual authority. An example foreign 
+                   authority might return metadata service endpoints that contain additional 
+                   metadata (for example annotations) about LSIDs for which it is not the authority.   
+                    
+
+Problem 
+------- 
+
+In the Life Science Identifier specification, we now have a means       
+by which we can uniquely name a data object as well as a protocol       
+though which client software can retrieve that data object or metadata  
+information about that data object. We can also use the same protocol   
+to retrieve metadata information about that data object from third      
+parties called foreign authorities.                                     
+
+Many people now ask how LSID client software can dynamically discover   
+and retrieve information stored about LSIDs that is collected by        
+third parties (not the authority) given that there is generally no      
+link stored between the authority for any LSID named object and a       
+random third party that wishes to offer their own metadata about that   
+named data object, for example third party annotations on existing      
+information.                                                            
+
+The current specification leaves this capability undefined and          
+we are forced to talk about perhaps relying on "Bio-Google" type        
+universal crawler/indexing services to find all mentions of any         
+particular LSID or somehow "magically" knowing to also query against    
+the LSID resolution services provided by colaborators or other "well    
+known metadata sources" as these emerge. Neither of these solutions     
+adequately address the issue.                                           
+
+
+Solution 
+-------- 
+
+The adoption of this proposal or something similar would provide the    
+formal means by which third parties might provide pointers to their own 
+information that would be retrievable along with the metadata provided  
+by the authority for a Life Science Identifier.                         
+
+If an LSID Authority Service wishes to also implement FAP, it would
+provide two additional methods:
+
+notifyForeignAuthority(String lsid, String authorityName) 
+revokeNotifcationForeignAuthority(String lsid, String authorityName) 
+
+The optionally provided notify method registers, with the authority for 
+any LSID, the details of the foreign authority service that also knows  
+something about that LSID. The acceptance and storage of notifications  
+is left entirely at the discretion of that LSID's authority. The        
+implementation of these mappings is also left to the implementer of the 
+authority service.                                                      
+
+However, all published mappings for an LSID must be returned by some    
+metadata service pointed to by the actual authority and returned along  
+with any other metadata in the getMetaData() method call. The metadata  
+language we would propose is RDF (Resource Description Framework). We   
+recommend something like the following RDF predicate for indicating     
+a foreign authority be returned as metadata for the LSID concerned:     
+urn:lsid:i3c.org:predicates:foreignauthority. At the moment, we are not 
+settled on what should sit on the right-hand-side of this predicate.    
+In an initial implementation, we might return the authority string.     
+However, richer implementations might return an LSID representing the   
+authority itself which would link to semantic information about the     
+foreign authority itself.                                               
+
+The revokeNotification method removes the mapping if it exists. 
+
+
+Reasoning 
+--------- 
+
+We use the metadata to return the foreign authorities because it allows 
+the use of existing infrastructure and in particular the getMetaData()  
+method call. In addition, rich metadata about the foreign authority     
+may be included to provide trust or context information about the       
+foreign authority. LSID authority names are returned because it allows  
+the client to know the source of the foreign information for trust      
+decisions. Users of third party metadata for any LSID would need to be  
+made aware that some of the information they are seeing was retrieved   
+from the authority for that LSID and some was returned from additional  
+third parties. All of these parties, including the original authority,  
+would most likely have different levels of trust in the eyes of the     
+user.                                                                   
+
+Other candidates were actual authority endpoints, and actual            
+metadata/data service endpoints. Authority endpoints were ruled out     
+because the endpoint may change while the authority name is constant.   
+Actual service endpoints were ruled out because there would be no       
+qualification of these endpoints. Furthermore, a foreign authority      
+might add services and this would require re-registration. Finally, the 
+authority name is the most general and flexible means of identifying a  
+source of information about an LSID.                                    
+
+
+Security Concerns 
+----------------- 
+
+A FAP service notifyForeignAuthority call contains no built-in means    
+of access restrictions. Authentication, web of trust, or other means    
+could be used for access control and is left to the implementer of a    
+FAP service. We present a recommended approach for discussion here:     
+
+When a foreign authority is published, the implementation can actually  
+try to resolve the foreign authority and check if it in fact has any    
+metadata services for the given LSID. This does not solve the problem   
+of foreign authorities presenting bogus metadata or for parties to      
+create notifications without the permission of the third party, but     
+it does make sure that all registered authorities have the metadata     
+available that they claim to have.                                      
+
+A second security approach would be to secure the publish service       
+itself so that only authorized parties could publish mappings.          
+
+
+Metadata Ports and the problem of duplication 
+--------------------------------------------- 
+
+In order to make sure that a client has all metadata that the authority 
+knows about, the client must download metadata from all metadata ports  
+returned by getAvailableServices(). In the current specification, there 
+exists no convention for specifying duplicate metadata services. This   
+will lead to inefficiencies. We propose that all metadata services      
+listed under a given WSDL service must return unique metadata AND that  
+a complete set of the metadata for a given LSID may be obtained by      
+merging the metadata from all ports in a single service.                
+
+Consider the current WSDL for an OMIM based LSID: 
+
+<definitions targetNamespace="http://ncbi.nlm.nih.gov.lsid.i3c.org/availableServices?urn:lsid:ncbi.nlm.nih.gov.lsid.i3c.org:omim:601077" xmlns:tns="http://ncbi.nlm.nih.gov.lsid.i3c.org/availableServices?urn:lsid:ncbi.nlm.nih.gov.lsid.i3c.org:omim:601077" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:dsb="http://www.omg.org/LSID/2003/DataServiceSOAPBindings" xmlns:dhb="http://www.omg.org/LSID/2003/DataServiceHTTPBindings" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns="http://schemas.xmlsoap.org/wsdl/"> 
+  <import namespace="http://www.omg.org/LSID/2003/DataServiceSOAPBindings" location="LSIDDataServiceSOAPBindings.wsdl"/> 
+  <import namespace="http://www.omg.org/LSID/2003/DataServiceHTTPBindings" location="LSIDDataServiceHTTPBindings.wsdl"/> 
+  <service name="Omim"> 
+    <port name="HTTPMetadata" binding="dhb:LSIDMetadataHTTPBinding"> 
+      <http:address location="http://lsid.i3c.org:9090/authority/metadata"/> 
+    </port> 
+    <port name="SOAPMetadata" binding="dsb:LSIDMetadataSOAPBinding"> 
+      <soap:address location="http://lsid.i3c.org:9090/authority/metadata"/> 
+    </port> 
+  </service> 
+</definitions> 
+
+
+The SOAP and HTTP endpoints contain the same metadata, but these        
+semantics are not conveyed to the client currently. Now consider the    
+following modififed WSDL using the rule defined above:                  
+
+
+<definitions targetNamespace="http://ncbi.nlm.nih.gov.lsid.i3c.org/availableServices?urn:lsid:ncbi.nlm.nih.gov.lsid.i3c.org:omim:601077" xmlns:tns="http://ncbi.nlm.nih.gov.lsid.i3c.org/availableServices?urn:lsid:ncbi.nlm.nih.gov.lsid.i3c.org:omim:601077" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:dsb="http://www.omg.org/LSID/2003/DataServiceSOAPBindings" xmlns:dhb="http://www.omg.org/LSID/2003/DataServiceHTTPBindings" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns="http://schemas.xmlsoap.org/wsdl/"> 
+  <import namespace="http://www.omg.org/LSID/2003/DataServiceSOAPBindings" location="LSIDDataServiceSOAPBindings.wsdl"/> 
+  <import namespace="http://www.omg.org/LSID/2003/DataServiceHTTPBindings" location="LSIDDataServiceHTTPBindings.wsdl"/> 
+  <service name="OmimSOAP"> 
+    <port name="SOAPMetadata" binding="dsb:LSIDMetadataSOAPBinding"> 
+      <soap:address location="http://lsid.i3c.org:9090/authority/metadata"/> 
+    </port> 
+  </service> 
+  <service name="OmimHTTP"> 
+    <port name="HTTPMetadata" binding="dhb:LSIDMetadataHTTPBinding"> 
+        <http:address location="http://lsid.i3c.org:9090/authority/metadata"/> 
+    </port> 
+  </service> 
+</definitions> 
+
+No service contains duplicate ports and all OMIM metadata may be
+obtained by downloading the metadata from either of the services.

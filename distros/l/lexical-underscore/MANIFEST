@@ -1,0 +1,17 @@
+COPYRIGHT
+CREDITS
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+SIGNATURE
+dist.ini
+doap.ttl
+lib/lexical/underscore.pm
+t/01basic.t
+t/02synopsis.t
+t/03perl58.t

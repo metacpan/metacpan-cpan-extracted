@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<definitions targetNamespace="http://www.omg.org/LSID/2003/Standard/WSDL" xmlns:tns="http://www.omg.org/LSID/2003/Standard/WSDL" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+ xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+ xmlns:asb="http://www.omg.org/LSID/2003/AuthorityServiceSOAPBindings"
+ xmlns:ahb="http://www.omg.org/LSID/2003/AuthorityServiceHTTPBindings"
+ xmlns="http://schemas.xmlsoap.org/wsdl/">
+<import namespace="http://www.omg.org/LSID/2003/AuthorityServiceHTTPBindings" location="LSIDAuthorityServiceHTTPBindings.wsdl"/>
+<import namespace="http://www.omg.org/LSID/2003/AuthorityServiceSOAPBindings" location="LSIDAuthorityServiceSOAPBindings.wsdl"/>
+<service name="AuthorityService">
+<port name="soapPort" binding="asb:LSIDAuthoritySOAPBinding">
+<soap:address location="http://lsid.biopathways.org/authority/"/>
+</port>
+<port name="httpPort" binding="ahb:LSIDAuthorityHTTPBinding">
+<http:address location="http://lsid.biopathways.org"/>
+</port>
+</service>
+</definitions>

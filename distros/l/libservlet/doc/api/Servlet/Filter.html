@@ -1,0 +1,163 @@
+<HTML>
+<HEAD>
+<TITLE>Servlet::Filter - filter interface</TITLE>
+<LINK REL="stylesheet" HREF="../../libservlet.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Servlet::Filter - filter interface</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  $filter-&gt;setFilterConfig($fconfig);</PRE>
+<PRE>
+  # later</PRE>
+<PRE>
+  $filter-&gt;doFilter($request, $response, $chain);</PRE>
+<PRE>
+  my $config = $filter-&gt;getConfig();</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This is the interface for an object that performs filtering tasks on
+the request for a resource, the response, or both.</P>
+<P>Filters perform filtering in the <A HREF="#item_doFilter"><CODE>doFilter()</CODE></A> method. Every filter
+has access to a <STRONG>Servlet::FilterConfig</STRONG> object from which it can
+obtain its initialization parameters and a reference to the
+<STRONG>Servlet::ServletContext</STRONG> which it can use, for example, to load
+resources needed for filtering tasks.</P>
+<P>Filters are configured in the deployment descriptor of a web
+application.</P>
+<P>Examples that have been identified for this design are:</P>
+<DL>
+<DT><STRONG><A NAME="item_Authentication_Filters">Authentication Filters</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Logging_and_Auditing_Filters">Logging and Auditing Filters</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Image_conversion_Filters">Image conversion Filters</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Data_compression_Filters">Data compression Filters</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Encryption_Filters">Encryption Filters</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Tokenizing_Filters">Tokenizing Filters</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_Filters_that_trigger_resource_access_events">Filters that trigger resource access events</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_XSL%2FT_Filters">XSL/T Filters</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_MIME%2Dtype_chain_Filters">MIME-type chain Filters</A></STRONG><BR>
+<DD>
+</DL>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_doFilter">doFilter($request, $response, $chain)</A></STRONG><BR>
+<DD>
+This method is called by the container each time a request/response
+pair is passed through the filter chain due to a client request for a
+resource at the end of the chain. The filter chain passed into this
+method allows the filter to passon the request and response to the
+next entity in the chain.
+<P>A typical implementation of this method would follow such a pattern:</P>
+<OL>
+<LI>
+Examine the request
+<P></P>
+<LI>
+Optionally wrap the request object with a custom implementation to
+filter content or headers for input filtering
+<P></P>
+<LI>
+Optionally wrap the response object with a custom implementation to
+filter content or headers for output filtering
+<P></P>
+<LI><STRONG><A NAME="item_a%29">a)</A></STRONG><BR>
+
+<STRONG>Either</STRONG> invoke the next entity in the chain by calling <A HREF="#item_doFilter"><CODE>doFilter()</CODE></A>
+on <EM>$chain</EM>,
+<P></P>
+<LI><STRONG><A NAME="item_b%29">b)</A></STRONG><BR>
+
+<STRONG>or</STRONG> block further filter processing by not passing the
+request/response pair down the chain
+<P></P>
+<LI>
+Directly set headers on the response after invocation of the next
+entity in the filter chain.
+<P></P></OL>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24request"><EM>$request</EM></A></STRONG><BR>
+<DD>
+the <STRONG>Servlet::ServletRequest</STRONG> object that contains the client's
+request
+<P></P>
+<DT><STRONG><A NAME="item_%24response"><EM>$response</EM></A></STRONG><BR>
+<DD>
+the <STRONG>Servlet::ServletResponse</STRONG> object that contains the servlet's
+response
+<P></P>
+<DT><STRONG><A NAME="item_%24chain"><EM>$chain</EM></A></STRONG><BR>
+<DD>
+the <STRONG>Servlet::FilterChain</STRONG> through which the request and response are
+passed
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AServletException"><STRONG>Servlet::ServletException</STRONG></A></STRONG><BR>
+<DD>
+if an exception occurs while performing the filtering task
+<P></P></DL>
+<DT><STRONG><A NAME="item_getFilterConfig"><CODE>getFilterConfig()</CODE></A></STRONG><BR>
+<DD>
+Returns the <STRONG>Servlet::FilterConfig</STRONG> object for this filter
+<P></P>
+<DT><STRONG><A NAME="item_setFilterConfig"><CODE>setFilterConfig($config)</CODE></A></STRONG><BR>
+<DD>
+Set the config object for this filter
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24config"><EM>$config</EM></A></STRONG><BR>
+<DD>
+the <STRONG>Servlet::FilterConfig</STRONG> object for this filter
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../api/Servlet/FilterChain.html">the Servlet::FilterChain manpage</A>,
+<A HREF="../../api/Servlet/FilterConfig.html">the Servlet::FilterConfig manpage</A>,
+<A HREF="../../api/Servlet/ServletException.html">the Servlet::ServletException manpage</A>,
+<A HREF="../../api/Servlet/ServletRequest.html">the Servlet::ServletRequest manpage</A>,
+<A HREF="../../api/Servlet/ServletResponse.html">the Servlet::ServletResponse manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

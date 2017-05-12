@@ -1,0 +1,454 @@
+This is a simple, respectively stupid Perl package that shows how the
+complete internationalization process for a Perl package *could* be
+done.  It does not claim to be the smartest or the only possible
+solution, but it provides at least a skeleton for real packages.  If
+libintl-perl should someday become an "established" Perl package, it
+would probably be a lot better to seamlessly integrate the process
+into ExtUtils::MakeMaker, but for now it's all we have.
+
+The example focuses on the packaging process, i. e. on the things you
+have to do to maintain an internationalized Perl package, so that
+users of your package will benefit from translations you provide.  It
+therefore doesn't make use of any of the nitty-gritty details of
+message translation like plural handling or the like.
+
+Requirements
+------------
+
+The only requirement is a Perl aware version of GNU gettext.  Perl
+support was introduced only recently in GNU gettext, and you will have
+to check whether your copy of GNU gettext already supports Perl.  
+Support for Perl was introduced in version 0.12.2 of GNU gettext.  If 
+your version is older, you have to update GNU gettext.
+
+First test
+----------
+
+The subdirectory "simplecal" contains a regular Perl package like the
+ones you will find on the CPAN.  You should first try to build and
+use the package:
+
+     cd simplecal
+     perl Makefile.PL
+     make
+
+If you see a warning that the prerequisite Locale::TextDomain is not
+found, then you have to install libintl-perl first.
+
+You should never "make install", the package is only a stupid example
+and you will not really want to install it.  You can simply try it out
+from the installation directory itself:
+
+     perl -Ilib bin/simplecal.pl
+
+It should print a crude calendar representation in English, or even in
+your preferred language, depending on your system settings.
+
+The Programming
+---------------
+
+Now we should dig into the sources.  All relevant files are commented
+and should give you a pretty good idea of what's going on.  Change
+your directory to the package directory "simplecal" and inspect the
+source files.
+
+The heart of the library is found in the file lib/SimpleCal.pm.  This
+Perl module defines functions that map numeric values to month names
+or abbreviated week day names.  You will find nothing unusual in this
+module except for a line at the beginning of the file that reads:
+
+     use Locale::TextDomain qw (com.cantanea.simplecal);
+
+In case you are not familiar with the operator "qw", this is an
+equivalent writing of 
+
+     use Locale::TextDomain ('com.cantanea.simplecal');
+
+That line in the code does three things: It imports the module
+Locale::TextDomain, *and* it states that the text domain (or
+identifier) for this package is "com.cantanea.simplecal", *and* it says
+that the translations for this package can be found in the
+subdirectory "LocaleDate" of any component of @INC (unless it can be
+found in one of the system locations).  See the POD in
+Locale::TextDomain for more information.
+
+You may also find out that some strings have a "__" or a "N__" in
+front of them.  The explanation to these funny things has two sides:
+First, they mark the following strings as being translatable, so that the
+parser "xgettext" included in GNU gettext can find them.  Yet, at runtime
+both "__" and "N__" are really function names, and they will look up
+their argument in the translation database.  There is more
+documentation available on this.  Guess where! Yepp, in the POD of
+Locale::TextDomain.
+
+The library is used by a Perl script "bin/simplecal.pl".  Let's have a
+look at that script now.  The first remarkable line is the one that
+calls POSIX::setlocale():
+
+     setlocale (LC_MESSAGES, '');
+
+The POD of the POSIX module gives additional information on the
+function setlocale().  In brief, that call initializes the locale
+settings for the category "LC_MESSAGES" to the pre-selected user
+settings (this is indicated by the empty second argument).  The
+constant LC_MESSAGES is exported by Locale::Messages, which is always
+a safe choice.  If your script is only intended to run with Perl 5.8
+or better, you can also import LC_MESSAGES from the POSIX module.
+
+The rest of the program only prints a calendar for the current month.
+It retrieves the name of the month and the abbreviated weekday names
+from our little SimpleCal.pm module which provides this information in
+a localized form.
+
+A Dutch Calendar
+----------------
+
+We want to see the calendar in Dutch now.  All you have to do is to
+set the environment variable LANGUAGE to the value "nl".  If you don't
+know how to do this, add the following line somewhere at the top of
+"bin/simplecal.pl":
+
+     $ENV{LANGUAGE} = "nl";
+
+Now run the script again:
+
+     perl -Ilib bin/simplecal.pl
+
+It should print out the calendar in Dutch.  Look at the *.po files in
+the subdirectory "po" for a list of other translations I have
+prepared.  You can try them out in a similar manner.
+
+Please see the file "README-NLS" in subdirectory "sample/simplecal"
+for details on how to set the language via environment variables.
+
+The Subdirectory "po"
+---------------------
+
+This directory contains the raw translations and a Makefile that will
+compile and install them.  If you enter this directory and type "make"
+you will see a list of the available Makefile targets.
+
+The first one is the target "pot", a so-called phony target, i. e. it
+is not related to a file with the name of "pot".  The command "make
+pot" will remake the master catalog of the package and place the
+result in the file "com.cantanea.simplecal.pot"
+("com.cantanea.simplecal" is the text domain resp. identifier for our
+package).  Type the command "make pot" now to see how the master
+catalog is actually generated.  If the output says something like
+"nothing to be done for `pot'", then delete the file
+"com.cantanea.simplecal.pot" and try again.
+
+You should see now that the target file "com.cantanea.simplecal.pot" is
+generated by the program xgettext with a plethora of options:
+
+     xgettext --output=./com.cantanea.simplecal.pox --from-code=utf-8 \
+              --add-comments=TRANSLATORS: --files-from=./POTFILES \
+	      --copyright-holder="Imperia AG Huerth/Germany" \
+	      --keyword --keyword='$__' --keyword=__ --keyword=__x \
+	      --keyword=__n:1,2 --keyword=__nx:1,2 --keyword=__xn \
+	      --keyword=N__ --language=perl && \
+     rm -f com.cantanea.simplecal.pot && \
+     mv com.cantanea.simplecal.pox com.cantanea.simplecal.pot
+
+Type "xgettext --help" for a detailled explanation of the command line
+options.  In brief this invocation causes xgettext to read a list of
+files from the file "POTFILES", extract all messages from these
+source files and place the result in the output file
+"com.cantanea.simplecal.pox".  If the command succeeds, the old ".pot"
+file is replaced by the new ".pox" file.
+
+Yes, this is complicated, and that is why this skeleton Makefile is
+provided here.  You can copy it without any modification into your
+package to use it.
+
+The file POTFILES contains a list of source files to be scanned for
+translatable strings.  Have a look at it, and you will understand it.
+
+The Makefile also includes a file called "PACKAGE".  This file contains
+all package-dependent information in a couple of Makefile variables:
+
+- TEXTDOMAIN
+This Makefile variable should contain the text domain/identifier
+for your package.  Please see the POD of Locale::TextDomain for advice
+on a reasonable naming.
+
+- LINGUAS
+The language codes of all languages supported by your package.  Each 
+entry corresponds to a po file in the po subdirectory.
+
+- COPYRIGHT_HOLDER
+Usually your name.  Whatever you put here will be included as the
+copyright holder in the header of the po files.
+
+- MSGID_BUGS_ADDRESS
+Usually your name and e-mail address.  It will also be included in the
+po header and translators will check this entry when they come across
+a bug in a msgid, or when they have difficulties to translate a certain
+message because of awkward coding on your side.
+
+Okay, after "make pot" we have updated the master message catalog
+TEXTDOMAIN.pot, in our case "com.cantanea.simplecal.pot".  Have a look
+into the file now.  It contains the original English messages that
+xgettext has extracted from our source files and blank translations.
+The po files (the files the names of which end with ".po") contain
+previous translations provided by our package translators.  Whenever
+you change the Perl sources, the list of messages may change.  This
+results in a maybe new .pot file and requires an update of all po
+files.  Try that now and type "make update-po"
+
+You will see confusing output from "make" but you may get the idea
+that every single po file (every language that the package supports)
+gets updated, and the new strings are inserted into the po
+files. Since nothing really changed here (we did not change the source
+files yet) you can now try to update the compiled po files which end in
+".gmo" (for GNU mo format) with "make update-mo".
+
+Again, you will see maybe cryptic output from "make" that signifies
+that all compiled files are re-generated now by a program called
+"msgfmt".
+
+The last step requires that you copy the (possibly changed) mo files
+into your package by "make install".  This will copy the gmo files as
+".mo" files into the subdirectory "LocaleData" of your package so that 
+libintl-perl is able to find them at runtime.
+
+You can perform all these steps at once by typing "make all" although
+this is mostly useful for testing purposes.  In reality the workflow
+is different:
+
+- You change your source files, messages may have been added, deleted
+  or modified.  You will have to update the master message catalog by
+  typing "make pot".
+
+- Since the translations may have gotten out-of-date, you will have to
+  merge your changes into all po files by "make update-po".
+
+- Your translators will get copies of the po files, reflect your
+  changes in the po files and send them back to you.
+
+- When you have received the updates, it is time to compile the po
+  files into a binary representation with "make update-mo".
+
+- These binary mo files have to be installed under "LocaleData", and
+  you have to "make install".  Note that "make install" installs the
+  mo files in your source package, not in the system location!
+
+- Now that you have updated the translations for your package, you
+  will want to upload a new version to the CPAN.
+
+Note that all these steps are *only* necessary for package
+maintainers.  As a user of the package, you will only see the
+resulting mo files under "LocaleData".  End users do *not* need any of
+the gettext tools, and they do not have to perform any of the above
+steps theirselves!
+
+Changing the Sources
+--------------------
+
+You may wonder whether your translators have to re-translate
+everything from scratch whenever you change your Perl sources.  This
+is, of course, not the case.  Let's say, you want to add a welcome and
+a good-bye message to the program output.  Have a look into
+"bin/simplecal.pl" and you will see that this is already prepared but
+commented out (search for "Welcome to" and "Bye" if you can't find
+it).  Uncomment these lines and see what happens to the po files in
+that case.
+
+Before you proceed, you should have a look at the Dutch translation
+file "nl.po".  At the bottom you will find some lines that are
+commented out with "#~" and that proove that I have already prepared
+that case.  The comment sign "#~" in po files signifies that a
+particular translation is obsoleted, i. e. no longer needed because it
+is no longer present in the source files.
+
+Say, that you have really changed your mind, and you want to
+re-introduce the welcome and good-bye messages to your program and you
+uncomment the corresponding lines in "bin/simplecal.pl".  You will
+have to re-make the master catalog "com.cantanea.simplecal.pot" by
+"make pot", and then "make update-po" to update the po files.  In
+fact, "make update-po" is sufficient because it will also update the
+pot file if it is out-of-date (i. e. if any of the source files have
+changed in the meantime).
+
+Type "make update-po" now, and look again at "po/nl.po".  You will see
+that the previously translated welcome and good-bye messages have been
+re-activated from the obsoleted entries.  In fact your translators
+will have nothing to do, because their old translations are still
+valid.  Type "make install" and then re-run "perl -Ilib
+bin/simplecal.pl", set the environment variable "LANG" to any of the
+available languages, and things will still work perfectly.
+
+Of course, it is a rare case that messages are discarded and later
+re-activated in programming sources.  It is more likely that you will
+modify a message, or maybe add a message that is similar to former
+ones.  Let's say that you want to change the exclamation mark in the
+good-bye message at the bottom of the script to a simple full stop.
+Look for the line that reads
+
+     print __"Bye!\n";
+
+and change it into
+
+     print __"Bye.\n";
+
+Change into the directory "po", update the translation files with
+"make update-po" and inspect the file "nl.po".  At first glance, you
+may not see any change.  But then: The entry for the good-bye message
+has an additional comment "#, fuzzy".  The fuzzy mark signifies that
+the msgerge program has found that a message is very similar to a
+previous message (even obsoleted ones are taken into account), and
+that it proposes an old translation here.  The translator will
+normally modify the translation accordingly (without having to re-type
+everything), remove the fuzzy mark and send back the translation to
+you.
+
+In fact you could also install translations that have not been revised
+by the translator and are still marked as fuzzy.  This is not
+recommended however! The algorithm used in msgmerge is quite smart
+and seldom fails to detect minimal changes in the source message and
+propose the old translation.  However, it often proposes translations
+from other valid or obsoleted entries that are only vaguely related to
+the real meaning.  You should understand the fuzzy merging mechanism
+as a helpful feature to the translator only and never install fuzzy
+translations unless you absolutely know what you are doing.
+
+Pass Comments to Translators
+----------------------------
+
+The po files contain references for every message to the corresponding
+source files as comments.  But you still may feel a need for giving
+hints to the translators.  You may want to tell the translators, that
+the good-bye message can be somewhat sloppy (or whatever you like).
+This is simple to do.  Have a look at the good-bye message in
+"bin/simplecal.pl" and you will see that it is preceded by a comment
+introduced with the string "TRANSLATORS:".  If you start your Perl
+comment like this, it will end up as a comment for translators in the
+resulting po (resp. pot) file and may serve as a hint for translators.
+
+In fact, the string "TRANSLATORS:" is arbitrarily chosen.  If you
+prefer another string, change it in the invocation of "xgettext" in
+the skeleton Makefile provided here.
+
+Informational Files
+-------------------
+
+You should put two additional files in your distribution.  The first 
+one is "README-NLS".  It should be a verbatim copy of the most recent
+version found in the "simplecal" sample package.  Please send 
+corrections or improvements to this file to the maintainer Guido
+Flohr <guido.flohr@cantanea.com>, and add package-specific notes to your
+documentation instead.  Users expect this file to have a standard
+contents, and they will not check it for changes on a regular basis.
+
+The file "TRANSLATIONS" should reflect the current translation status
+of your package.  It should list all currently availabe translations,
+their completeness, and it should also inform your user which translations
+are actively maintained, and which are not.  You can find a sample
+in the "simplecal" sample package. 
+
+Bringing It All Together
+------------------------
+
+The above sounds definitely more complicated than it is.  In practice
+you code as before but mark all your strings with "__" and friends
+like described in the POD of Locale::TextDomain.  Before a new release
+you change into the directory "po" of your distribution and type "make
+update-po" to update the available translations.  Distribute the
+modified po files to your translators, and once you have collected
+them all, type "make install" to add them to your distribution.
+
+That's all, all translations will be available in your package now.
+
+Internationalizing Existing Packages
+------------------------------------
+
+Internationalizing an already existing package with libintl-perl is
+less painful than you think.  The following roadmap should do it with
+minimal effort.
+
+First create a subdirectory "po" in your sources, copy the "Makefile"
+from this sample, and copy and edit the files "TEXTDOMAIN" and
+"LINGUAS" (LINGUAS can set the Makefile variable "LINGUAS" to the
+empty string and TEXTDOMAIN should set "TEXTDOMAIN" to a name as
+advised in the POD of Locale::TextDomain).
+
+Next you have to mark the translatable strings in your sources with
+"__" and friends.  You can do that by hand, but isn't that the kind of
+job that you have bought a computer for?  List your source files in
+"po/POTFILES" and then try
+
+     xgettext -a --files-from=POTFILES -o all.pot
+
+The option "-a" instructs xgettext to extract *all* strings from your
+sources.  This option may miss a few strings (consider a bug report in
+that case), it will issue a lot of warnings about "illegal variable
+interpolations" (see the POD of Locale::TextDomain for workarounds)
+and will put a lot of strings extracted from your sources into the
+file "all.pot".
+
+Now, load the file "all.pot" into an editor of your choice.  If your
+choice is "GNU emacs" you will have maximum comfort: Select an entry,
+type "s" and you can cycle through the source files that this
+particular entry originates from.  Other PO editors like KBabel or
+PO-Edit provide similar functionality.  But even with the "Notepad" on
+MS-DOS you will be able to navigate to the corresponding source file.
+Once you have found the origin in your sources, you have to decide
+whether this is a false positive, and you simply ignore it.  If it is
+a translatable string you either simply mark it with "__" or you
+"repair" it.
+
+What does "repair" mean? Again, the POD of Locale::TextDomain... In
+brief: Your Perl sources will be full of stuff like:
+
+     die "Cannot open file '$filename': $!\n";
+
+This string is not suitable for translation, because it is not
+constant.  It may change depending on the value of the variable
+$filename and the value of $!.  You will have to change that into
+something like:
+
+     die __x ("Cannot open file '{filename}': {err}\n",
+              filename => $filename, err => $err);
+
+Once you are done with marking the strings, you can try to run your
+scripts/modules and you will see a lot of complaints by Perl that it
+doesn't know about "__" (in various incarnations).  Remember that "__"
+is really a function call and you have to import the function "__" and
+its relatives into your namespace.
+
+What you have to do is to invent an identifier for your package (see
+Locale::TextDomain for hints) and then add the following line to all
+of your source files that produced errors:
+
+     use Locale::TextDomain ('Name-Of-My-Package');
+
+You will be happy if "Name-Of-My-Package" is the same as the Makefile
+variable "TEXTDOMAIN" in the file "po/TEXTDOMAIN" that you have
+created in the beginning.
+
+For the common case of a pure library: Is that really all I have to
+do? Yes! What about POSIX::setlocale(), don't I have to make a call
+somewhere? No, not for a library! And what about calls to textdomain()
+and bindtextdomain() that I know from C or other languages? No, this
+is all hidden in "use TextDomain (PACKAGENAME)" for Perl.
+
+To make it clear again: A library should NEVER change the locale
+settings.  The script that uses a library (or multiple libraries)
+should do that, and this boils down to three lines of Perl:
+
+     use POSIX qw (setlocale);
+     use Locale::Messages (LC_MESSAGES);
+
+     setlocale (LC_MESSAGES, "");
+
+That means: The *calling* Perl script, the one that uses possibly
+internationalized libraries, should initialize the locale settings to
+the user preferences.  Libraries should honor that setting but should
+never change it.  If a script misses a call to setlocale(), your
+internationalized library will happily continue to work flawlessly
+with the original English messages, it is up to the client programmer
+to reveal the i18n features in your code!
+
+Good luck!
+
+Guido

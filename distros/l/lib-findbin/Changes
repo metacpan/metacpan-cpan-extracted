@@ -1,0 +1,9 @@
+Revision history for lib-findbin
+
+0.2  Fri Apr  6 19:39:52 2012
+    - Change tests to address http://www.cpantesters.org/cpan/report/7c04b026-7e60-11e1-9d6f-f6dbfa7543f5
+    - dump @INC in case they still fail so the data will be in the report
+
+0.1  Thu Mar 29 21:25:52 2012
+       Initial release.
+

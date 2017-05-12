@@ -1,0 +1,178 @@
+0.23    24 May 2012
+        Added license information.  Verified it works with 5.16.0, threaded
+        and unthreaded.
+
+0.22    13 April 2012
+        Fixed spelling error as suggested by Gregor Herrmann. RT #76532
+
+0.21    31 March 2012
+        Fixed some pod issues.  Brought code in line with current esthetics.
+        Changed internal storage from packed L3 to packed w3 format, for
+        hopefully smaller memory footprint.
+
+0.20    20 September 2010
+        Fixed problem that started to manifest itself with a slightly different
+        handling of localized $@, starting in perl 5.13.x.
+
+0.19    24 April 2007
+        Fixed problem in test-suite that was long overseen because it would
+        work ok if load.pm was already installed (which it was on my dev
+        system).  Not sure whether this was internally introduced, or some
+        new feature of Test::More.
+
+0.18    18 October 2005
+        Added fix for missing Kwalitee point for not using 'strict'
+
+0.17    9 July 2005
+        Finished AutoLoader emulation mode and adapted testing accordingly.
+        Fixed some test problems if ifdef.pm is not installed.  Changes tests
+        so that the first failure will die with a dump so that specific
+        problems can be worked on more precisely.
+
+        Verified load.pm works on Perl 5.8.7.
+
+        30 September 2004
+        Added initial support AutoLoader emulation mode.
+
+        Verified load.pm will work on Perl 5.8.5.
+
+0.16    15 March 2004
+        Changed tracing calls so that they get optimized away if tracing is
+        not active.
+
+        Fixed bug that would cause "ifdef.pm" to split on every character if
+        "now" loading was selected.
+
+        Fixed bug with subs that really do not exist.  Added some more test
+        with regards to the interface with "ifdef.pm".
+
+0.15        14 March 2004
+        Added support for "ifdef.pm".  If ifdef.pm is loaded, then all eval's
+        will be done using the source filter provided by ifdef, possibly
+        activating code depending on environment variables being set.  Added
+        tests to check functionality when ifdef.pm is loaded.
+
+        Fixed some possible minor problems with localizing $_: it appears a
+        simple "local $_" is not enough, instead a "local $_ = \my $foo" seems
+        to be the canonical solution to this problem as of now according to
+        p5p.
+
+        28 January 2004
+        Made sure the test-suite cleans up on multi-versioned systems.
+
+0.14    28 December 2003
+        Added automatic required modules update using Devel::Required.
+
+0.13    12 November 2003
+        Perl 5.8.2 does not handle empty subroutines (sub foo {}) very well.
+        In some cases, it segfaults.  This happened in the test-suite.
+        Test-suite has been adapted (that really is the only change, apart
+        from the version number).
+
+0.12    29 September 2003
+        Added support for register additional "use" modules for specific
+        packages (e.g. when subroutines need to be handled by a source
+        filter).  Tests to be added later, if ever here.
+
+        26 September 2003
+        Realised testing for running under taint was pretty trivial: the
+        entire test-suite now runs twice: once with and once without tainting.
+
+0.11    26 September 2003
+        Turns out load.pm didn't work when taint was active.  And it silently
+        failed to boot.  This should now be fixed.  Added a todo to make tests
+        that will functioning under taint: activating taint in the tests
+        caused too many failures to allow checking in the allotted time..
+
+0.10    18 September 2003
+        Frank Tolstrup pointed out some test misses because of CRLF versus LF
+        issues on Windows.  These should now also be fixed.  Mention Frank
+        in the new ACKNOWLEDGEMENTS section of load.
+
+        Added thread indicator to trace if threads are used.  This should
+        facilitate debugging of the Thread::xxx modules.  Added tests for
+        it as well.  For the trace to properly detect threads, the threads
+        module must have been loaded prior to loading load.pm.
+
+        17 September 2003
+        Hmmm... I may be taking the "release soon, release often" too
+        literally.  Anyway, Frank Tolstrup's output of the failing test-suite
+        under Windows, pointed to a possible seek() problem under Windows.
+        Added a binmode() in case the source-file is opened again for on-demand
+        loading of a subroutine.  And the tests with $Foo::{} also failed
+        under Windows: they shouldn't anymore.
+
+        Installed experimental trace possibility that is activated by setting
+        the environment variable "LOAD_TRACE" to a true value.  This is still
+        experimental so therefore only documented here.
+
+0.09    17 September 2003
+        Frank Tolstrup pointed out that many of the tests wouldn't run under
+        Windows because of quoting issues.  Adapted the test so that would
+        not be an issue anymore.  Hope this is the last one of today ;-)
+
+0.08    17 September 2003
+        Indeed, it is one of those days.  Added some more tests to make sure
+        that subroutines are indeed loaded on demand.
+
+0.07    17 September 2003
+        Argh.  I guess it is one of those days.  Using strict in load.pm
+        bleeds into the eval's and causes compile errors.  And of course
+        the test-suite didn't catch it.  Removed stricture but added a
+        comment in the source about it.  Adapted the test-suite so it _will_
+        catch it this time (but won't of course, because it's fixed).
+
+0.06    17 September 2003
+        Finally figured how to make something like a test-suite.  Now checks
+        whether ondemand subs can be called and whether or not they exist
+        and can be can()ned.
+
+        Argh.  A typo caused the "now" functionality to completely broken.
+        This is now fixed.  Problem was introduced in version 0.02.
+
+        Added optional support for strict and warnings in the source.
+
+        11 August 2003
+        Fixed stupid typo in Makefile.PL that caused description of module
+        not to be included ever.
+
+        Verified load.pm will work on Perl 5.8.1.
+
+0.05    29 December 2002
+        Increased version to be able to upload a more recent version of load.pm
+        to CPAN to prevent interference with Jos 'Kane' Boumans' version of
+        load.pm.
+
+0.04    21 October 2002
+        Fixed small problem when running with warnings and attempting to access
+        non-existing subroutine.  Spotted by Lars Fenneberg.
+
+0.03    1 October 2002
+        Changed using of lexical file handles to globs, to ensure compatibility
+        with earlier versions of Perl.
+
+        Fixed problem with running with warnings (caused by UNIVERSAL::can
+        redefine).  Removed use strict and other stuff to make this module
+        yet leaner and meaner.
+
+0.02    30 September 2002
+        Now hijacks UNIVERSAL::can so that ->can does the right thing for
+        subroutines that have not been loaded yet.  As a side effect, this
+        loads the subroutine specified.  Added documentation to reflect that.
+
+        Localised $_, $! and $@ at several places just to make sure they
+        don't clobber anything on the outside.
+
+        Added support for line numbers and file name (swiped from AutoSplit
+        generated code), so that eval errors will give you more information.
+
+        Added check for DESTROY: apparently you get an infinite loop if you're
+        gotoing the DESTROY if it doesn't exist.  Now AUTOLOAD just returns
+        for DESTROY if it doesn't exist.
+
+        Fixed typo in _scan() which would trigger a loop if a second __END__
+        was encountered in the source of a module.
+
+0.01    29 September 2002
+        First version of load.pm, renamed from jit.pm after discussions on and
+        off p5p.

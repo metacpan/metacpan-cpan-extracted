@@ -1,0 +1,372 @@
+=head1 NAME
+
+libapreq - Apache Request C Library
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 ApacheRequest
+
+=over 4
+
+=item req->parms
+
+This field is an Apache I<table> that holds the parsed contents of
+B<GET> and B<POST> requests.
+Example:
+
+ table *data = req->parms;
+ ap_table_set(data, "Key", "Value");
+
+=item req->post_max
+
+=item ApacheRequest_set_post_max(req, max)
+
+Limit the size of POST data.  I<ApacheRequest_parse> will return an
+error code if the size is exceeded:
+
+ int status;
+ ApacheRequest *req = ApacheRequest_new(r);
+
+ req->post_max = 1204;
+ if((status = ApacheRequest_parse(req)) != OK) {
+     char *errmsg = ap_table_get(r->notes, "error-notes");
+     ...
+     return status;
+ }
+
+=item req->disable_uploads
+
+Disable file uploads.  I<ApacheRequest_parse> will return an
+error code if a file upload is attempted:
+
+ int status;
+ ApacheRequest *req = ApacheRequest_new(r);
+
+ req->disable_uploads = 1;
+ if((status = ApacheRequest_parse(req)) != OK) {
+     char *errmsg = ap_table_get(r->notes, "error-notes");
+     ...
+     return status;
+ }
+
+
+=item req->temp_dir
+
+=item ApacheRequest_set_temp_dir(req, dir)
+
+Sets the directory where upload files are spooled.
+
+  char dir[] = "/usr/tmp";
+  req->temp_dir = dir;
+
+
+=item req->hook_data
+
+=item req->upload_hook
+
+Redirects upload data to be processed by the hook.
+
+  req->hook_data = (void *) data;
+  req->upload_hook = (int(*)(void*,char*,int,ApacheUpload*)) func;
+
+In this case 
+
+  func(req->hook_data,buffer,bufsize,upload);
+
+will be called repeatedly during the file upload instead of writing the 
+data to a temp file.
+
+=back
+
+=head2 ApacheRequest *ApacheRequest_new (request_rec *r)
+
+This function creates a new I<ApacheRequest> object using the given
+I<request_rec> structure:
+
+ ApacheRequest *req = ApacheRequest_new(r);
+
+=head2 int ApacheRequest_parse (ApacheRequest *req)
+
+If the request method is B<GET> or B<POST>, the query string
+arguments and the client form data will be read, parsed and saved.
+In addition, if the request method is B<POST> and the I<Content-type> is
+I<multipart/form-data>, the uploaded files will be written to
+temporary files which can be accessed with the I<upload> field names.
+The return value is B<OK> on success, otherwise an error code that
+your handler should return.
+
+=head2 const char *ApacheRequest_param (ApacheRequest *req, const char *key)
+
+This function will return the value of the given parameter I<key>:
+
+ const char *value = ApacheRequest_param(req, "Key");
+
+=head2 array_header *ApacheRequest_params (ApacheRequest *req, const char *key)
+
+This function will return an I<array_header> of values for the given
+parameter I<key>: 
+
+ array_header *values = ApacheRequest_params(req, "Key");
+
+=head2 char *ApacheRequest_params_as_string (ApacheRequest *req, const char *key)
+
+This function will format multi-value parmeters into a comma delimited string.
+
+ char *list = ApacheRequest_params_as_string(req, "Key");
+
+=head2 ApacheUpload *upload = ApacheRequest_upload (ApacheRequest *req)
+
+If the request I<Content-type> was that of I<multipart/form-data>,
+this will return an I<ApacheUpload> pointer containing the upload data,
+B<NULL> otherwise.  See I<ApacheUpload>.
+
+ ApacheUpload *upload = ApacheRequest_upload(req);
+
+=head1 ApacheUpload
+
+The I<ApacheUpload> structure holds all information for all uploaded
+files and is accessed via the I<upload> field of an I<ApacheRequest>
+structure.  
+
+=over 4
+
+=item upload->name
+
+The name of the filefield parameter:
+
+ char *name = upload->name;
+
+=item upload->filename
+
+The name of the upload file as reported by the client:
+
+ char *filename = upload->filename;
+
+=item upload->fp
+
+A file pointer to the uploaded file:
+
+ FILE *fp = upload->fp;
+
+=item upload->tempname
+
+The name of the temporary upload file on the server:
+
+char *tempname = upload->tempname;
+
+=item upload->size
+
+The size of the uploaded file in bytes:
+
+ long size = upload->size;
+
+=item upload->info
+
+The additional header information for the uploaded file:
+
+ table *info = upload->info;
+ const char *type = ap_table_get(info, "Content-type");
+
+=item upload->next
+
+Pointer to the next I<ApacheUpload> structure if multiple files were
+uploaded:
+
+    ApacheUpload *uptr;
+    for (uptr = ApacheRequest_upload(req); uptr; uptr = uptr->next) {
+	char *name = uptr->name;
+	FILE *fp   = uptr->fp;
+	...
+    }
+
+=back
+
+=head2 ApacheUpload *ApacheUpload_find (ApacheUpload *upload, char *name)
+
+Returns the I<ApacheUpload> pointer associated with I<name> or
+B<NULL> if I<name> is not found in the list:
+
+ ApacheUpload *upload = ApacheUpload_find(upload, name);
+
+=head2 const char *ApacheUpload_info (ApacheUpload *upload, char *key)
+
+Shortcut for accessing the I<info> table:
+
+ const char *type = ApacheUpload_info(upload, "Content-Type");
+
+=head2 const char *ApacheUpload_type (ApacheUpload *upload)
+
+Shortcut for accessing the uploaded file I<Content-Type>:
+
+ const char *type = ApacheUpload_type(upload);
+
+=head1 ApacheCookie
+
+=over 4
+
+=head2 ApacheCookie *ApacheCookie_new (request_rec *r, ...) 
+
+This function creates a new I<ApacheCookie> object, using the given
+I<request_request> and optional attribute arguments which are as follows:
+
+=over 4
+
+=item -name
+
+Sets the I<name> field to the given value.
+
+=item -value
+
+Adds the value to I<values> field.
+
+=item -expires
+
+Sets the I<expires> field to the calculated date string.
+See I<ApacheCookie_expires> for a listing of format options.
+The default is B<NULL>.
+
+=item -domain
+
+Sets the I<domain> field to the given value.
+The default is B<NULL>.
+
+=item -path
+
+Sets the I<path> field to the given value.
+The default I<path> is derived from the requested I<uri>.
+
+=item -secure
+
+Sets the I<secure> field to true or false using a given string value
+of I<On> or I<Off>.  
+The default is I<Off>.
+
+=back
+
+Example:
+
+ ApacheCookie *c = ApacheCookie_new(r,
+			"-name",    "foo", 
+                        "-value",   "bar", 
+                        "-expires", "+3M", 
+                        "-domain",  ".cp.net", 
+                        "-path",    "/mypath/database", 
+                        "-secure",  "On", 
+                        NULL); 
+
+
+=head2 char *ApacheCookie_attr (ApacheCookie *c, char *key, char *val) 
+
+This function is used to get or set a cookie attribute pair, accepting
+the same attributes as the list above.  Example:
+
+ char *name = ApacheCookie_attr(c, "-name"); /* same as c->name */
+ (void *)ApacheCookie_attr(c, "-expires", "+3h");
+
+=head2 ApacheCookieJar *ApacheCookie_parse (request_rec *r, const char *data) 
+
+This function parses the given I<data> string or the incoming
+I<Cookie> header, returning an I<ApacheCookieJar> of I<ApacheCookie>
+objects.  
+
+Example:
+
+ int i;
+ ApacheCookieJar *cookies = ApacheCookie_parse(r, NULL);
+ for (i = 0; i < ApacheCookieJarItems(cookies); i++) { 
+     ApacheCookie *c = ApacheCookieJarFetch(cookies, i);
+     int j;
+     for (j = 0; j < ApacheCookieItems(c); j++) {
+         char *name = c->name;
+         char *value = ApacheCookieFetch(c, j);
+         ...
+     }
+ }
+
+=head2 int ApacheCookieItems (ApacheCookie *c)
+
+The number of values for the given cookie.
+
+=head2 char *ApacheCookieFetch (ApacheCookie *c, int n)
+
+The I<n>th value for the given cookie.
+
+=head2 void ApacheCookieAdd (ApacheCookie *c, char *value)
+
+Add a new value to the cookie.
+
+=head2 int ApacheCookieJarItems (ApacheCookieJar *cookies)
+
+The number of cookies in the given cookie jar.
+
+=head2 ApacheCookie *ApacheCookieJarFetch (ApacheCookieJar *cookies, int n)
+
+The I<n>th cookie in the given cookie jar.
+
+=head2 void ApacheCookieJarAdd (ApacheCookieJar *cookies, ApacheCookie *c)
+
+Add a new cookie to the cookie jar.
+
+=head2 char *ApacheCookie_expires (ApacheCookie *c, char *time_str) 
+
+This function gets or sets the expiration date for cookie.
+The following forms are all valid for the I<time_str> parmeter:
+
+        +30s                              30 seconds from now 
+        +10m                              ten minutes from now 
+        +1h                               one hour from now 
+        -1d                               yesterday (i.e. "ASAP!") 
+        now                               immediately 
+        +3M                               in three months 
+        +10y                              in ten years time 
+        Thursday, 25-Apr-1999 00:40:33 GMT  at the indicated time & date 
+
+=head2 void ApacheCookie_bake (ApacheCookie *c)
+
+Put cookie in the oven to bake.
+(Add a I<Set-Cookie> header to the outgoing headers table.)
+
+ ApacheCookie_bake(c);
+
+=head2 char *ApacheCookie_as_string (ApacheCookie *c)  
+
+Returns a string version of the cookie:
+
+ ap_table_add(r->headers_out, "Set-Cookie", ApacheCookie_as_string(c));
+
+=back
+
+=head1 BUGS
+
+=over 4
+
+=item * multi-select file uploads are currently unsupported
+
+=item * header-folding is unsupported for multipart/form-data
+
+=item * newer XML-based MIME-encodings are not supported
+
+=back
+
+=head1 CREDITS
+
+This library is based on Perl modules by Lincoln Stein.
+
+=head1 LICENSE
+
+  Copyright 2000-2004  The Apache Software Foundation
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+

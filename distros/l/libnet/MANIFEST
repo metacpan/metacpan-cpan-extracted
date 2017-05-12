@@ -1,0 +1,56 @@
+Artistic
+Changes
+Configure
+Copying
+INSTALL
+LICENCE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+demos/ftp
+demos/nntp
+demos/nntp.mirror
+demos/pop3
+demos/smtp.self
+demos/time
+lib/Net/Cmd.pm
+lib/Net/Config.pm
+lib/Net/Domain.pm                        DNS Domain name lookup
+lib/Net/FTP.pm                           File Transfer Protocol Client
+lib/Net/FTP/A.pm
+lib/Net/FTP/E.pm
+lib/Net/FTP/I.pm
+lib/Net/FTP/L.pm
+lib/Net/FTP/dataconn.pm
+lib/Net/NNTP.pm                          Network News Transfer Protocol
+lib/Net/Netrc.pm                         .netrc lookup routines
+lib/Net/POP3.pm                          Post Office Protocol
+lib/Net/SMTP.pm                          Simple Mail Transfer Protocol Client
+lib/Net/Time.pm                          time & nettime protocols
+lib/Net/libnetFAQ.pod
+t/changes.t
+t/config.t
+t/critic.t
+t/datasend.t
+t/external/ftp-ssl.t
+t/external/pop3-ssl.t
+t/external/smtp-ssl.t
+t/ftp.t
+t/hostname.t
+t/libnet_t.pl
+t/netrc.t
+t/nntp.t
+t/nntp_ipv6.t
+t/nntp_ssl.t
+t/pod.t
+t/pod_coverage.t
+t/require.t
+t/smtp.t
+t/smtp_ipv6.t
+t/smtp_ssl.t
+t/pop3_ipv6.t
+t/pop3_ssl.t
+t/time.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

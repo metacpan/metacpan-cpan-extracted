@@ -1,0 +1,365 @@
+<!-- $Id: sax-2.0.html,v 1.6 2002/01/21 19:21:43 darobin Exp $ -->
+<html>
+  <head>
+    <title>Perl SAX 2.0 Binding</title>
+  </head>
+  <body>
+
+<h1>Perl SAX 2.0 Binding</h1>
+
+<p>SAX (Simple API for XML) is a common parser interface for XML
+parsers.  It allows application writers to write applications that use
+XML parsers, but are independent of which parser is actually used.</p>
+
+<p>This document describes the version of SAX used by Perl modules.
+The original version of SAX 2.0, for Java, is described at <a
+href="http://sax.sourceforge.net/">http://sax.sourceforge.net/</a>.</p>
+
+<p>There are two basic interfaces in the Perl version of SAX, the
+parser interface and the handler interface.  The parser interface
+creates new parser instances, starts parsing, and provides additional
+information to handlers on request.  The handler interface is used to
+receive parse events from the parser.  This pattern is also commonly
+called "Producer and Consumer" or "Generator and Sink". Note that the
+parser doesn't have to be an XML parser, all it needs to do is provide
+a stream of events to the handler as if it were parsing XML. But the
+actual data from which the events are generated can be anything, a Perl
+object, a CSV file, a database table...
+</p>
+
+<p>SAX is typically used like this:
+
+<pre>
+    my $handler = MyHandler->new();
+    my $parser = AnySAXParser->new( Handler => $handler );
+    $parser->parse($uri);
+</pre></p>
+
+<p>Handlers are typically written like this:
+
+<pre>
+    package MyHandler;
+
+    sub new {
+        my $type = shift;
+        return bless {}, $type;
+    }
+
+    sub start_element {
+        my ($self, $element) = @_;
+
+        print "Starting element $element->{Name}\n";
+    }
+
+    sub end_element {
+        my ($self, $element) = @_;
+
+        print "Ending element $element->{Name}\n";
+    }
+
+    sub characters {
+        my ($self, $characters) = @_;
+
+        print "characters: $characters->{Data}\n";
+    }
+
+    1;
+</pre></p>
+
+<h2>Basic SAX Parser</h2>
+
+<p>These methods and options are the most commonly used with SAX
+parsers and event generators.</p>
+
+<p>Applications may not invoke a <tt>parse()</tt> method again while a
+parse is in progress (they should create a new SAX parser instead for
+each nested XML document). Once a parse is complete, an application
+may reuse the same parser object, possibly with a different input
+source.</p>
+
+<p>During the parse, the parser will provide information about the XML
+document through the registered event handlers. Note that an event that
+hasn't been registered (ie that doesn't have its corresponding method in
+the handler's class) will <b>not</b> be called. This allows one to only
+get the events one is interested in.
+</p>
+
+<p>
+<dl><dt><b><tt class='function'>parse</tt></b>(<var>uri</var> [, <var>options</var>])</dt>
+<dd>
+Parses the XML instance identified by <var>uri</var> (a system
+identifier).  <var>options</var> can be a list of option, value pairs
+or a hash.  Options include <tt>Handler</tt>, features and properties,
+and advanced SAX parser options.  <tt>parse()</tt> returns the result
+of calling the <tt>end_document()</tt> handler. The options supported
+by <tt>parse()</tt> may vary slightly if what is being "parsed" isn't
+XML.
+</dd></dl></p>
+
+<p>
+<dl><dt><b><tt class='function'>parse_file</tt></b>(<var>stream</var> [, <var>options</var>])</dt>
+<dd>
+Parses the XML instance in the already opened <var>stream</var>, an
+IO::Handler or similar.  <var>options</var> are the same as for <tt
+class='function'>parse()</tt>.  <tt>parse_file()</tt> returns the result
+of calling the <tt>end_document()</tt> handler.</dd></dl></p>
+
+<p>
+<dl><dt><b><tt class='function'>parse_string</tt></b>(<var>string</var> [, <var>options</var>])</dt>
+<dd>
+Parses the XML instance in <var>string</var>.  <var>options</var> are
+the same as for <tt class='function'>parse()</tt>.
+<tt>parse_string()</tt> returns the result of calling the
+<tt>end_document()</tt> handler.</dd></dl></p>
+
+<p>
+<dl><dt><b><tt>Handler</tt></b></dt>
+<dd>
+The default handler object to receive all events from the parser.
+Applications may change <tt>Handler</tt> in the middle of the parse
+and the SAX parser will begin using the new handler
+immediately. The <a href="sax-2.0-adv.html">Advanced SAX</a> document
+lists a number of more specialized handlers that can be used should you
+wish to dispatch different types of events to different objects.
+</dd></dl></p>
+
+<h2><a name="BasicHandler">Basic SAX Handler</a></h2>
+
+<p>These methods are the most commonly used by SAX handlers.</p>
+
+<p>
+<dl><dt><b><tt class='function'>start_document</tt></b>(<var>document</var>)</dt>
+<dd>
+Receive notification of the beginning of a document.
+
+<p>The SAX parser will invoke this method only once, before any other
+methods (except for <tt>set_document_locator()</tt> in advanced SAX
+handlers).</p>
+
+No properties are defined for this event (<var>document</var> is
+empty).</dd></dl></p>
+
+<p>
+<dl><dt><b><tt class='function'>end_document</tt></b>(<var>document</var>)</dt>
+<dd>
+Receive notification of the end of a document.
+
+<p>The SAX parser will invoke this method only once, and it will be
+the last method invoked during the parse. The parser shall not invoke
+this method until it has either abandoned parsing (because of an
+unrecoverable error) or reached the end of input.</p>
+
+<p>No properties are defined for this event (<var>document</var> is
+empty).</p>
+
+The return value of <tt>end_document()</tt> is returned by the
+parser's <tt>parse()</tt> methods.</dd></dl></p>
+
+<p>
+<dl><dt><b><tt class='function'>start_element</tt></b>(<var>element</var>)</dt>
+<dd>
+Receive notification of the start of an element.
+
+<p>The Parser will invoke this method at the beginning of every
+element in the XML document; there will be a corresponding
+<tt>end_element()</tt> event for every <tt>start_element()</tt> event (even when the
+element is empty). All of the element's content will be reported, in
+order, before the corresponding <tt>end_element()</tt> event.</p>
+
+<var>element</var> is a hash with these properties:
+
+<blockquote>
+<table>
+<tr><td><b><tt>Name</tt></b></td>
+<td>The element type name (including prefix).</td></tr>
+<tr><td><b><tt>Attributes</tt></b></td>
+<td>The attributes attached to the element, if any.</td></tr>
+</table>
+</blockquote>
+
+If namespace processing is turned on (which is the default), these
+properties are also available:
+
+<blockquote>
+<table>
+<tr><td><b><tt>NamespaceURI</tt></b></td>
+<td>The namespace of this element.</td></tr>
+<tr><td><b><tt>Prefix</tt></b></td>
+<td>The namespace prefix used on this element.</td></tr>
+<tr><td><b><tt>LocalName</tt></b></td>
+<td>The local name of this element.</td></tr>
+</table>
+</blockquote>
+
+<tt>Attributes</tt> is a hash keyed by JClark namespace notation. That
+is, the keys are of the form "{NamespaceURI}LocalName". If the attribute
+has no NamespaceURI, then it is simply "{}LocalName". Each attribute is
+a hash with these properties:
+
+<blockquote>
+<table>
+<tr><td><b><tt>Name</tt></b></td>
+<td>The attribute name (including prefix).</td></tr>
+<tr><td><b><tt>Value</tt></b></td>
+<td>The normalized value of the attribute.</td></tr>
+<tr><td><b><tt>NamespaceURI</tt></b></td>
+<td>The namespace of this attribute.</td></tr>
+<tr><td><b><tt>Prefix</tt></b></td>
+<td>The namespace prefix used on this attribute.</td></tr>
+<tr><td><b><tt>LocalName</tt></b></td>
+<td>The local name of this attribute.</td></tr>
+</table>
+</blockquote>
+</dd>
+</dl>
+</p>
+
+<p>
+<dl><dt><b><tt class='function'>end_element</tt></b>(<var>element</var>)</dt>
+<dd>
+Receive notification of the end of an element.
+
+<p>The SAX parser will invoke this method at the end of every element
+in the XML document; there will be a corresponding <tt
+class='function'>start_element()</tt> event for every <tt
+class='function'>end_element()</tt> event (even when the element is
+empty).</p>
+
+<var>element</var> is a hash with these properties:
+
+<blockquote>
+<table>
+<tr><td><b><tt>Name</tt></b></td>
+<td>The element type name (including prefix).</td></tr>
+</table>
+</blockquote>
+
+If namespace processing is turned on (which is the default), these
+properties are also available:
+
+<blockquote>
+<table>
+<tr><td><b><tt>NamespaceURI</tt></b></td>
+<td>The namespace of this element.</td></tr>
+<tr><td><b><tt>Prefix</tt></b></td>
+<td>The namespace prefix used on this element.</td></tr>
+<tr><td><b><tt>LocalName</tt></b></td>
+<td>The local name of this element.</td></tr>
+</table>
+</blockquote></dd>
+</dl></p>
+
+<p>
+<dl><dt><b><tt class='function'>characters</tt></b>(<var>characters</var>)</dt>
+<dd>
+Receive notification of character data.
+
+<p>The Parser will call this method to report each chunk of character
+data.  SAX parsers may return all contiguous character data in a
+single chunk, or they may split it into several chunks (however, all
+of the characters in any single event must come from the same external
+entity so that the Locator provides useful information).</p>
+
+<p><var>characters</var> is a hash with this property:</p>
+
+<blockquote>
+<table>
+<tr><td><b><tt>Data</tt></b></td>
+<td>The characters from the XML document.</td></tr>
+</table>
+</blockquote></dd>
+</dl></p>
+
+<p>
+<dl><dt><b><tt class='function'>ignorable_whitespace</tt></b>(<var>characters</var>)</dt>
+<dd>
+Receive notification of ignorable whitespace in element content.
+
+<p>Validating Parsers must use this method to report each chunk of
+ignorable whitespace (see the W3C XML 1.0 recommendation, section
+2.10): non-validating parsers may also use this method if they are
+capable of parsing and using content models.</p>
+
+<p>SAX parsers may return all contiguous whitespace in a single chunk,
+or they may split it into several chunks; however, all of the
+characters in any single event must come from the same external
+entity, so that the Locator provides useful information.</p>
+
+<p><var>characters</var> is a hash with this property:</p>
+
+<blockquote>
+<table>
+<tr><td><b><tt>Data</tt></b></td>
+<td>The whitespace characters from the XML document.</td></tr>
+</table>
+</blockquote></dd>
+</dl></p>
+
+<h2><a name="Exceptions">Exceptions</a></h2>
+
+<p>
+  Conformant XML parsers are required to abort processing when
+  well-formedness or validation errors occur.  In Perl, SAX parsers use
+  <tt>die()</tt> to signal these errors.  To catch these errors and prevent
+  them from killing your program, use <tt>eval{}</tt>:
+
+<pre>
+    eval { $parser->parse($uri) };
+    if ($@) {
+        # handle error
+    }
+</pre>
+</p>
+
+<p>
+Exceptions can also be thrown when setting features or properties
+on the SAX parser (see advanced SAX below).</p>
+
+<p>
+  Exception values (<tt>$@</tt>) in SAX are hashes blessed into the
+  package that defines their type, and have the following properties:
+</p>
+
+<blockquote>
+<table>
+<tr><td><b><tt>Message</tt></b></td>
+<td>A detail message for this exception.</td></tr>
+<tr><td><b><tt>Exception</tt></b></td>
+<td>The embedded exception, or <tt>undef</tt> if there is none.</td></tr>
+</table>
+</blockquote>
+
+If the exception is raised due to parse errors, these
+properties are also available:
+
+<blockquote>
+<table>
+<tr><td><b><tt>ColumnNumber</tt></b></td>
+<td>The column number of the end of the text where the exception
+occurred.</td></tr>
+<tr><td><b><tt>LineNumber</tt></b></td>
+<td>The line number of the end of the text where the exception
+occurred.</td></tr>
+<tr><td><b><tt>PublicId</tt></b></td>
+<td>The public identifier of the entity where the exception
+occurred.</td></tr>
+<tr><td><b><tt>SystemId</tt></b></td>
+<td>The system identifier of the entity where the exception
+occurred.</td></tr>
+</table>
+</blockquote>
+
+
+<p></p><hr />
+<h2>Advanced SAX</h2>
+<ul>
+<li><a href="sax-2.0-adv.html#Parsers">SAX Parsers</a></li>
+<li><a href="sax-2.0-adv.html#Features">Features</a></li>
+<li><a href="sax-2.0-adv.html#InputSources">Input Sources</a></li>
+<li><a href="sax-2.0-adv.html#Handlers">SAX Handlers</a></li>
+<li><a href="sax-2.0-adv.html#Filters">SAX Filters</a></li>
+<li><a href="sax-2.0-adv.html#Java">Java and DOM Compatibility</a></li>
+</ul>
+
+  </body>
+</html>

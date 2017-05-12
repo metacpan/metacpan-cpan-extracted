@@ -1,0 +1,155 @@
+<?xml version="1.0"?>
+<!-- 
+
+LSID Assigning Standard Port Type
+
+This WSDL defines an interface to be implemented by LSID Assigning Services.
+
+Jordi Albornoz
+23 October 2003 - Initial Draft
+24 October 2003 - Minor cosmetic changes
+-->
+
+<definitions xmlns:tns="http://www.omg.org/LSID/2003/Standard/Assigning/WSDL"
+		targetNamespace="http://www.omg.org/LSID/2003/Standard/Assigning/WSDL"
+		xmlns:ns="http://www.omg.org/LSID/2003/Standard/Assigning/WSDL/SchemaTypes"
+		xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+		xmlns="http://schemas.xmlsoap.org/wsdl/">
+	
+	<types>
+		<xsd:schema targetNamespace="http://www.omg.org/LSID/2003/Standard/Assigning/WSDL/SchemaTypes"
+			xmlns="http://www.omg.org/LSID/2003/Standard/Assigning/WSDL/SchemaTypes"
+			elementFormDefault="qualified">
+			
+			<xsd:complexType name="propertyList">
+				<xsd:sequence>
+					<xsd:element name="property" maxOccurs="unbounded" minOccurs="0">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="name" type="xsd:string" />
+								<xsd:element name="value" type="xsd:string" />
+							</xsd:sequence>
+						</xsd:complexType>						
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+			
+			<xsd:complexType name="LSIDList">
+				<xsd:sequence>
+					<xsd:element name="LSID" type="xsd:anyURI" maxOccurs="unbounded" minOccurs="0" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="LSIDPatternList">
+				<xsd:sequence>
+					<xsd:element name="LSIDPattern" type="xsd:string" maxOccurs="unbounded" minOccurs="0" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="propertyNameList">
+				<xsd:sequence>
+					<xsd:element name="propertyName" type="xsd:string" maxOccurs="unbounded" minOccurs="0" />
+				</xsd:sequence>
+			</xsd:complexType>
+			
+			<xsd:complexType name="authorityNamespaceList">
+				<xsd:sequence>
+					<xsd:element name="authorityNamespace" maxOccurs="unbounded" minOccurs="0">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="authority" type="xsd:string" />
+								<xsd:element name="namespace" type="xsd:string" />
+							</xsd:sequence>
+						</xsd:complexType>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+
+		</xsd:schema>
+	</types>
+
+	<message name="assignLSIDRequest">
+		<part name="authority" type="xsd:string" />
+		<part name="namespace" type="xsd:string" />
+		<part name="propertyList" type="ns:propertyList" />
+	</message>
+	<message name="assignLSIDResponse">
+		<part name="LSID" type="xsd:anyURI" />
+	</message>
+
+	<message name="assignLSIDFromListRequest">
+		<part name="propertyList" type="ns:propertyList" />
+		<part name="suggestedLSIDs" type="ns:LSIDList" />
+	</message>
+	<message name="assignLSIDFromListResponse">
+		<part name="LSID" type="xsd:anyURI" />
+	</message>
+
+	<message name="getLSIDPatternRequest">
+		<part name="authority" type="xsd:string" />
+		<part name="namespace" type="xsd:string" />
+		<part name="propertyList" type="ns:propertyList" />
+	</message>
+	<message name="getLSIDPatternResponse">
+		<part name="LSIDPattern" type="xsd:string" />
+	</message>
+
+	<message name="getLSIDPatternFromListRequest">
+		<part name="propertyList" type="ns:propertyList" />
+		<part name="suggestedLSIDPatterns" type="ns:LSIDPatternList" />
+	</message>
+	<message name="getLSIDPatternFromListResponse">
+		<part name="LSIDPattern" type="xsd:string" />
+	</message>
+
+	<message name="assignLSIDForNewRevisionRequest">
+		<part name="previousLSID" type="xsd:anyURI" />
+	</message>
+	<message name="assignLSIDForNewRevisionResponse">
+		<part name="LSID" type="xsd:anyURI" />
+	</message>
+
+	<message name="getAllowedPropertyNamesRequest">
+	</message>
+	<message name="getAllowedPropertyNamesResponse">
+		<part name="propertyNames" type="ns:propertyNameList" />
+	</message>
+
+	<message name="getAuthoritiesAndNamespacesRequest">
+	</message>
+	<message name="getAuthoritiesAndNamespacesResponse">
+		<part name="authorityAndNamespaces" type="ns:authorityNamespaceList" />
+	</message>
+
+	<portType name="LSIDAssigningServicePortType">
+		<operation name="assignLSID">
+			<input message="tns:assignLSIDRequest" />
+			<output message="tns:assignLSIDResponse" />
+		</operation>
+		<operation name="assignLSIDFromList">
+			<input message="tns:assignLSIDFromListRequest" />
+			<output message="tns:assignLSIDFromListResponse" />
+		</operation>
+		<operation name="getLSIDPattern">
+			<input message="tns:getLSIDPatternRequest" />
+			<output message="tns:getLSIDPatternResponse" />
+		</operation>
+		<operation name="getLSIDPatternFromList">
+			<input message="tns:getLSIDPatternFromListRequest" />
+			<output message="tns:getLSIDPatternFromListResponse" />
+		</operation>
+		<operation name="assignLSIDForNewRevision">
+			<input message="tns:assignLSIDForNewRevisionRequest" />
+			<output message="tns:assignLSIDForNewRevisionResponse" />
+		</operation>
+		<operation name="getAllowedPropertyNames">
+			<input message="tns:getAllowedPropertyNamesRequest" />
+			<output message="tns:getAllowedPropertyNamesResponse" />
+		</operation>
+		<operation name="getAuthoritiesAndNamespaces">
+			<input message="tns:getAuthoritiesAndNamespacesRequest" />
+			<output message="tns:getAuthoritiesAndNamespacesResponse" />
+		</operation>
+	</portType>
+
+</definitions>

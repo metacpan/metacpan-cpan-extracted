@@ -1,0 +1,39 @@
+NAME
+    lib::none - Empty @INC
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+     % perl -Mlib::none yourscript.pl
+
+     # To load some modules first before emptying @INC
+     % perl -Mstrict -Mwarnings -Mlib::none yourscript.pl
+
+DESCRIPTION
+    This pragma is used to test a script under a condition of empty @INC,
+    for example: fatpacked script.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/lib-none>.
+
+SOURCE
+    Source repository is at <https://github.com/sharyanto/perl-noinc>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=lib-none>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

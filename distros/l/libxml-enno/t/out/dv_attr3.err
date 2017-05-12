@@ -1,0 +1,4 @@
+XML::Checker ERROR-114: ENTITY [ent] already defined
+	Context: line 9, column 26, byte 182
+XML::Checker ERROR-114: ENTITY [%pent] already defined
+	Context: line 11, column 29, byte 243

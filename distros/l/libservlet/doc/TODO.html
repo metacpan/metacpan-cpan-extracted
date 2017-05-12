@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+  "http://www.w3.org/TR/REC-html40/loose.dtd">
+
+<html>
+<head>
+<title>libservlet TODO List</title>
+<!-- thanks perldoc.com! -->
+<link rel="stylesheet" href="./libservlet.css">
+</head>
+<body>
+<h1>libservlet TODO List</h1>
+<ul>
+<li><a href="#design">Design</a>
+<li><a href="#code">Code</a>
+<li><a href="#documentation">Documentation</a>
+</ul>
+<hr noshade>
+<h2><a name="design">Design</a></h2>
+<ol>
+<li> How do locales work? Is there an interface to the OS locale
+system or another library?
+<li> Provide Reader/Writer classes that do character conversions on
+<strong>IO::Handle</strong> objects.
+<li> How do principals work?
+</ol>
+<h2><a name="code">Code</a></h2>
+<ol>
+<li> For the <code>doOptions()</code> method of
+<strong>Servlet::Http::HttpServlet</strong>, look only at descendent
+classes when determining available HTTP methods.
+</ol>
+<h2><a name="documentation">Documentation</a></h2>
+<ol>
+<li> Complete &quot;Writing Servlet Applications&quot;
+<li> Create frameset, package and class indices for API docs
+</ol>
+</body>
+</html>

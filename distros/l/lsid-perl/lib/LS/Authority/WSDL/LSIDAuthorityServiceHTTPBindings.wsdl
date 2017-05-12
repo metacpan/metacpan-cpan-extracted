@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!-- 
+LSID HTTP Binding Standard for LSIDAuthorityServicePortType
+
+Jordi Albornoz and Ben Szekely
+11 November 2003 - Initial Draft
+
+-->
+
+<definitions xmlns:tns="http://www.omg.org/LSID/2003/AuthorityServiceHTTPBindings"
+		targetNamespace="http://www.omg.org/LSID/2003/AuthorityServiceHTTPBindings"
+		xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+		xmlns="http://schemas.xmlsoap.org/wsdl/"
+		xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+		xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+		xmlns:sns="http://www.omg.org/LSID/2003/Standard/WSDL">
+
+	<import namespace="http://www.omg.org/LSID/2003/Standard/WSDL" location="LSIDPortTypes.wsdl" />
+
+	<binding name="LSIDAuthorityHTTPBinding" type="sns:LSIDAuthorityServicePortType">
+		<http:binding verb="GET" />
+		<operation name="getAvailableServices">
+			<http:operation location="/authority/" />
+			<input>
+				<http:urlEncoded/>
+			</input>
+			<output>
+				<mime:multipartRelated>
+					<mime:part>
+						<mime:content part="wsdl" type="application/octet-stream" />
+					</mime:part>
+				</mime:multipartRelated>
+			</output>
+		</operation>
+	</binding>
+</definitions>

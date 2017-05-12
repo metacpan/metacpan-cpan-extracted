@@ -1,0 +1,6 @@
+# This file enables local resolution of LSID authorities.
+# For more information, see the perldoc for LS::Locator.
+#
+# id    server:port/servicepath
+
+testuri.org  localhost:80/authority.pl

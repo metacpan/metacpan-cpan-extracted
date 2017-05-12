@@ -1,0 +1,26 @@
+7/30/04
+
+SETUP
+
+1) Run the standard 'perl Makefile.PL; make; make test; make install'.
+
+2) Copy examples/ldapsh_config to /usr/local/etc, /etc, or ~/.ldapsh_config,
+and modify it to point to your ldap sources.
+
+3) Run 'ldapsh'.  It will create a '.ldapuids' file
+in your home directory as a cache of UIDs.
+
+HELP
+
+See 'perldoc ldapsh' for more detailed documentation.
+
+COMMANDS
+
+See the COMMANDS file, or run 'commands' in the shell.
+
+THAT'S ALL
+
+Please, if you use this, and you would like me to continue developing it,
+drop me an email:  luke at madstop.com
+
+Luke Kanies

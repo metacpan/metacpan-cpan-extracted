@@ -1,0 +1,12 @@
+usr/bin
+usr/lib
+usr/lib/perl5
+usr/lib/perl5/5.005
+usr/lib/perl5/5.005/i386-linux
+usr/lib/perl5/5.005/i386-linux/Ogg
+usr/lib/perl5/5.005/i386-linux/auto
+usr/lib/perl5/5.005/i386-linux/auto/Ogg
+usr/lib/perl5/5.005/i386-linux/auto/Ogg/Vorbis
+usr/share/man
+usr/share/man/man1
+usr/share/man/man3

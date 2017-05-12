@@ -1,0 +1,1 @@
+lib::gitroot - locate .git root at compile time and use as lib path

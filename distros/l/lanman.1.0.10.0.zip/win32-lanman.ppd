@@ -1,0 +1,20 @@
+<SOFTPKG NAME="Win32-Lanman" VERSION="1,0,10,0">
+	<TITLE>Win32-Lanman</TITLE>
+	<ABSTRACT>Contains the most important calls from the MS-Lanmanager API.</ABSTRACT>
+	<AUTHOR>Jens Helberg (jens.helberg@de.bosch.com)</AUTHOR>
+	<IMPLEMENTATION>
+		<OS NAME="MSWin32" />
+		<ARCHITECTURE NAME="MSWin32-x86-object" />
+		<CODEBASE HREF="x86/Win32-Lanman.tar.gz" />
+	</IMPLEMENTATION>
+	<IMPLEMENTATION>
+		<OS NAME="MSWin32" />
+		<ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+		<CODEBASE HREF="MSWin32-x86-multi-thread/Win32-Lanman.tar.gz" />
+	</IMPLEMENTATION>
+	<IMPLEMENTATION>
+		<OS NAME="MSWin32" />
+		<ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+		<CODEBASE HREF="MSWin32-x86-multi-thread-5.8/Win32-Lanman.tar.gz" />
+	</IMPLEMENTATION>
+</SOFTPKG>

@@ -1,0 +1,26 @@
+<HTML><HEAD><TITLE>XML::RegExp - Regular expressions for XML tokens</TITLE></HEAD><BODY><H1><A NAME="NAME">NAME
+
+</A></H1><P>XML::RegExp - Regular expressions for XML tokens
+
+<P><HR><H1><A NAME="SYNOPSIS">SYNOPSIS
+
+</A></H1><PRE> use XML::RegExp;
+
+</PRE><PRE> if ($my_name =~ /^$XML::RegExp::Name$/)
+ {
+   # $my_name is a valid XML 'Name'
+ }
+
+</PRE><P><HR><H1><A NAME="DESCRIPTION">DESCRIPTION
+
+</A></H1><P>This package contains regular expressions for the following XML tokens:
+BaseChar, Ideographic, Letter, Digit, Extender, CombiningChar, NameChar, 
+EntityRef, CharRef, Reference, Name, NmToken, and AttValue.
+
+<P>The definitions of these tokens were taken from the XML spec 
+(Extensible Markup Language 1.0) at <A HREF="http://www.w3.org/TR/REC-xml">http://www.w3.org/TR/REC-xml</A>.
+
+<P><HR><H1><A NAME="AUTHOR">AUTHOR
+
+</A></H1><P>Please send bugs, comments and suggestions to Enno Derksen &lt;<I>enno@att.com</I>&gt;
+<P><HR><I><FONT SIZE="-1">Last updated: Fri Oct 22 18:47:37 1999</FONT></I></BODY></HTML>

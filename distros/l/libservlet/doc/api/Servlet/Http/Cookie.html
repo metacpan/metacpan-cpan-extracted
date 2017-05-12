@@ -1,0 +1,270 @@
+<HTML>
+<HEAD>
+<TITLE>Servlet::Http::Cookie - HTTP cookie class</TITLE>
+<LINK REL="stylesheet" HREF="../../../libservlet.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Servlet::Http::Cookie - HTTP cookie class</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  my $cookie = Servlet::Http::Cookie-&gt;new($name, $value);</PRE>
+<PRE>
+  my $clone = $cookie-&gt;clone();</PRE>
+<PRE>
+  my $comment = $cookie-&gt;getComment();
+  $cookie-&gt;setComment($comment);</PRE>
+<PRE>
+  my $domain = $cookie-&gt;getDomain();
+  $cookie-&gt;setDomain($domain);</PRE>
+<PRE>
+  my $seconds = $cookie-&gt;getMaxAge();
+  $cookie-&gt;setMaxAge($seconds);</PRE>
+<PRE>
+  my $name = $cookie-&gt;getName();</PRE>
+<PRE>
+  my $path = $cookie-&gt;getPath();
+  $cookie-&gt;setPath($path);</PRE>
+<PRE>
+  my $bool = $cookie-&gt;getSecure();
+  $cookie-&gt;setSecure($bool);</PRE>
+<PRE>
+  my $value = $cookie-&gt;getValue();
+  $cookie-&gt;setValue($value);</PRE>
+<PRE>
+  my $version = $cookie-&gt;getVersion();
+  $cookie-&gt;setVersion();</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This class represents a cookie, a small amount of information sent by
+a servlet to a Web browser, saved by the browser, and later sent back
+to the server. A cookie's value can uniquely identify a client, so
+cookies are commonly used for session management.</P>
+<P>A cookie has a name, a single value, and optional attributes such as a
+comment, path and domain qualifiers, a maximum age, and a version
+number. Some Web browsers have bugs in how they handle the optional
+attributes, so use them sparingly to improve the interoperability of
+your servlets.</P>
+<P>The servlet sends cookies to the browser by using the <CODE>addCookie()</CODE>
+method, which adds fields to the HTTP response headers to send cookies
+to the browser, one at a time. The browser is expected to support 20
+cookies for each Web server, 300 cookies total, and may limit cookie
+size to 4 KB each.</P>
+<P>The browser returns cookies to the servlet by adding fields to HTTP
+request headers. Cookies can be retrieved from a request by using the
+<CODE>getCookies()</CODE> method. Serveral cookies might have the same name but
+different path attributes.</P>
+<P>Cookies affect the caching of the Web pages that use them. HTTP 1.0
+does not cache pages that use cookies created with this class. This
+class does not support the cache control defined with HTTP 1.1.</P>
+<P>This class supports both the Version 0 (by Netscape) and Version 1 (by
+RFC 2109) cookie specifications. By default, cookies are created using
+Version 0 to ensure the best interoperability.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new">new($name, $value)</A></STRONG><BR>
+<DD>
+Constructs an instance with the specified name and value.
+<P>The name must conform to RFC 2109. That means it can contain only
+ASCII alphanumeric characters and cannot contain commas, semicolons,
+or white space or begin with a $ character. The cookie's name cannot
+be changed after creation.</P>
+<P>The value can be anything the server chooses to send. Its value is
+probably of interest only to the server. The cookie's value can be c
+hanged after creation with <A HREF="#item_setValue"><CODE>setValue()</CODE></A>.</P>
+<P>By deafult, cookies are created according to the Netscape cookie
+specification. The version can be changed with <A HREF="#item_setVersion"><CODE>setVersion()</CODE></A>.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24name"><EM>$name</EM></A></STRONG><BR>
+<DD>
+the name of the cookie
+<P></P>
+<DT><STRONG><A NAME="item_%24value"><EM>$value</EM></A></STRONG><BR>
+<DD>
+the value of the cookie
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIllegalArgumentException"><STRONG>Servlet::Util::IllegalArgumentException</STRONG></A></STRONG><BR>
+<DD>
+if the cookie name contains illegal characters or is one of the tokens
+reserved for use by the cookie specification
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_clone"><CODE>clone()</CODE></A></STRONG><BR>
+<DD>
+Returns a copy of the object.
+<P></P>
+<DT><STRONG><A NAME="item_getComment"><CODE>getComment()</CODE></A></STRONG><BR>
+<DD>
+Returns the comment describing the purpose of the cookie, or <EM>undef</EM>
+if the cookie has no comment.
+<P></P>
+<DT><STRONG><A NAME="item_getDomain"><CODE>getDomain()</CODE></A></STRONG><BR>
+<DD>
+Returns the domain name for the cookie, in the form specified by RFC
+2109.
+<P></P>
+<DT><STRONG><A NAME="item_getMaxAge"><CODE>getMaxAge()</CODE></A></STRONG><BR>
+<DD>
+Returns the maximum age of the cookie, specified in seconds. The
+default value is -1, indicating that the cookie will persist until
+client shutdown.
+<P></P>
+<DT><STRONG><A NAME="item_getName"><CODE>getName()</CODE></A></STRONG><BR>
+<DD>
+Returns the name of the cookie. The name cannot be changed after
+creation.
+<P></P>
+<DT><STRONG><A NAME="item_getPath"><CODE>getPath()</CODE></A></STRONG><BR>
+<DD>
+Returns the path on the server to which the browser returns the
+cookie. The cookie is visible to all subpaths on the server.
+<P></P>
+<DT><STRONG><A NAME="item_getSecure"><CODE>getSecure()</CODE></A></STRONG><BR>
+<DD>
+Returns true if the cookie can only be sent over a secure channel., or
+false if the cookie can be sent over any channel.
+<P></P>
+<DT><STRONG><A NAME="item_getValue"><CODE>getValue()</CODE></A></STRONG><BR>
+<DD>
+Returns the value of the cookie.
+<P></P>
+<DT><STRONG><A NAME="item_getVersion"><CODE>getVersion()</CODE></A></STRONG><BR>
+<DD>
+Returns the version of the cookie specification complied with by the
+cookie. Version 1 complies with RFC 2109, and version 0 complies with
+the original cookie specification drafted by Netscape. Cookies
+provided by a client use and identify the client's cookie version.
+<P></P>
+<DT><STRONG><A NAME="item_setComment"><CODE>setComment($comment)</CODE></A></STRONG><BR>
+<DD>
+Specifies a comment that describes the cookie's purpose. Comments are
+not supported by Version 0 cookies.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24comment"><EM>$comment</EM></A></STRONG><BR>
+<DD>
+the comment
+<P></P></DL>
+<DT><STRONG><A NAME="item_setDomain"><CODE>setDomain($domain)</CODE></A></STRONG><BR>
+<DD>
+Specifies the domain within which this cookie should be presented.
+<P>The form of the domain name is specified by RFC 2109. A domain name
+begins with a dot (<EM>.foo.com</EM>), which means that the cookie is
+visible to servers in that domain only (<EM>www.foo.com</EM>, but not
+<EM>www.bar.com</EM>). By default, cookies are only returned to the server
+that sent them.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24domain"><EM>$domain</EM></A></STRONG><BR>
+<DD>
+the domain name within which the cookie is visible
+<P></P></DL>
+<DT><STRONG><A NAME="item_setMaxAge"><CODE>setMaxAge($expiry)</CODE></A></STRONG><BR>
+<DD>
+Sets the maximum age of the cookie in seconds.
+<P>A positive value indicates that the cookie will expire after that many
+seconds have passed. Note that the value is the maximum age when the
+cookie will expire, not the cookie's current age.</P>
+<P>A negative value means that the cookie is not stored persistently and
+will be deleted when the client exits. A zero value causes the cookie
+to be deleted.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24expiry"><EM>$expiry</EM></A></STRONG><BR>
+<DD>
+the maximum age of the cookie in seconds
+<P></P></DL>
+<DT><STRONG><A NAME="item_setPath"><CODE>setPath($uri)</CODE></A></STRONG><BR>
+<DD>
+Specifies a server namespace for which the cookie is visible.
+<P>The cookie is visible to all the resources at or beneath the URI
+namespace specified by the path. A cookie's path must include the
+servlet that set the cookie in order to make the cookie visible to
+that servlet.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24uri"><EM>$uri</EM></A></STRONG><BR>
+<DD>
+the uri path denoting the visible namespace for the cookie
+<P></P></DL>
+<DT><STRONG><A NAME="item_setSecure"><CODE>setSecure($flag)</CODE></A></STRONG><BR>
+<DD>
+Indicates to the if the cookie must be sent only over a secure channel
+or if it can be sent over any channel. The default is false.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24flag"><EM>$flag</EM></A></STRONG><BR>
+<DD>
+a flag specifying the security requirement for cookie transmission
+<P></P></DL>
+<DT><STRONG><A NAME="item_setValue"><CODE>setValue($value)</CODE></A></STRONG><BR>
+<DD>
+Assigns a new value to a cookie after the cookie is created. If a
+binary value is used, Base64 encoding the value is suggested.
+<P>With version 0 cookies, values should not contain white space,
+brackets, parentheses, equals signs, commas, double quotes, slashes,
+question marks, at signs, colons and semicolons. The behavior of
+clients in response to empty values is undefined.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><EM>$value</EM></STRONG><BR>
+<DD>
+the new value of the cookie
+<P></P></DL>
+<DT><STRONG><A NAME="item_setVersion"><CODE>setVersion($number)</CODE></A></STRONG><BR>
+<DD>
+Sets the version of the cookie specification with which the cookie
+complies. Version 0 complies with the original Netscape cookie
+specification, Version 1 complies with RFC 2109. The default is 0.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24number"><EM>$number</EM></A></STRONG><BR>
+<DD>
+the version number of the supported cookie specification
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../api/Servlet/Util/Exception.html">the Servlet::Util::Exception manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

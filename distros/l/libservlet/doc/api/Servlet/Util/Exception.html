@@ -1,0 +1,146 @@
+<HTML>
+<HEAD>
+<TITLE>Servlet::Util::Exception - exception base class</TITLE>
+<LINK REL="stylesheet" HREF="../../../libservlet.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#class methods">CLASS METHODS</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#exception subclassess">EXCEPTION SUBCLASSESS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Servlet::Util::Exception - exception base class</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  eval {
+      Servlet::Util::Exception-&gt;throw(&quot;oops&quot;);
+  };</PRE>
+<PRE>
+  if ($@) {
+      warn &quot;caught exception: $@\n&quot;;
+  }</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This is a base class for exceptions. It extends
+<STRONG>Exception::Class::Base</STRONG>. See <STRONG>Exception::Class</STRONG> for a full list of
+inherited methods.</P>
+<P>There is only one exception to the inherited API: tracing is on by
+default. This means that a stack trace will be created when an
+exception is thrown. By way of comparison to <STRONG>java.lang.Throwable</STRONG>,
+it's as if <CODE>fillInStackTrace()</CODE> is automatically called inside
+<A HREF="#item_throw"><CODE>throw()</CODE></A>. To selectively disable tracing for a subclass, do the
+following:</P>
+<PRE>
+  My::Exception::do_trace(0);</PRE>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new($msg)</CODE></A></STRONG><BR>
+<DD>
+Construct an instance with the given error message.
+<P>Exceptions are rarely directly constructed. Usually they are
+constructed and thrown in one call to <A HREF="#item_throw"><CODE>throw()</CODE></A>.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24msg"><EM>$msg</EM></A></STRONG><BR>
+<DD>
+the error message
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="class methods">CLASS METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_throw"><CODE>throw($msg)</CODE></A></STRONG><BR>
+<DD>
+Constructs an instance with the given error essage and then <CODE>die()</CODE>s.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><EM>$msg</EM></STRONG><BR>
+<DD>
+the error message
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getMessage"><CODE>getMessage()</CODE></A></STRONG><BR>
+<DD>
+Returns the error message.
+<P></P>
+<DT><STRONG><A NAME="item_toString"><CODE>toString()</CODE></A></STRONG><BR>
+<DD>
+Returns a short description of the exception, including the stack
+trace if the exception has been thrown.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="exception subclassess">EXCEPTION SUBCLASSESS</A></H1>
+<P>These commonly encountered exceptions are provided as utilities.</P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIOException"><STRONG>Servlet::Util::IOException</STRONG></A></STRONG><BR>
+<DD>
+Thrown to indicate than an I/O exception of some sort has occurred.
+<P></P>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIllegalArgumentException"><STRONG>Servlet::Util::IllegalArgumentException</STRONG></A></STRONG><BR>
+<DD>
+Thrown to indicate that a method has been passed an illegal or
+inappropriate argument.
+<P></P>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIllegalStateException"><STRONG>Servlet::Util::IllegalStateException</STRONG></A></STRONG><BR>
+<DD>
+Thrown to indicate that a method has been invoked at an illegal or
+inappropriate time.
+<P></P>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIndexOutOfBoundsException"><STRONG>Servlet::Util::IndexOutOfBoundsException</STRONG></A></STRONG><BR>
+<DD>
+Thrown to indicate that an index of some sort (such as to an array) is
+out of range.
+<P></P>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AUndefReferenceException"><STRONG>Servlet::Util::UndefReferenceException</STRONG></A></STRONG><BR>
+<DD>
+Thrown to indicate that <EM>undef</EM> was used in a case where a value is
+required.
+<P></P>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AUnsupportedEncodingExceptio"><STRONG>Servlet::Util::UnsupportedEncodingException</STRONG></A></STRONG><BR>
+<DD>
+Thrown to indicate that the chosen character encoding is unsupported
+by the environment (most commonly encountered during character
+conversions on byte streams).
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../api/Exception/Class.html">the Exception::Class manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

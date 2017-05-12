@@ -1,0 +1,199 @@
+%left SeqOp
+%left 'or'
+%left 'and'
+%left 'not'
+%left UnionOp
+%left 'intersect'
+%left COMPARE
+%left MATCH
+%left '/' '//'
+%left '!'
+%left '[' ']'
+%left '(' ')'
+
+%%
+
+Query:		Sequence
+		;
+
+WildNCName:	NCName | '*'
+		;
+
+#?? not sure about NCName
+
+WildQName:	WildNCName { [ Name => $_[1] ]; }
+		| WildNCName ':' WildNCName { 
+			[ NameSpace => $_[1], Name => $_[2]]; }
+		;
+
+Param:		Disjunction
+		| INTEGER { new XML::XQL::Number ($_[1]); }
+		| NUMBER { new XML::XQL::Number ($_[1]); }
+		| TEXT { new XML::XQL::Text ($_[1]); }
+		;
+
+ElementName:	WildQName { new XML::XQL::Element (@{$_[1]}); }
+		;
+
+AttributeName:	'@' WildQName { new XML::XQL::Attribute (@{$_[2]}); }
+		;
+
+Invocation:	XQLName_Paren Invocation_2 {
+			my ($func, $type) = $_[0]->{Query}->findFunctionOrMethod ($_[1], $_[2]);
+
+			new XML::XQL::Invocation (Name => $_[1], 
+						  Args => $_[2],
+						  Func => $func,
+						  Type => $type); }
+		;
+
+Invocation_2:	')' { [] }
+		| Param Invocation_3 ')' { unshift @{$_[2]}, $_[1]; $_[2]; }
+		;
+
+Invocation_3:	/* empty */ { [] }
+		| ',' Param Invocation_3 { unshift @{$_[3]}, $_[2]; $_[3]; }
+		;
+
+PathOp:		'/' | '//'
+		;
+
+Sequence:	Disjunction
+		| Disjunction SeqOp Sequence {
+		    new XML::XQL::Sequence (Left => $_[1], Oper => $_[2], 
+					    Right => $_[3]); }
+		;
+
+Disjunction:	Conjunction 
+		| Conjunction 'or' Disjunction { 
+		    new XML::XQL::Or (Left => $_[1], Right => $_[3]); }
+		;
+
+Conjunction:	Negation
+		| Negation 'and' Conjunction { 
+		    new XML::XQL::And (Left => $_[1], Right => $_[3]); }
+		;
+
+Negation:	Union
+		| 'not' Negation { new XML::XQL::Not (Left => $_[2]); }
+		;
+
+Union:		Intersection 
+		| Intersection UnionOp Union { 
+		    new XML::XQL::Union (Left => $_[1], Right => $_[3]); }
+		;
+
+Intersection:	Comparison 
+		| Comparison 'intersect' Intersection { 
+		    new XML::XQL::Intersect ($_[1], $_[3]); }
+		;
+
+ComparisonOp:	COMPARE {
+		  [ $_[1], $_[0]->{Query}->findComparisonOperator ($_[1]) ]; }
+		| MATCH {
+		  [ $_[1], $_[0]->{Query}->findComparisonOperator ($_[1]) ]; }
+		;
+
+Comparison:	Path
+		| LValue ComparisonOp RValue {
+			new XML::XQL::Compare (All => 0, Left => $_[1], 
+				Oper => $_[2]->[0], Func => $_[2]->[1], 
+				Right => $_[3]); }
+		| 'any' LValue ComparisonOp RValue {
+			new XML::XQL::Compare (All => 0, Left => $_[2], 
+				Oper => $_[3]->[0], Func => $_[3]->[0],
+				Right => $_[4]); }
+		| 'all' LValue ComparisonOp RValue {
+			new XML::XQL::Compare (All => 1, Left => $_[2], 
+				Oper => $_[3]->[0], Func => $_[3]->[0],
+				Right => $_[4]); }
+		;
+
+LValue:		Path
+		;
+
+RValue:		Path
+		| INTEGER { new XML::XQL::Number ($_[1]); }
+		| NUMBER { new XML::XQL::Number ($_[1]); }
+		| TEXT { new XML::XQL::Text ($_[1]); }
+		;
+
+Path:		AbsolutePath | RelativePath
+		;
+
+AbsolutePath:	'/' { new XML::Root; }
+		| PathOp RelativePath { 
+		    new XML::XQL::Path (PathOp => $_[1], Right => $_[2]); }
+		;
+
+RelativePath:	Bang 
+		| Bang PathOp RelativePath { 
+		    new XML::XQL::Path (Left => $_[1], PathOp => $_[2], 
+				        Right => $_[3]); }
+		;
+
+Bang:		Subscript
+		| Subscript '!' Invocation {
+		    XML::XQL::parseError ("only methods (not functions) can be used after the Bang (near '!" . $_[3]->{Name} . "'")
+			unless $_[3]->isMethod;
+
+		    new XML::XQL::Bang (Left => $_[1], 
+				        Right => $_[3]); }
+		;
+
+Subscript:	Filter Subscript_2 { 
+		    defined($_[2]) ? 
+			new XML::XQL::Subscript (Left => $_[1], 
+					    IndexList => $_[2]) : $_[1]; }
+		;
+
+Subscript_2:	/* empty */
+		| '[' IndexList ']' { $_[2]; }
+#?? The following line *IS* part of the XQL spec, but it doesn't make sense
+#??		| '[' ']'
+		;
+
+IndexList:	IndexArg IndexList_2 { push (@{$_[1]}, @{$_[2]}); $_[1]; }
+		;
+
+IndexList_2:	/* empty */ { [] } 
+		| ',' IndexArg IndexList_2 { push (@{$_[2]}, @{$_[3]}); $_[2]; }
+		;
+
+IndexArg:	INTEGER { [ $_[1], $_[1] ]; }
+		| Range
+		;
+
+Range:		INTEGER 'to' INTEGER {
+		    # Syntactic Constraint 9:
+		    # If both integers are positive or if both integers are 
+		    # negative, the first integer must be less than or
+          	    # equal to the second integer. 
+
+		    XML::XQL::parseError (
+			"$_[1] should be less than $_[3] in '$_[1] $_[2] $_[3]'")
+				if ($_[1] > $_[3] && ($_[1] < 0) == ($_[3] < 0));
+		    [ $_[1], $_[3] ]; }
+		;
+
+Filter:		Grouping 
+		| Filter '[' Subquery ']' { 
+			new XML::XQL::Filter (Left => $_[1], Right => $_[3]); }
+		;
+
+#?? Eliminate Subquery
+Subquery:	Query
+		;
+
+Grouping:	RelativeTerm 
+		| '(' Query ')'	 { $_[2]; }
+		;
+
+RelativeTerm:	'.' { new XML::XQL::Current; }
+		| '..' { new XML::XQL::Parent; }
+		| Invocation 
+		| ElementName
+		| AttributeName
+		;
+
+%%

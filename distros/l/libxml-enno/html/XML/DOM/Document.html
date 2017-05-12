@@ -1,0 +1,194 @@
+<HTML><HEAD><TITLE>XML::DOM::Document - An XML document node in XML::DOM</TITLE></HEAD><BODY><H1><A NAME="NAME">NAME
+
+</A></H1><P>XML::DOM::Document - An XML document node in XML::DOM
+
+<P><HR><H1><A NAME="DESCRIPTION">DESCRIPTION
+
+</A></H1><P>XML::DOM::Document extends <A HREF="Node.html">XML::DOM::Node</A>.
+
+<P>It is the main root of the XML document structure as returned by 
+XML::DOM::Parser::parse and XML::DOM::Parser::parsefile.
+
+<P>Since elements, text nodes, comments, processing instructions, etc.
+cannot exist outside the context of a Document, the Document interface
+also contains the factory methods needed to create these objects. The
+Node objects created have a getOwnerDocument method which associates
+them with the Document within whose context they were created.
+
+<H2><A NAME="METHODS">METHODS
+
+</A></H2><DL><DT><A NAME="getDocumentElement_"><STRONG><P>getDocumentElement
+
+</STRONG></A><DD>This is a convenience method that allows direct access to
+the child node that is the root Element of the document.
+
+<DT><A NAME="getDoctype_"><STRONG><P>getDoctype
+
+</STRONG></A><DD>The Document Type Declaration (see DocumentType) associated
+with this document. For HTML documents as well as XML
+documents without a document type declaration this returns
+undef. The DOM Level 1 does not support editing the Document
+Type Declaration.
+
+<P><B>Not In DOM Spec</B>: This implementation allows editing the doctype. 
+See <I>XML::DOM::ignoreReadOnly</I> for details.
+
+<DT><A NAME="getImplementation_"><STRONG><P>getImplementation
+
+</STRONG></A><DD>The DOMImplementation object that handles this document. A
+DOM application may use objects from multiple implementations.
+
+<DT><A NAME="createElement_tagName_"><STRONG><P>createElement (tagName)
+
+</STRONG></A><DD>Creates an element of the type specified. Note that the
+instance returned implements the Element interface, so
+attributes can be specified directly on the returned object.
+
+<P>DOMExceptions:
+
+<DL><DT><A NAME="_INVALID_CHARACTER_ERR_"><STRONG><P>* INVALID_CHARACTER_ERR
+
+</STRONG></A><DD>Raised if the tagName does not conform to the XML spec.
+
+</DL><DT><A NAME="createTextNode_data_"><STRONG><P>createTextNode (data)
+
+</STRONG></A><DD>Creates a Text node given the specified string.
+
+<DT><A NAME="createComment_data_"><STRONG><P>createComment (data)
+
+</STRONG></A><DD>Creates a Comment node given the specified string.
+
+<DT><A NAME="createCDATASection_data_"><STRONG><P>createCDATASection (data)
+
+</STRONG></A><DD>Creates a CDATASection node given the specified string.
+
+<DT><A NAME="createAttribute_name_value_specified_"><STRONG><P>createAttribute (name [, value [, specified ]])
+
+</STRONG></A><DD>Creates an Attr of the given name. Note that the Attr
+instance can then be set on an Element using the setAttribute method.
+
+<P><B>Not In DOM Spec</B>: The DOM Spec does not allow passing the value or the 
+specified property in this method. In this implementation they are optional.
+
+<P>Parameters:
+ <I>value</I>     The attribute's value. See Attr::setValue for details.
+              If the value is not supplied, the specified property is set to 0.
+ <I>specified</I> Whether the attribute value was specified or whether the default
+              value was used. If not supplied, it's assumed to be 1.
+
+<P>DOMExceptions:
+
+<DL><DT><A NAME="_INVALID_CHARACTER_ERR_"><STRONG><P>* INVALID_CHARACTER_ERR
+
+</STRONG></A><DD>Raised if the name does not conform to the XML spec.
+
+</DL><DT><A NAME="createProcessingInstruction_target_data_"><STRONG><P>createProcessingInstruction (target, data)
+
+</STRONG></A><DD>Creates a ProcessingInstruction node given the specified name and data strings.
+
+<P>Parameters:
+ <I>target</I>  The target part of the processing instruction.
+ <I>data</I>    The data for the node.
+
+<P>DOMExceptions:
+
+<DL><DT><A NAME="_INVALID_CHARACTER_ERR_"><STRONG><P>* INVALID_CHARACTER_ERR
+
+</STRONG></A><DD>Raised if the target does not conform to the XML spec.
+
+</DL><DT><A NAME="createDocumentFragment_"><STRONG><P>createDocumentFragment
+
+</STRONG></A><DD>Creates an empty DocumentFragment object.
+
+<DT><A NAME="createEntityReference_name_"><STRONG><P>createEntityReference (name)
+
+</STRONG></A><DD>Creates an EntityReference object.
+
+</DL><H2><A NAME="Additional_methods_not_in_the_DOM_Spec">Additional methods not in the DOM Spec
+
+</A></H2><DL><DT><A NAME="getXMLDecl_and_setXMLDecl_xmlDecl_"><STRONG><P>getXMLDecl and setXMLDecl (xmlDecl)
+
+</STRONG></A><DD>Returns the XMLDecl for this Document or undef if none was specified.
+Note that XMLDecl is not part of the list of child nodes.
+
+<DT><A NAME="setDoctype_doctype_"><STRONG><P>setDoctype (doctype)
+
+</STRONG></A><DD>Sets or replaces the DocumentType. 
+<B>NOTE</B>: Don't use appendChild or insertBefore to set the DocumentType.
+Even though doctype will be part of the list of child nodes, it is handled
+specially.
+
+<DT><A NAME="getDefaultAttrValue_elem_attr_"><STRONG><P>getDefaultAttrValue (elem, attr)
+
+</STRONG></A><DD>Returns the default attribute value as a string or undef, if none is available.
+
+<P>Parameters:
+ <I>elem</I>    The element tagName.
+ <I>attr</I>    The attribute name.
+
+<DT><A NAME="getEntity_name_"><STRONG><P>getEntity (name)
+
+</STRONG></A><DD>Returns the Entity with the specified name.
+
+<DT><A NAME="createXMLDecl_version_encoding_standalone_"><STRONG><P>createXMLDecl (version, encoding, standalone)
+
+</STRONG></A><DD>Creates an XMLDecl object. All parameters may be undefined.
+
+<DT><A NAME="createDocumentType_name_sysId_pubId_"><STRONG><P>createDocumentType (name, sysId, pubId)
+
+</STRONG></A><DD>Creates a DocumentType object. SysId and pubId may be undefined.
+
+<DT><A NAME="createNotation_name_base_sysId_pubId_"><STRONG><P>createNotation (name, base, sysId, pubId)
+
+</STRONG></A><DD>Creates a new Notation object. Consider using 
+XML::DOM::DocumentType::addNotation!
+
+<DT><A NAME="createEntity_parameter_notationName_value_sysId_pubId_ndata_"><STRONG><P>createEntity (parameter, notationName, value, sysId, pubId, ndata)
+
+</STRONG></A><DD>Creates an Entity object. Consider using XML::DOM::DocumentType::addEntity!
+
+<DT><A NAME="createElementDecl_name_model_"><STRONG><P>createElementDecl (name, model)
+
+</STRONG></A><DD>Creates an ElementDecl object.
+
+<P>DOMExceptions:
+
+<DL><DT><A NAME="_INVALID_CHARACTER_ERR_"><STRONG><P>* INVALID_CHARACTER_ERR
+
+</STRONG></A><DD>Raised if the element name (tagName) does not conform to the XML spec.
+
+</DL><DT><A NAME="createAttlistDecl_name_"><STRONG><P>createAttlistDecl (name)
+
+</STRONG></A><DD>Creates an AttlistDecl object.
+
+<P>DOMExceptions:
+
+<DL><DT><A NAME="_INVALID_CHARACTER_ERR_"><STRONG><P>* INVALID_CHARACTER_ERR
+
+</STRONG></A><DD>Raised if the element name (tagName) does not conform to the XML spec.
+
+</DL><DT><A NAME="expandEntity_entity_parameter_"><STRONG><P>expandEntity (entity [, parameter])
+
+</STRONG></A><DD>Expands the specified entity or parameter entity (if parameter=1) and returns
+its value as a string, or undef if the entity does not exist.
+(The entity name should not contain the '%', '&amp;' or ';' delimiters.)
+
+<DT><A NAME="check_checker_"><STRONG><P>check ( [$checker] )
+
+</STRONG></A><DD>Uses the specified <A HREF="../Checker.html">XML::Checker</A> to validate the document.
+If no XML::Checker is supplied, a new XML::Checker is created.
+See <A HREF="../Checker.html">XML::Checker</A> for details.
+
+<DT><A NAME="check_sax_checker_"><STRONG><P>check_sax ( [$checker] )
+
+</STRONG></A><DD>Similar to check() except it uses the SAX interface to XML::Checker instead of 
+the expat interface. This method may disappear or replace check() at some time.
+
+<DT><A NAME="createChecker_"><STRONG><P>createChecker ()
+
+</STRONG></A><DD>Creates an XML::Checker based on the document's DTD.
+The $checker can be reused to check any elements within the document.
+Create a new <A HREF="../Checker.html">XML::Checker</A> whenever the DOCTYPE section of the document 
+is altered!
+
+</DL><P><HR><I><FONT SIZE="-1">Last updated: Fri Oct 22 18:47:25 1999</FONT></I></BODY></HTML>

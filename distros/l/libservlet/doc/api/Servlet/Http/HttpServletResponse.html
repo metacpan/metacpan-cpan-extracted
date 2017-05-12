@@ -1,0 +1,478 @@
+<HTML>
+<HEAD>
+<TITLE>Servlet::Http::HttpServletResponse - HTTP servlet response interface</TITLE>
+<LINK REL="stylesheet" HREF="../../../libservlet.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#fields">FIELDS</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Servlet::Http::HttpServletResponse - HTTP servlet response interface</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  $response-&gt;addCookie($cookie);</PRE>
+<PRE>
+  $response-&gt;addDateHeader($name, $date);</PRE>
+<PRE>
+  $response-&gt;addHeader($name, $value);</PRE>
+<PRE>
+  $bool = $response-&gt;containsHeader($name);</PRE>
+<PRE>
+  $response-&gt;encodeRedirectURL($url);</PRE>
+<PRE>
+  $response-&gt;encodeURL($url);</PRE>
+<PRE>
+  $response-&gt;sendError($sc, $msg);</PRE>
+<PRE>
+  $response-&gt;sendRedirect($location);</PRE>
+<PRE>
+  $response-&gt;setDateHeader($name, $date);</PRE>
+<PRE>
+  $response-&gt;setHeader($name, $value);</PRE>
+<PRE>
+  $response-&gt;setStatus($sc);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Extends the <STRONG>Servlet::ServletResponse</STRONG> interface to provide
+HTTP-specific functionality in sending a response. For example, it has
+methods to access HTTP headers and cookies.</P>
+<P>The servlet container creates the object and passes it as an argument
+to the servlet's service methods (<CODE>doGet()</CODE>, <CODE>doPost()</CODE>, etc).</P>
+<P>
+<HR>
+<H1><A NAME="fields">FIELDS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_SC_ACCEPTED">SC_ACCEPTED</A></STRONG><BR>
+<DD>
+Status code (202) indicating that a request was accepted for
+processing, but was not completed.
+<P></P>
+<DT><STRONG><A NAME="item_SC_BAD_GATEWAY">SC_BAD_GATEWAY</A></STRONG><BR>
+<DD>
+Status code (502) indicating that the HTTP server received an invalid
+response from a server it consulted when acting as a proxy or gateway.
+<P></P>
+<DT><STRONG><A NAME="item_SC_BAD_REQUEST">SC_BAD_REQUEST</A></STRONG><BR>
+<DD>
+Status code (400) indicating the request sent by the client was
+syntactically incorrect.
+<P></P>
+<DT><STRONG><A NAME="item_SC_CONFLICT">SC_CONFLICT</A></STRONG><BR>
+<DD>
+Status code (409) indicating that the request could not be completed
+due to a conflict with the current state of the resource.
+<P></P>
+<DT><STRONG><A NAME="item_SC_CONTINUE">SC_CONTINUE</A></STRONG><BR>
+<DD>
+Status code (100) indicating the client can continue.
+<P></P>
+<DT><STRONG><A NAME="item_SC_CREATED">SC_CREATED</A></STRONG><BR>
+<DD>
+Status code (201) indicating the request succeeded and created a new
+resource on the server.
+<P></P>
+<DT><STRONG><A NAME="item_SC_EXPECTATION_FAILED">SC_EXPECTATION_FAILED</A></STRONG><BR>
+<DD>
+Status code (417) indicating that the server could not meet the
+expectation given in the Expect request header.
+<P></P>
+<DT><STRONG><A NAME="item_SC_FORBIDDEN">SC_FORBIDDEN</A></STRONG><BR>
+<DD>
+Status code (403) indicating the server understood the request but
+refused to fulfill it.
+<P></P>
+<DT><STRONG><A NAME="item_SC_GATEWAY_TIMEOUT">SC_GATEWAY_TIMEOUT</A></STRONG><BR>
+<DD>
+Status code (504) indicating that the server did not receive a timely
+response from the upstream server while acting as a gateway or proxy.
+<P></P>
+<DT><STRONG><A NAME="item_SC_GONE">SC_GONE</A></STRONG><BR>
+<DD>
+Status code (410) indicating that the resource is no longer available
+at the server and no forwarding address is known. This condition
+<EM>SHOULD</EM> be considered permanent.
+<P></P>
+<DT><STRONG><A NAME="item_SC_HTTP_VERSION_NOT_SUPPORTED">SC_HTTP_VERSION_NOT_SUPPORTED</A></STRONG><BR>
+<DD>
+Status code (505) indicating that the server does not support or
+refuses to support the HTTP protocol version that was used in the
+request message.
+<P></P>
+<DT><STRONG><A NAME="item_SC_INTERNAL_SERER_ERROR">SC_INTERNAL_SERER_ERROR</A></STRONG><BR>
+<DD>
+Status code (500) indicating an error inside the HTTP server which
+prevented it from fulfilling the request.
+<P></P>
+<DT><STRONG><A NAME="item_SC_LENGTH_REQUIRED">SC_LENGTH_REQUIRED</A></STRONG><BR>
+<DD>
+Status code (411) indicating that the requst cannot be handled without
+a defined Content-Length.
+<P></P>
+<DT><STRONG><A NAME="item_SC_METHOD_NOT_ALLOWED">SC_METHOD_NOT_ALLOWED</A></STRONG><BR>
+<DD>
+Status code (405) indicating that the method specified in the
+Request-Line is not allowed for the resource identified by the
+Request-URI.
+<P></P>
+<DT><STRONG><A NAME="item_SC_MOVED_PERMANENTLY">SC_MOVED_PERMANENTLY</A></STRONG><BR>
+<DD>
+Status code (301) indicating that the resource has permanently moved
+to a new location, and that future references shoud use a new URI with
+their requests.
+<P></P>
+<DT><STRONG><A NAME="item_SC_MOVED_TEMPORARILY">SC_MOVED_TEMPORARILY</A></STRONG><BR>
+<DD>
+Status code (302) indicating that the resource has temporarily moved
+to another location, but that future references should still use the
+original URI to access the resource.
+<P></P>
+<DT><STRONG><A NAME="item_SC_MULTIPLE_CHOICES">SC_MULTIPLE_CHOICES</A></STRONG><BR>
+<DD>
+Status code (300) indicating that the requested resource corresponds
+to any one of a set of representations, each with its own specified
+location.
+<P></P>
+<DT><STRONG><A NAME="item_SC_NO_CONTENT">SC_NO_CONTENT</A></STRONG><BR>
+<DD>
+Status code (204) indicating that the request succeeded but that there
+was no new information to return.
+<P></P>
+<DT><STRONG><A NAME="item_SC_NON_AUTHORITATIVE_INFORMATION">SC_NON_AUTHORITATIVE_INFORMATION</A></STRONG><BR>
+<DD>
+Status code (203) indicating that the meta information presented by
+the client did not originate from th server.
+<P></P>
+<DT><STRONG><A NAME="item_SC_NOT_ACCEPTABLE">SC_NOT_ACCEPTABLE</A></STRONG><BR>
+<DD>
+Status code (406) indicating that the resource identified by the
+request is only capable of generating response entities which have
+content characteristics not acceptable according to the Accept headers
+sent in the request.
+<P></P>
+<DT><STRONG><A NAME="item_SC_NOT_FOUND">SC_NOT_FOUND</A></STRONG><BR>
+<DD>
+Status code (404) indicating that the requested resource is not
+available.
+<P></P>
+<DT><STRONG><A NAME="item_SC_NOT_IMPLEMENTED">SC_NOT_IMPLEMENTED</A></STRONG><BR>
+<DD>
+Status code (501) indicating that the HTTP server does not support the
+functionality needed to fulfill the request.
+<P></P>
+<DT><STRONG><A NAME="item_SC_NOT_MODIFIED">SC_NOT_MODIFIED</A></STRONG><BR>
+<DD>
+Status code (304) indicating that a conditional GET operation found
+that the resource was available and not modified.
+<P></P>
+<DT><STRONG><A NAME="item_SC_OK">SC_OK</A></STRONG><BR>
+<DD>
+Status code (200) indicating the request succeeded normally.
+<P></P>
+<DT><STRONG><A NAME="item_SC_PARTIAL_CONTENT">SC_PARTIAL_CONTENT</A></STRONG><BR>
+<DD>
+Status code (206) indicating that the server has fulfilled the partial
+GET request for the resource.
+<P></P>
+<DT><STRONG><A NAME="item_SC_PAYMENT_REQUIRED">SC_PAYMENT_REQUIRED</A></STRONG><BR>
+<DD>
+Status code (402) reserved for future use.
+<P></P>
+<DT><STRONG><A NAME="item_SC_PRECONDITION_FAILED">SC_PRECONDITION_FAILED</A></STRONG><BR>
+<DD>
+Status code (412) indicating that the precondition given in one or
+more of the request header fields evaluated to false when it was
+tested on the server.
+<P></P>
+<DT><STRONG><A NAME="item_SC_PROXY_AUTHENTICATION_REQUIRED">SC_PROXY_AUTHENTICATION_REQUIRED</A></STRONG><BR>
+<DD>
+Status code (407) indicating that the client <EM>MUST</EM> first
+authenticate itself with the proxy.
+<P></P>
+<DT><STRONG><A NAME="item_SC_REQUEST_ENTITY_TOO_LARGE">SC_REQUEST_ENTITY_TOO_LARGE</A></STRONG><BR>
+<DD>
+Status code (413) indicating that the server is refusing to process
+the request because the request entity is larger than the server is
+willing or able to process.
+<P></P>
+<DT><STRONG><A NAME="item_SC_REQUEST_TIMEOUT">SC_REQUEST_TIMEOUT</A></STRONG><BR>
+<DD>
+Status code (408) indicating that the client did not produce a request
+within the time that the server was prepared to wait.
+<P></P>
+<DT><STRONG><A NAME="item_SC_REQUEST_URI_TOO_LONG">SC_REQUEST_URI_TOO_LONG</A></STRONG><BR>
+<DD>
+Status code (414) indicating that the server is refusing to service
+the request because the Request-URI is longer than the server is
+willing to interpret.
+<P></P>
+<DT><STRONG><A NAME="item_SC_REQUESTED_RANGE_NOT_SATISFIABLE">SC_REQUESTED_RANGE_NOT_SATISFIABLE</A></STRONG><BR>
+<DD>
+Status code (416) indicating that the server cannot serve the
+requested byte range.
+<P></P>
+<DT><STRONG><A NAME="item_SC_RESET_CONTENT">SC_RESET_CONTENT</A></STRONG><BR>
+<DD>
+Status code (205) indicating that the agent <EM>SHOULD</EM> reset the
+document view which caused the request to be sent.
+<P></P>
+<DT><STRONG><A NAME="item_SC_SEE_OTHER">SC_SEE_OTHER</A></STRONG><BR>
+<DD>
+Status code (303) indicating that the response to the request can be
+found under a different URI.
+<P></P>
+<DT><STRONG><A NAME="item_SC_SERVICE_UNAVAILABLE">SC_SERVICE_UNAVAILABLE</A></STRONG><BR>
+<DD>
+Status code (503) indicating that the HTTP server is temporarily
+overloaded and unable to handle the reqeust.
+<P></P>
+<DT><STRONG><A NAME="item_SC_SWITCHING_PROTOCOLS">SC_SWITCHING_PROTOCOLS</A></STRONG><BR>
+<DD>
+Status code (101) indicating the server is switching protocols
+according to the Upgrade header.
+<P></P>
+<DT><STRONG><A NAME="item_SC_UNAUTHORIZED">SC_UNAUTHORIZED</A></STRONG><BR>
+<DD>
+Status code (401) indicating that the request requires HTTP
+authentication.
+<P></P>
+<DT><STRONG><A NAME="item_SC_UNSUPPORTED_MEDIA_TYPE">SC_UNSUPPORTED_MEDIA_TYPE</A></STRONG><BR>
+<DD>
+Status code (415) indicating that the server is refusing to service
+the request because the entity of the request is in a format not
+supported by the requested resource for the requested method.
+<P></P>
+<DT><STRONG><A NAME="item_SC_USE_PROXY">SC_USE_PROXY</A></STRONG><BR>
+<DD>
+Status code (305) indicating that the requested resource <EM>MUST</EM> be
+accessed through the proxy given by the Location field.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_addCookie"><CODE>addCookie($cookie)</CODE></A></STRONG><BR>
+<DD>
+Adds the specified cookie to the response. This method can be called
+multiple times to set more than one cookie.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24cookie"><EM>$cookie</EM></A></STRONG><BR>
+<DD>
+the <STRONG>Servlet::Http::Cookie</STRONG> to return to the client
+<P></P></DL>
+<DT><STRONG><A NAME="item_addDateHeader">addDateHeader($name, $date)</A></STRONG><BR>
+<DD>
+Adds a response header with the given name and date-value. The date is
+specified in terms of seconds since the epoch. This method allows
+respone headers to have multiple values.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24name"><EM>$name</EM></A></STRONG><BR>
+<DD>
+the name of the header to add
+<P></P>
+<DT><STRONG><A NAME="item_%24date"><EM>$date</EM></A></STRONG><BR>
+<DD>
+the additional header value
+<P></P></DL>
+<DT><STRONG><A NAME="item_addHeader">addHeader($name, $value)</A></STRONG><BR>
+<DD>
+Adds a response header with the given name and value. This method
+allows response headers to have multiple values.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><EM>$name</EM></STRONG><BR>
+<DD>
+the name of the header to add
+<P></P>
+<DT><STRONG><EM>$date</EM></STRONG><BR>
+<DD>
+the additional header value
+<P></P></DL>
+<DT><STRONG><A NAME="item_containsHeader"><CODE>containsHeader($name)</CODE></A></STRONG><BR>
+<DD>
+Returns a boolean indicating whether the named response header has
+already been set.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><EM>$name</EM></STRONG><BR>
+<DD>
+the name of the header
+<P></P></DL>
+<DT><STRONG><A NAME="item_encodeRedirectURL"><CODE>encodeRedirectURL($url)</CODE></A></STRONG><BR>
+<DD>
+Encodes the specified URL for use in the <A HREF="#item_sendRedirect"><CODE>sendRedirect()</CODE></A> method or,
+if encoding is not needed, returns the URL unchanged. The
+implementation of this method includes the logic to determine whether
+the session ID needs to be encoded in the URL. Because the rules for
+making this determination can differ from those used to decide whether
+to encode a normal link, this method is separate from the <A HREF="#item_encodeURL"><CODE>encodeURL()</CODE></A>
+method.
+<P>All URLs sent to the <A HREF="#item_sendRedirect"><CODE>sendRedirect()</CODE></A> method should be run through
+this method. Otherwise, URL rewriting cannot be used with browsers
+which do not support cookies.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24url"><EM>$url</EM></A></STRONG><BR>
+<DD>
+the url to be encoded
+<P></P></DL>
+<DT><STRONG><A NAME="item_encodeURL"><CODE>encodeURL($url)</CODE></A></STRONG><BR>
+<DD>
+Encodes the session ID into the specified URL or, if encoding is not
+needed, returns the URL unchanged. The implementation of this method
+includes the logic to determine whether the session ID needs to be
+encoded in the URL. For example, if the borwser supports cookies, or
+session tracking is turned off, URL encoding is unnecessary.
+<P>For robust session tracking, all URLs emitted by a servlet should be
+run through this method. Otherwise, URL rewriting cannot be used with
+browsers which do not support cookies.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><EM>$url</EM></STRONG><BR>
+<DD>
+the url to be encoded
+<P></P></DL>
+<DT><STRONG><A NAME="item_sendError">sendError($sc, [$msg])</A></STRONG><BR>
+<DD>
+Sends an error response to the client using the specified status code
+and optional descriptive message, clearing the output buffer. The
+server defaults to creating the response to look like an
+HTML-formatted server error page, setting the content type to
+``text/html'', leaving cookies and other headers unmodified. If an
+error-page declaration has been made for the web application
+corresponding to the status code passed in, it will be served back in
+preference to the server-generated page.
+<P>After using this method, the response should be considered to be
+committed and should not be written to.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24sc"><EM>$sc</EM></A></STRONG><BR>
+<DD>
+the error status code
+<P></P>
+<DT><STRONG><A NAME="item_msg"><EM>msg</EM></A></STRONG><BR>
+<DD>
+the optional descriptive message; if unspecified, the standard message
+for the given status code will be used.
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIOException"><STRONG>Servlet::Util::IOException</STRONG></A></STRONG><BR>
+<DD>
+if an input or output exception occurs
+<P></P>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIllegalStateException"><STRONG>Servlet::Util::IllegalStateException</STRONG></A></STRONG><BR>
+<DD>
+if the response has already been committed
+<P></P></DL>
+<DT><STRONG><A NAME="item_sendRedirect"><CODE>sendRedirect($location)</CODE></A></STRONG><BR>
+<DD>
+Sends a temporary redirect response to the client using the specified
+redirect location URI. This method can accept relative URLs; the
+servlet container must convert the relative URL to an absolute URL
+before sending the response to the client. If the location is relative
+without a leading ``/'' the container interprets it as relative to the
+current request URI. If the location is relative with a leading ``/''
+the container interprets it as relative to the servlet container root.
+<P>After using this method, the response should be considered to be
+committed and should not be written to.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24location"><EM>$location</EM></A></STRONG><BR>
+<DD>
+the redirect location URL
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::Util::IOException</STRONG></STRONG><BR>
+<DD>
+if an input or output exception occurs
+<P></P>
+<DT><STRONG><STRONG>Servlet::Util::IllegalStateException</STRONG></STRONG><BR>
+<DD>
+if the response has already been committed
+<P></P></DL>
+<DT><STRONG><A NAME="item_setDateHeader">setDateHeader($name, $date)</A></STRONG><BR>
+<DD>
+Sets a respone header with the given name and date-value. The date is
+specified in terms of seconds since the epoch. If the header has
+already been set, the new value overwrites the previous one. The
+<A HREF="#item_containsHeader"><CODE>containsHeader()</CODE></A> method can be used to test for the presence of a
+header before setting its value.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><EM>$name</EM></STRONG><BR>
+<DD>
+the name of the header
+<P></P>
+<DT><STRONG><EM>$date</EM></STRONG><BR>
+<DD>
+the header value
+<P></P></DL>
+<DT><STRONG><A NAME="item_setHeader">setHeader($name, $value)</A></STRONG><BR>
+<DD>
+Sets a response header with the given name and value. If the header
+has already been set, the new value overwrites the previous one. The
+<A HREF="#item_containsHeader"><CODE>containsHeader()</CODE></A> method can be used to test for the presence of a
+header before setting its value.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><EM>$name</EM></STRONG><BR>
+<DD>
+the name of the header
+<P></P>
+<DT><STRONG><A NAME="item_%24value"><EM>$value</EM></A></STRONG><BR>
+<DD>
+the header value
+<P></P></DL>
+<DT><STRONG><A NAME="item_setStatus"><CODE>setStatus($sc)</CODE></A></STRONG><BR>
+<DD>
+Sets the status code for this response. This method is used to set the
+return status code when there is no error (for example, for the status
+codes <EM>SC_OK</EM> or <EM>SO_MOVED_TEMPORARILY</EM>). If there is an error, and
+the caller wishes to invoke an error-page defined in the web
+application, the <A HREF="#item_sendError"><CODE>sendError()</CODE></A> method should be used instead.
+<P>The container clears the output buffer and sets the Location header,
+preserving cookies and other headers.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><EM>$sc</EM></STRONG><BR>
+<DD>
+the status code
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../api/Servlet/ServletResponse.html">the Servlet::ServletResponse manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

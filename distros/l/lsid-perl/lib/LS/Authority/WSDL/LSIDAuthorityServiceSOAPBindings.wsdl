@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<!-- 
+LSID SOAP Binding Standard for LSIDAuthorityServicePortType
+
+Jordi Albornoz
+16 October 2003 - Initial Draft
+17 October 2003 - Removed getAuthorityVersion
+24 October 2003 - Minor cosmetic changes
+-->
+
+<definitions xmlns:tns="http://www.omg.org/LSID/2003/AuthorityServiceSOAPBindings"
+		targetNamespace="http://www.omg.org/LSID/2003/AuthorityServiceSOAPBindings"
+		xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+		xmlns="http://schemas.xmlsoap.org/wsdl/"
+		xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+		xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+		xmlns:sns="http://www.omg.org/LSID/2003/Standard/WSDL">
+
+	<import namespace="http://www.omg.org/LSID/2003/Standard/WSDL" location="LSIDPortTypes.wsdl" />
+
+	<binding name="LSIDAuthoritySOAPBinding" type="sns:LSIDAuthorityServicePortType">
+		<soap:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http" />
+		<operation name="getAvailableServices">
+			<soap:operation />
+			<input>
+				<soap:body use="literal" namespace="http://www.omg.org/LSID/2003/AuthorityServiceSOAPBindings" />
+			</input>
+			<output>
+				<mime:multipartRelated>
+					<mime:part>
+						<soap:body use="literal" namespace="http://www.omg.org/LSID/2003/AuthorityServiceSOAPBindings" />
+					</mime:part>
+					<mime:part>
+						<mime:content part="wsdl" type="application/xml" />
+					</mime:part>
+				</mime:multipartRelated>
+			</output>
+		</operation>
+	</binding>
+</definitions>

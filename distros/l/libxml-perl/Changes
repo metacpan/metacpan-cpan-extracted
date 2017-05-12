@@ -1,0 +1,113 @@
+Revision history for Perl extension libxml
+
+Backwards incompatible changes are marked with a `*'.
+
+ToDo
+        - XML::ESISParser: include Robert Braddock's update for OpenSP,
+	  in email 25Jul
+	- XML::Parser::PerlSAX doesn't pass ParseParamEnt to
+	  XML::Parser, inspired by a request by Paul Mahoney
+	  <ptm@xact.co.uk>
+	- switch Data::Grove::Visitor to use UNIVERSAL::can instead of
+	  $self->{'has'}, suggested by Mike Richardson
+	  <mike@quaking.demon.co.uk>
+	- no modules are yet supporting SAX2
+	- XML::Parser::PerlSAX doesn't implement ErrorHandler, it
+	  should at least call fatal_error() if XML::Parser dies;
+	  reported by Craig N. Caroon <caroon@caroon.nando.net>
+
+0.08  Tue Oct 21 10:54:18 CDT 2003
+	- added Perl SAX 2.0 Binding
+	- XML::ESISParser: add -E0 to nsgmls options so that nsgmls
+	  doesn't quit after 200 errors.  Add more detail to command
+	  character error message.  Suggested by Charles Thayer
+	  <thayer@mediabridge.com>.
+	- fixes
+	  - Data::Grove::Visitor: children_accept_name was not
+	    returning any data in some cases; reported by Laurent
+            CAPRANI <caprani@multimania.com>
+	  - XML::SAX2Perl: typo in startElement; reported by Mark
+	    A. Hershberger <mhershb@mcdermott.com>
+          - t/stream.t Test 11 fails due to 8-bit characters on Perl
+            5.6, first reported by Ed Arnold <era@ucar.edu>
+
+0.07  Tue Feb 22 14:24:52 CST 2000
+	- doc/index.html: libxml-perl site index
+	- doc/mirror.sh: creates a libxml-perl mirror site
+	- fixes
+	  - all modules: release script didn't insert version numbers
+	    in Perl modules.  Reported by Enno Derksen <enno@att.com>
+	  - doc/modules.xml: well-formedness errors.  Reported by
+	    KangChan Lee <dolphin@ce.cnu.ac.kr>
+
+0.06  Wed Dec 22 15:14:39 CST 1999
+	- all modules: add $VERSION.  Suggested by Michael Koehne
+	  <kraehe@copyleft.de>
+	- XML::Parser::PerlSAX: add UseAttributeOrder option and
+          AttributeOrder and Defaulted properties to start_element()
+          handler.  Suggested by Enno Derksen <enno@att.com>
+	- XML::Parser::PerlSAX: add start_cdata, end_cdata, and
+	  entity_reference events
+	- XML::PatAct::Amsterdam: added Output and AsString options,
+	  added support for replacing attributes
+	- Data::Grove: add a Data::Grove::Characters class to act as a
+	  default grove object for containing characters.
+	- fixes
+	  - XML::PatAct::ToObjects: removed leftover debugging statement
+	  - XML::ESISParser: report record end as characters if no
+	    record_end() handler
+	  - XML::Parser::PerlSAX: For attribute list declarations, now
+	    correctly calls the attlist_decl() method and passes the
+	    ElementName property, it used to call entity_decl()
+	    passing EntityName.  Reported by Enno Derksen
+	    <enno@att.com> and Colin Muller <colin@durbanet.co.za>
+
+0.05  Mon Aug 16 11:02:32 CDT 1999
+	- Major update to PerlSAX.pod
+          - added an introduction
+          - added a ``Deviations from the Java version'' section
+	  * re-added the `set_document_locator()' handler method
+	  - added arguments to method synopses
+	  - attributed most of the content to the SAX 1.0 JavaDoc
+	  - minor typos
+	- XML::Handler::XMLWriter: a new PerlSAX handler for writing
+	  readable XML (in contrast to Canonical XML)
+	- XML::Handler::Subs: a new PerlSAX handler base class for
+	  calling user-defined subs
+	- XML::Handler::Sample: this is a template for creating
+	  PerlSAX handlers, it is now in the Public Domain
+	- XML::PatAct::ToObjects: add CopyAttributes option, add
+	  -grove-contents option
+	- all PatAct modules can now take parameters as either a list
+	  of key, value pairs or a hash
+	- fixes
+	  - XML::ESISParser wasn't testing handlers for what methods
+	    they support
+	  - XML::Parser::PerlSAX wasn't capturing XML::Parser Element
+	    events
+
+0.04  Wed Aug 11 10:03:00 CDT 1999
+	- README: updated with PatAct modules
+	- added Creating PatAct Modules and Using PatAct Modules docs
+	- added XML::PatAct::ActionTempl, XML::PatAct::Amsterdam,
+	  XML::PatAct::MatchName, XML::PatAct::PatternTempl,
+	  XML::PatAct::ToObjects
+	- added schema.pl and schema.xml examples
+	- added schema.t test
+	- fixes
+	  - XML::Parser::PerlSAX and XML::ESISParser were not passing
+	    a hash for start_document() or end_document() per spec
+	  - t/canon_xml_writer.t, t/xp_sax.t: added CVS ID
+
+0.03  Wed May 26 19:49:46 CDT 1999
+	- added XML::Handler::CanonXMLWriter and test
+
+0.02  Mon May 24 18:02:00 CDT 1999
+	- renamed package from `libxml' to `libxml-perl'
+	- added doc/modules.xml
+	- added doc/UsingPerlSAX.pod and example files
+	- moved PerlSAX.pod and interface-style.pod to `doc/'
+	- renamed Data::Grove::Tied to Data::Grove::Parent
+
+0.01  Fri May  7 14:59:07 CDT 1999
+	- original version

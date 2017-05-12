@@ -1,0 +1,42 @@
+PREREQUISITES
+
+    Perl
+
+        Perl version 5.8.1 or later.
+        The latest version of Perl is available from http://www.perl.com/.
+
+    Perl Modules
+
+        There are no non-standard Perl modules required by this module.
+
+INSTALLATION
+
+    To install this module, cd to the directory that contains this INSTALL file
+    and type the following:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    Normally when Makefile.PL is run it will run Configure which will ask some
+    questions about your system.  The results of these questions will be stored
+    in a file called libnet.cfg which will be installed alongside the other perl
+    modules in this distribution.  Makefile.PL will run Configure in an
+    interactive mode unless these exists a file called libnet.cfg in the build
+    directory or Makefile.PL itself is being run non-interactively or via cpan,
+    cpanp or cpanm.
+
+    If you are on a system which cannot run this script you can create an empty
+    file to make Makefile.PL skip running Configure.  If you want to keep your
+    existing settings and not run interactivly then simply run:
+
+        perl Configure -d
+
+    before running Makefile.PL.
+
+    On Windows, you will need to use "nmake" or "dmake" rather than "make" in
+    the commands above, depending on what your perl was built with.  To
+    determine which make program was used to build your perl type the following:
+
+        perl -V:make

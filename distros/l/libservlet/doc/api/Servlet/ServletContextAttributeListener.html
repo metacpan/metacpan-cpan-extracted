@@ -1,0 +1,94 @@
+<HTML>
+<HEAD>
+<TITLE>Servlet::ServletContextAttributeListener - context attribute listener interface</TITLE>
+<LINK REL="stylesheet" HREF="../../libservlet.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Servlet::ServletContextAttributeListener - context attribute listener interface</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  $listener-&gt;attributeAdded($event);</PRE>
+<PRE>
+  $listener-&gt;attributeReplaced($event)</PRE>
+<PRE>
+  $listener-&gt;attributeRemoved($event)</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Implementations of this interface receive notifications of changes to
+the attribute list on the servlet context of a web application. To
+receive notification events, the implementation class must be
+configured in the deployment descriptor for the web application.</P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<P>For each of the following methods, the event passed to the method is
+of type <STRONG>Servlet::ServletContextAttributeEvent</STRONG>.</P>
+<DL>
+<DT><STRONG><A NAME="item_attributeAdded"><CODE>attributeAdded($event)</CODE></A></STRONG><BR>
+<DD>
+Notification that a new attribute was added to the servlet
+context. Called after the attribute is added.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24event"><EM>$event</EM></A></STRONG><BR>
+<DD>
+an instance of <STRONG>Servlet::ContextAttributeEvent</STRONG>
+<P></P></DL>
+<DT><STRONG><A NAME="item_attributeRemoved"><CODE>attributeRemoved($event)</CODE></A></STRONG><BR>
+<DD>
+Notification that an existing attribute was removed from the servlet
+context. Called after the attribute is removed.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><EM>$event</EM></STRONG><BR>
+<DD>
+an instance of <STRONG>Servlet::ContextAttributeEvent</STRONG>
+<P></P></DL>
+<DT><STRONG><A NAME="item_attributeReplaceded"><CODE>attributeReplaceded($event)</CODE></A></STRONG><BR>
+<DD>
+Notification that an existing attribute on servlet context was
+replaced. Called after the attribute is replaced.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><EM>$event</EM></STRONG><BR>
+<DD>
+an instance of <STRONG>Servlet::ContextAttributeEvent</STRONG>
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../api/Servlet/ServletContext.html">the Servlet::ServletContext manpage</A>,
+<A HREF="../../api/Servlet/ContextAttributeEvent.html">the Servlet::ContextAttributeEvent manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

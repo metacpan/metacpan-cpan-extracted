@@ -1,0 +1,128 @@
+<HTML>
+<HEAD>
+<TITLE>Servlet::UnavailableException - servlet unavailability exception</TITLE>
+<LINK REL="stylesheet" HREF="../../libservlet.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Servlet::UnavailableException - servlet unavailability exception</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  package My::Servlet;</PRE>
+<PRE>
+  use base qw(Servlet::GenericServlet);
+  use Servlet::UnavailableException ();</PRE>
+<PRE>
+  sub service {</PRE>
+<PRE>
+      # ...</PRE>
+<PRE>
+      Servlet::UnavailableException-&gt;throw('db server inaccessible',
+                                           seconds =&gt; 30);
+  }</PRE>
+<PRE>
+  package My::ServletContainer;</PRE>
+<PRE>
+  # ...</PRE>
+<PRE>
+  eval {
+      $servlet-&gt;service($request, $response);
+  };</PRE>
+<PRE>
+  if ($@ &amp;&amp; $@-&gt;isa('Servlet::UnavailableException')) {
+      if ($@-&gt;isPermanent()) {
+          $response-&gt;sendError(410) # SC_GONE;
+          $servlet-&gt;destroy();
+      } else {
+          $response-&gt;sendError(503); # SC_SERVICE_UNAVAILABLE
+      }
+  };</PRE>
+<PRE>
+  # ...</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Defines an exception that a servlet throws to indicate that it is
+permanently or temporarily unavailable.</P>
+<P>When a servlet is permanently unavailable, something is wrong with the
+servlet, and it cannot handle requests until some action is taken. For
+example, the servlet might be configured incorrectly, or its state may
+be corrupted. A servlet should log both the error and the corrective
+action that is needed.</P>
+<P>A servlet is temporarily unavailable if it cannot handle requests
+momentarily due to some system-wide problem. For example, a third-tier
+server might not be accessible, or there may be insufficient memory or
+disk storage to handle requests. A system administrator may need to
+take corrective action.</P>
+<P>Servlet containers can safely treat both types of unavailabile
+exceptions in the same way. However, treating termporary
+unavailability effectively makes the servlet container more
+robust. Specifically, the servlet container might block requests to
+the servlet for a period of time suggested by the servlet, rather than
+rejecting them until the servlet container restarts.</P>
+<P>Extends <STRONG>Servlet::ServletException</STRONG>. See that class for a description
+of inherited methods.</P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new">new($msg, $seconds)</A></STRONG><BR>
+<DD>
+Constructs a new exception. Optional arguments include an error
+message, and an estimate of temporary unavailability in seconds. If
+<EM>seconds</EM> is not specified, the indication is that the servlet is
+permanently unavailable.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24msg"><EM>$msg</EM></A></STRONG><BR>
+<DD>
+the error message
+<P></P>
+<DT><STRONG><A NAME="item_%24seconds"><EM>$seconds</EM></A></STRONG><BR>
+<DD>
+the number of seconds that the servlet will be unavailable
+<P></P></DL>
+<DT><STRONG><A NAME="item_getUnavailableSeconds"><CODE>getUnavailableSeconds()</CODE></A></STRONG><BR>
+<DD>
+Returns the number of seconds the servlet expects to be temporarily
+unavailable, or -1 if the servlet is permanently unavailable.
+<P></P>
+<DT><STRONG><A NAME="item_isPermanent"><CODE>isPermanent()</CODE></A></STRONG><BR>
+<DD>
+Returns a boolean value indicating whether the servlet is permanently
+unavailable.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../api/Servlet/ServletException.html">the Servlet::ServletException manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,166 @@
+<HTML>
+<HEAD>
+<TITLE>Servlet::ServletOutputStream - servlet output stream interface</TITLE>
+<LINK REL="stylesheet" HREF="../../libservlet.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Servlet::ServletOutputStream - servlet output stream interface</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  $stream-&gt;print($string);</PRE>
+<PRE>
+  $stream-&gt;println();
+  $stream-&gt;println($string);</PRE>
+<PRE>
+  $stream-&gt;write($string);
+  $stream-&gt;write($string, $length);
+  $stream-&gt;write($string, $length, $offset);</PRE>
+<PRE>
+  $stream-&gt;flush();</PRE>
+<PRE>
+  $stream-&gt;close();</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Provides an output stream for writing binary data to a servlet
+response.</P>
+<P>An output stream object is normally retrieved via
+<A HREF="../../api/Servlet/ServletResponse.html#getoutputstream">getOutputStream in the Servlet::ServletResponse manpage</A>.</P>
+<P><STRONG>NOTE:</STRONG> While this is an abstract class in the Java API, the Perl API
+provides it as an interface. The main difference is that the Perl
+version has no constructor. Also, it merges the methods declared in
+<STRONG>java.io.OutputStream</STRONG> and <STRONG>javax.servlet.ServletOutputStream</STRONG> into a
+single interface.</P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_close"><CODE>close()</CODE></A></STRONG><BR>
+<DD>
+Closes the stream and releases any system resources associated with
+the stream.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIOException"><STRONG>Servlet::Util::IOException</STRONG></A></STRONG><BR>
+<DD>
+if an output exception occurred
+<P></P></DL>
+<DT><STRONG><A NAME="item_flush"><CODE>flush()</CODE></A></STRONG><BR>
+<DD>
+Flushes this input stream and forces any buffered output bytes to be
+written out.
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::Util::IOException</STRONG></STRONG><BR>
+<DD>
+if an output exception occurred
+<P></P></DL>
+<DT><STRONG><A NAME="item_print"><CODE>print($value)</CODE></A></STRONG><BR>
+<DD>
+Writes a scalar value to the client, with no carriage return-line feed
+(CRLF) character at the end.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24value"><EM>$value</EM></A></STRONG><BR>
+<DD>
+the value to send to the client
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::Util::IOException</STRONG></STRONG><BR>
+<DD>
+if an output exception occurred
+<P></P></DL>
+<DT><STRONG><A NAME="item_println"><CODE>println([$value])</CODE></A></STRONG><BR>
+<DD>
+Writes a scalar value to the client, if specified, followed by a
+carriage return-line feed (CRLF) character.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><EM>$value</EM></STRONG><BR>
+<DD>
+the (optional) value to send to the client
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::Util::IOException</STRONG></STRONG><BR>
+<DD>
+if an output exception occurred
+<P></P></DL>
+<DT><STRONG><A NAME="item_write"><CODE>write($value)</CODE></A></STRONG><BR>
+<DD>
+<DT><STRONG>write($value, $length)</STRONG><BR>
+<DD>
+<DT><STRONG>write($value, $length, $offset)</STRONG><BR>
+<DD>
+Writes the scalar $value to the stream.
+<P>If no arguments are specified, functions exactly equivalently to
+<A HREF="#item_print"><CODE>print()</CODE></A>.</P>
+<P>If <EM>$length</EM> is specified, writes that many bytes from <EM>$value</EM>. If
+<EM>$offset</EM> is specified, starts writing that many bytes from the
+beginning of <EM>$value</EM>. <EM>$offset</EM> and <EM>$length</EM> must not be negative,
+and <EM>$length</EM> must not be greater than the amount of data in
+<EM>$value</EM> starting from <EM>$offset</EM>.</P>
+<P>Blocks until input data is available, the end of the stream is
+detected, or an exception is thrown.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><EM>$value</EM></STRONG><BR>
+<DD>
+a scalar value to be written
+<P></P>
+<DT><STRONG><A NAME="item_%24length"><EM>$length</EM></A></STRONG><BR>
+<DD>
+the maximum number of bytes to write
+<P></P>
+<DT><STRONG><A NAME="item_%24offset"><EM>$offset</EM></A></STRONG><BR>
+<DD>
+the location in <EM>$value</EM> where data is read from
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::Util::IOException</STRONG></STRONG><BR>
+<DD>
+if an input exception occurs
+<P></P>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIndexOutOfBoundsException"><STRONG>Servlet::Util::IndexOutOfBoundsException</STRONG></A></STRONG><BR>
+<DD>
+if <EM>$buffer</EM> is specified as <EM>undef</EM>
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../api/Servlet/ServletResponse.html">the Servlet::ServletResponse manpage</A>,
+<A HREF="../../api/Servlet/Util/Exception.html">the Servlet::Util::Exception manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

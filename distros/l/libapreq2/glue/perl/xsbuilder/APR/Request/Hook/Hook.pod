@@ -1,0 +1,94 @@
+=for testing
+  ok(1);
+
+=head1 NAME
+
+APR::Request::Hook - wrapper for libapreq2's hook API.
+
+
+
+
+=head1 SYNOPSIS
+
+  use APR::Request::Hook;
+
+
+
+
+=head1 DESCRIPTION
+
+
+This manpage documents version 2.13
+of the APR::Request::Hook package.
+
+
+
+
+=head1 METHODS
+
+APR::Request::Hook
+
+
+
+
+=head2 disable_uploads
+
+    APR::Request::Hook->disable_uploads($pool)
+    APR::Request::Hook->disable_uploads($pool, $next)
+
+Hook which returns APREQ_ERROR_GENERAL 
+if a file upload field is detected. $pool
+is an APR::Pool object; $next (if present)
+is the next APR::Request::Hook in the chain.
+
+
+
+
+=head2 apr_xml_parser
+
+    APR::Request::Hook->apr_xml_parser($pool)
+    APR::Request::Hook->apr_xml_parser($pool, $next)
+
+Xml parser hook.  $pool is an APR::Pool object;
+$next (if present) is the next APR::Request::Hook
+in the chain.
+
+
+
+
+=head2 discard_brigade
+
+    APR::Request::Hook->discard_brigade($pool)
+    APR::Request::Hook->discard_brigade($pool, $next)
+
+Hook which discards the brigade it receives from the parser.
+$pool is an APR::Pool object; $next (if present) is the next
+APR::Request::Hook in the chain.
+
+
+
+
+=head1 SEE ALSO
+
+L<< APR::Request >>, L<< APR::Request::Parser >>
+
+
+
+
+=head1 COPYRIGHT
+
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+

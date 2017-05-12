@@ -1,0 +1,88 @@
+0.35 Wed Dec 31 21:40:12 PST 2014
+ - Update copyright years
+
+0.34 Wed Dec 31 15:53:28 PST 2014
+ - New doc standard.
+
+0.33 Fri Dec 26 21:39:28 PST 2014
+ - New zd style. About.
+
+0.32 Sat Aug 16 16:30:06 PDT 2014
+ - Change 'See' to 'See Also' in doc
+
+0.31 Sat Aug 16 11:31:00 PDT 2014
+ - Meta 0.0.2
+
+0.30 Fri Aug 15 16:01:53 PDT 2014
+ - Add t/000-compile-modules.t
+ - CPAN Day 2014 - 21 Release Salute!
+
+0.29 Fri Aug 15 13:55:47 PDT 2014
+ - Timed Zilla-Dist Massive Attack test II
+
+0.28 Fri Aug 15 13:51:09 PDT 2014
+ - Timed Zilla-Dist Massive Attack test
+
+0.27 Fri Aug  8 19:22:19 PDT 2014
+ - Fix swim errors
+
+0.26 Sat Aug  2 16:09:34 PDT 2014
+ - Remove old doc section
+
+0.25 Wed Jul 30 15:47:42 PDT 2014
+ - Switch IRC to
+
+0.24 Thu Jul 24 10:01:31 PDT 2014
+ - Add travis badge to doc
+ - Small doc changes
+
+0.23 Tue Jul 15 11:12:25 PDT 2014
+ - Fix Meta and add Contributing file
+
+0.22 Fri Jun 27 21:19:32 PDT 2014
+ - Switch to Zilla::Dist and cleanup
+
+0.21 Thu Sep 22 00:00:30 CEST 2011
+ - Minor tweaks.
+ - Released from Liz++ and Wendy++'s fitness room. On the upper body
+   machine!
+
+0.20 Tue May 31 20:35:50 EST 2011
+ - Rerelease with Module::Package 0.19
+ - Change Makefile.PL to new call style.
+
+0.19 Mon May 30 15:24:04 EST 2011
+ - Rerelease with Module::Package 0.17
+ - 3rd time's a charm
+
+0.18 Sun May 29 23:57:43 EST 2011
+ - Rerelease with Module::Package 0.16
+
+0.17 Sat May 28 16:22:02 EST 2011
+ - Rerelease with Module::Package 0.14
+
+0.16 Sat May 28 03:43:09 EST 2011
+ - Didn't need Test::Base
+
+0.15 Sat May 28 03:38:55 EST 2011
+ - Use Module::Package
+
+0.14 Mon May 23 17:55:50 EST 2011
+ - Use requires_from in Makefile.PL
+ - Fix warning in test.
+
+0.13 Thu May 19 00:01:18 EST 2011
+ - Support hashes, arrays, and nested refs properly
+ - Thanks to rafl++ and rjbs++ for pointing out the bugs
+
+0.12 Wed May 18 15:18:27 EST 2011
+ - Use Module::Package
+
+0.11 Mon May 16 22:16:38 EST 2011
+ - requires PadWalker
+ - inc::Package
+ - stardoc_clean_pod
+
+0.10 Mon May 16 22:16:38 EST 2011
+ - First Release
+

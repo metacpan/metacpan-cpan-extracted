@@ -1,0 +1,84 @@
+# vim: syntax=perl
+###
+###
+
+###
+### Header section
+###
+
+
+%%
+
+###
+### Rules section
+###
+
+# this is a single command line
+line
+	: statement {
+		# execute the command
+		# currently can't deal with multiline commands
+		#print "passing [", join(", ", @{$_[1]}), "] to $Net::LDAP::Shell::SHELL\n";
+		#return @{$_[1]};
+		$Net::LDAP::Shell::SHELL->command(@{$_[1]});
+		$_[0]->YYData->{'lexer'}->start("INITIAL");
+	}
+	;
+
+statement
+	: name arguments {
+		return [ $_[1], @{ $_[2] } ];
+	}
+	| name {
+		#print "NAME: passing $_[1]\n";
+		return [ $_[1], ];
+	}
+	;
+
+name
+	: NAME {
+		#$_[0]->YYData->{'lexer'}->start("INCOMMAND");
+		Parse::Lex->inclusive('FIRSTWORD');
+		$_[0]->YYData->{'lexer'}->end("FIRSTWORD");
+		return $_[1];
+	}
+	;
+
+arguments
+	: arguments string {
+		return [ @{ $_[1] }, $_[2] ];
+	}
+	| string {
+		#print "string: passing $_[1]\n";
+		return [ $_[1] ];
+	}
+	;
+
+#assignment
+#	: NAME EQUALS string {
+#		return [ $_[1], $_[3] ];
+#	}
+#	;
+
+string
+	: DQSTRING {
+		#print "DQSTRING: passing $_[1]\n";
+		return $_[1];
+	}
+	| SQSTRING {
+		#print "SQSTRING: passing $_[1]\n";
+		return $_[1];
+	}
+	| STRING {
+		#print "STRING: passing $_[1]\n";
+		return $_[1];
+	}
+	;
+
+%%
+
+###
+### Footer section
+###
+
+

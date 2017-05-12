@@ -1,0 +1,75 @@
+=head1 Using PatAct Modules
+
+This document is targeted towards people who want to write scripts or
+modules that use pattern and action modules.  If you want to create a
+new pattern or action module, please see ``Creating PatAct Modules.''
+
+You would want to use pattern/action modules if you want to apply a
+complex set of patterns or queries against an XML instance and perform
+actions associated with those patterns or queries.  To be able to use
+pattern/action modules you will need a pattern-matching module that
+supports the format of the pattern or query language you can use and
+an action module that will perform the types of actions you need to
+perform.
+
+Available pattern-matching modules are:
+
+  XML::PatAct::
+  ::MatchName    Simple element name, element hierarchy matching
+
+Available action modules are:
+
+  XML::PatAct::
+  ::ToObjects    Convert XML instances into Perl objects
+  ::Amsterdam    Simplistic style-sheet using before/after strings
+
+Using pattern/action modules involves loading the modules, creating a
+pattern/action list, creating instances of the pattern and matching
+modules, and then starting a parse using the matching module as a
+handler:
+
+  use XML::Parser::PerlSAX;
+  use XML::PatAct::MatchName;
+  use XML::PatAct::ToObjects;
+
+  my $patterns = [
+      'schema'      => [ qw{ -holder                    } ],
+      'table'       => [ qw{ -make Schema::Table        } ],
+      'name'        => [ qw{ -field Name -as-string     } ],
+  ];
+
+  my $matcher = XML::PatAct::MatchName->new( Patterns => $patterns );
+  my $handler = XML::PatAct::ToObjects->new( Patterns => $patterns,
+                                             Matcher => $matcher);
+
+  my $parser = XML::Parser::PerlSAX->new( Handler => $handler );
+  my $schema = $parser->parse(Source => { SystemId => $ARGV[0] } );
+
+The example above use the MatchName and ToObjects pattern and action
+modules.  The pattern list contains pairs of patterns and actions in
+the format specified by MatchName and ToObjects, other modules will
+use other formats.  The patterns that MatchName supports are a simple
+element name or a hierarchy of element names.  The actions that
+ToObjects support describe how to create Perl objects from the XML
+instances.
+
+The $matcher object is an instance of XML::PatAct::MatchName.
+$matcher is created and associated with the pattern/action list that
+will be matched against.  The $handler object is an instance of
+XML::PatAct::ToObjects.  $handler is created and associated with the
+pattern/action list to be matched against as well as the pattern
+matching instance $matcher.
+
+$handler is a PerlSAX event handler.  XML::Parser::PerlSAX is used as
+the source of XML events.  Other PerlSAX event generators include
+XML::Grove::PerlSAX and XML::ESISParser.  $parser is created with the
+$handler object as it's Handler.
+
+The `parse()' method of $parser is called to run the handler (the
+matching object) to produce the output from XML::PatAct::ToObjects,
+which is a Perl object converted from XML, $schema.
+
+The above example is an abbrieviated version.  A complete example of
+usage of the MatchName and ToObjects modules, including source XML, is
+in the documentation for the XML::PatAct::ToObjects module.  The
+script and source XML are also in the examples directory.

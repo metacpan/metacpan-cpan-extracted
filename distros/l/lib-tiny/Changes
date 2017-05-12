@@ -1,0 +1,28 @@
+Revision history for lib-tiny
+
+0.7  Thu Mar 29 21:25:52 2012
+    - break POD out into its own file
+    - add lib::tiny::findbin v0.1
+    
+0.6  Thu Apr  3 20:55:36 2008
+       make lib.pm test eval'd and SKIP:able since at least one 5.00505 perl choked on lib->import
+       fix test mkdir call to be old compat as well
+
+0.5  Wed Apr  2 22:27:32 2008
+       make it actually tiny, no local(), pseudo 'compile' of Config vars
+
+0.4  Tue Apr  1 09:24:03 2008
+       2 arg open in Makefile.PL for older perls
+       bumped version in README
+
+0.3  Tue Apr  1 09:05:03 2008
+       rt 34586: remove Build.PL
+       rt 34586: remove use warnings from Makefile.PL
+       rt 34586: address use strict in comments above $VERSION
+
+0.2  Tue Apr  1 08:13:34 2008
+       improve strict fake out
+       fix .in substitution leftover from draft
+
+0.1  Mon Mar 31 18:07:15 2008
+       Initial release.

@@ -1,0 +1,137 @@
+=for testing
+  ok(1);
+
+=head1 NAME
+
+APR::Request::Parser - wrapper for libapreq2's parser API.
+
+
+
+
+=head1 SYNOPSIS
+
+  use APR::Request::Parser;
+
+
+
+
+=head1 DESCRIPTION
+
+
+This manpage documents version 2.13
+of the APR::Request::Parser package.
+
+
+
+
+=head1 METHODS
+
+APR::Request::Parser
+
+
+
+
+=head2 generic
+
+    APR::Request::Parser->generic($pool, $ba, $ct)
+    APR::Request::Parser->generic($pool, $ba, $ct, $blim)
+    APR::Request::Parser->generic($pool, $ba, $ct, $blim, $tdir)
+    APR::Request::Parser->generic($pool, $ba, $ct, $blim, $tdir, $hook)
+
+Noop-parser that collects everything into a single,
+internal parameter.  Here $pool is an APR::Pool object, $ba is
+an APR::BucketAlloc object, and $ct is the Content-Type
+header of the request.  Optionally $blim is the brigade in-memory limit,
+$tdir is the path to the temporary directory, and $hook is an 
+APR::Request::Hook object.
+
+
+
+
+=head2 headers
+
+    APR::Request::Parser->headers($pool, $ba, $ct)
+    APR::Request::Parser->headers($pool, $ba, $ct, $blim)
+    APR::Request::Parser->headers($pool, $ba, $ct, $blim, $tdir)
+    APR::Request::Parser->headers($pool, $ba, $ct, $blim, $tdir, $hook)
+
+RFC 822 header parser.  Here $pool is an APR::Pool object, $ba is
+an APR::BucketAlloc object, and $ct is the Content-Type
+header of the request.  Optionally $blim is the brigade in-memory limit,
+$tdir is the path to the temporary directory, and $hook is an 
+APR::Request::Hook object.
+
+
+
+
+=head2 urlencoded
+
+    APR::Request::Parser->urlencoded($pool, $ba, $ct)
+    APR::Request::Parser->urlencoded($pool, $ba, $ct, $blim)
+    APR::Request::Parser->urlencoded($pool, $ba, $ct, $blim, $tdir)
+    APR::Request::Parser->urlencoded($pool, $ba, $ct, $blim, $tdir, $hook)
+
+x-www-form-urlencoded parser.  Here $pool is an APR::Pool object, $ba is
+an APR::BucketAlloc object, and $ct is the Content-Type
+header of the request.  Optionally $blim is the brigade in-memory limit,
+$tdir is the path to the temporary directory, and $hook is an 
+APR::Request::Hook object.
+
+
+
+=head2 multipart
+
+    APR::Request::Parser->multipart($pool, $ba, $ct)
+    APR::Request::Parser->multipart($pool, $ba, $ct, $blim)
+    APR::Request::Parser->multipart($pool, $ba, $ct, $blim, $tdir)
+    APR::Request::Parser->multipart($pool, $ba, $ct, $blim, $tdir, $hook)
+
+Multipart parser.  Here $pool is an APR::Pool object, $ba is
+an APR::BucketAlloc object, and $ct is the Content-Type
+header of the request.  Optionally $blim is the brigade in-memory limit,
+$tdir is the path to the temporary directory, and $hook is an 
+APR::Request::Hook object.
+
+
+
+
+=head2 default
+
+    APR::Request::Parser->default($pool, $ba, $ct)
+    APR::Request::Parser->default($pool, $ba, $ct, $blim)
+    APR::Request::Parser->default($pool, $ba, $ct, $blim, $tdir)
+    APR::Request::Parser->default($pool, $ba, $ct, $blim, $tdir, $hook)
+
+Default parser.  Here $pool is an APR::Pool object, $ba is
+an APR::BucketAlloc object, and $ct is the Content-Type
+header of the request.  Optionally $blim is the brigade in-memory limit,
+$tdir is the path to the temporary directory, and $hook is an 
+APR::Request::Hook object.
+
+
+
+
+=head1 SEE ALSO
+
+L<< APR::Request >>, L<< APR::Request::Hook >>
+
+
+
+
+=head1 COPYRIGHT
+
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+

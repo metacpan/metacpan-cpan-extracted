@@ -1,0 +1,62 @@
+Mac OS X 10.2 and Later
+=======================
+
+On Mac OS X 10.2.x Jaguar and later, the normal Perl build of libapreq should
+work. Note that you'll need Apache::TestMM, libwwwperl, and URI installed in
+order to run "make test". It's also a good idea to use the "-apxs" argument to
+Makefile.PL so that "make test" knows where to find and start your Apache
+server. This is especially true if you've compiled and installed your own
+Apache.
+
+% perl Makefile.PL -apxs /usr/sbin/apxs
+% make
+% make test
+% sudo make install
+
+Mac OS X 10.1
+=============
+
+On Mac OS X 10.1, the libapreq API must be statically compiled into the Apache
+binary using the experimental patch in the patches directory. This means that
+libapreq cannot be used with Apple's Apache install; a new Apache server must
+be built from source, instead.
+
+To apply the patch to the Apache sources (assuming the apache-1.3.x source is
+along side of the libapreq-1.x source):
+
+% cd apache-1.3.x
+% patch -p0 < ../libapreq-1.x/patches/apache-1.3+apreq.patch
+% cp ../libapreq-1.x/c/*.[ch] src/lib/apreq
+
+If you've installed Perl and mod_perl in the default Darwin locations, you'll
+next need to set the PER5LIB environment variable to "/Library/Perl" so that
+the new mod_perl modules you install are preferred to the ones in
+/System/Library/Perl when Apache compiles. Use "setenv" under tsch:
+
+% setenv PERL5LIB /Library/Perl
+
+Or "export" under bash or zsh:
+
+% export PER5LIB=/Library/Perl
+
+Now build and install Apache (+modperl) as normal. Make sure that you use
+APACI, as the libapreq patch requires it. For example, if you're letting
+mod_perl's Makefile build Apache, configure it like this:
+
+% cd mod_perl-1.xx
+% perl Makefile.PL USE_APACI=1 EVERYTHING=1 APACI_ARGS="--without-execstrip"
+
+Be sure to pass the "--without-execstrip" argument to to the
+APACI_ARGS; this seems to be required to compile Apache with mod_perl
+on Mac OS X. If you compile Apache by hand, you'll need to pass the
+"--without-execstrip" option to its ./configure script.
+
+And finally, the normal Perl build of libapreq should work. Note that you'll
+need libwwwperl and URI installed in order to run make test.
+
+% perl Makefile.PL
+% make
+% make test
+% sudo make install
+
+

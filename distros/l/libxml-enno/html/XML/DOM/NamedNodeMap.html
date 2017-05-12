@@ -1,0 +1,116 @@
+<HTML><HEAD><TITLE>XML::DOM::NamedNodeMap - A hash table interface for XML::DOM</TITLE></HEAD><BODY><H1><A NAME="NAME">NAME
+
+</A></H1><P>XML::DOM::NamedNodeMap - A hash table interface for XML::DOM
+
+<P><HR><H1><A NAME="DESCRIPTION">DESCRIPTION
+
+</A></H1><P>Objects implementing the NamedNodeMap interface are used to represent
+collections of nodes that can be accessed by name. Note that
+NamedNodeMap does not inherit from NodeList; NamedNodeMaps are not
+maintained in any particular order. Objects contained in an object
+implementing NamedNodeMap may also be accessed by an ordinal index, but
+this is simply to allow convenient enumeration of the contents of a
+NamedNodeMap, and does not imply that the DOM specifies an order to
+these Nodes.
+
+<P>Note that in this implementation, the objects added to a NamedNodeMap
+are kept in order.
+
+<H2><A NAME="METHODS">METHODS
+
+</A></H2><DL><DT><A NAME="getNamedItem_name_"><STRONG><P>getNamedItem (name)
+
+</STRONG></A><DD>Retrieves a node specified by name.
+
+<P>Return Value: A Node (of any type) with the specified name, or undef if
+the specified name did not identify any node in the map.
+
+<DT><A NAME="setNamedItem_arg_"><STRONG><P>setNamedItem (arg)
+
+</STRONG></A><DD>Adds a node using its nodeName attribute.
+
+<P>As the nodeName attribute is used to derive the name which
+the node must be stored under, multiple nodes of certain
+types (those that have a "special" string value) cannot be
+stored as the names would clash. This is seen as preferable
+to allowing nodes to be aliased.
+
+<P>Parameters:
+ <I>arg</I>  A node to store in a named node map. 
+
+<P>The node will later be accessible using the value of the nodeName
+attribute of the node. If a node with that name is
+already present in the map, it is replaced by the new one.
+
+<P>Return Value: If the new Node replaces an existing node with the same
+name the previously existing Node is returned, otherwise undef is returned.
+
+<P>DOMExceptions:
+
+<DL><DT><A NAME="_WRONG_DOCUMENT_ERR_"><STRONG><P>* WRONG_DOCUMENT_ERR
+
+</STRONG></A><DD>Raised if arg was created from a different document than the one that 
+created the NamedNodeMap.
+
+<DT><A NAME="_NO_MODIFICATION_ALLOWED_ERR_"><STRONG><P>* NO_MODIFICATION_ALLOWED_ERR
+
+</STRONG></A><DD>Raised if this NamedNodeMap is readonly.
+
+<DT><A NAME="_INUSE_ATTRIBUTE_ERR_"><STRONG><P>* INUSE_ATTRIBUTE_ERR
+
+</STRONG></A><DD>Raised if arg is an Attr that is already an attribute of another Element object.
+The DOM user must explicitly clone Attr nodes to re-use them in other elements.
+
+</DL><DT><A NAME="removeNamedItem_name_"><STRONG><P>removeNamedItem (name)
+
+</STRONG></A><DD>Removes a node specified by name. If the removed node is an
+Attr with a default value it is immediately replaced.
+
+<P>Return Value: The node removed from the map or undef if no node with
+such a name exists.
+
+<P>DOMException:
+
+<DL><DT><A NAME="_NOT_FOUND_ERR_"><STRONG><P>* NOT_FOUND_ERR
+
+</STRONG></A><DD>Raised if there is no node named name in the map.
+
+</DL><DT><A NAME="item_index_"><STRONG><P>item (index)
+
+</STRONG></A><DD>Returns the indexth item in the map. If index is greater than
+or equal to the number of nodes in the map, this returns undef.
+
+<P>Return Value: The node at the indexth position in the NamedNodeMap, or
+undef if that is not a valid index.
+
+<DT><A NAME="getLength_"><STRONG><P>getLength
+
+</STRONG></A><DD>Returns the number of nodes in the map. The range of valid child node
+indices is 0 to length-1 inclusive.
+
+</DL><H2><A NAME="Additional_methods_not_in_the_DOM_Spec">Additional methods not in the DOM Spec
+
+</A></H2><DL><DT><A NAME="getValues_"><STRONG><P>getValues
+
+</STRONG></A><DD>Returns a NodeList with the nodes contained in the NamedNodeMap.
+The NodeList is "live", in that it reflects changes made to the NamedNodeMap.
+
+<P>When this method is called in a list context, it returns a regular perl list
+containing the values. Note that this list is not "live". E.g.
+
+<PRE> @list = $map-&gt;getValues;	 # returns a perl list
+ $nodelist = $map-&gt;getValues;    # returns a NodeList (object ref.)
+ for my $val ($map-&gt;getValues)   # iterate over the values
+
+</PRE><DT><A NAME="getChildIndex_node_"><STRONG><P>getChildIndex (node)
+
+</STRONG></A><DD>Returns the index of the node in the NodeList as returned by getValues, or -1
+if the node is not in the NamedNodeMap.
+
+<DT><A NAME="dispose_"><STRONG><P>dispose
+
+</STRONG></A><DD>Removes all circular references in this NamedNodeMap and its descendants so the 
+objects can be claimed for garbage collection. The objects should not be used
+afterwards.
+
+</DL><P><HR><I><FONT SIZE="-1">Last updated: Fri Oct 22 18:47:28 1999</FONT></I></BODY></HTML>

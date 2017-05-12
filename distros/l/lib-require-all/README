@@ -1,0 +1,24 @@
+NAME
+    lib::require::all - A tiny pragma to load all files from a lib directory
+
+SYNOPSIS
+      perl -Mlib::require::all=lib ...
+
+DESCRIPTION
+    lib::require::all is a pragma to load all "*.pm" files in a given
+    directory ("lib" by default). The lib directory is automatically added
+    to @INC via lib pragma automatically.
+
+    Handy to preload all modules with tools like forkprove.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+COPYRIGHT
+    Copyright 2012- Tatsuhiko Miyagawa
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO

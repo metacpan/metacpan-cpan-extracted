@@ -1,0 +1,7 @@
+As of libwww-perl v6.02 you need to install the LWP::Protocol::https module
+from its own separate distribution to enable support for https://... URLs for
+LWP::UserAgent.
+
+This makes it possible for that distribution to state the required dependencies
+as non-optional.  See <https://rt.cpan.org/Ticket/Display.html?id=66838> for
+further discussion why we ended up with this solution.

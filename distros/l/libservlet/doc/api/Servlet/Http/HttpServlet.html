@@ -1,0 +1,402 @@
+<HTML>
+<HEAD>
+<TITLE>Servlet::Http::HttpServlet - HTTP servlet base class</TITLE>
+<LINK REL="stylesheet" HREF="../../../libservlet.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Servlet::Http::HttpServlet - HTTP servlet base class</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  $servlet-&gt;doDelete($request, $response);</PRE>
+<PRE>
+  $servlet-&gt;doGet($request, $response);</PRE>
+<PRE>
+  $servlet-&gt;doHead($request, $response);</PRE>
+<PRE>
+  $servlet-&gt;doOptions($request, $response);</PRE>
+<PRE>
+  $servlet-&gt;doPost($request, $response);</PRE>
+<PRE>
+  $servlet-&gt;doPut($request, $response);</PRE>
+<PRE>
+  $servlet-&gt;doTrace($request, $response);</PRE>
+<PRE>
+  my $time = $servlet-&gt;getLastModified($request);</PRE>
+<PRE>
+  $servlet-&gt;service($request, $response);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This class acts as a base class for HTTP servlets. Subclasses must
+override at least one method, usually one of these:</P>
+<DL>
+<DT><STRONG><A NAME="item_doGet"><CODE>doGet()</CODE></A></STRONG><BR>
+<DD>
+if the servlet supports HTTP GET requests
+<P></P>
+<DT><STRONG><A NAME="item_doPost"><CODE>doPost()</CODE></A></STRONG><BR>
+<DD>
+for HTTP POST requests
+<P></P>
+<DT><STRONG><A NAME="item_doPut"><CODE>doPut()</CODE></A></STRONG><BR>
+<DD>
+for HTTP PUT requests
+<P></P>
+<DT><STRONG><A NAME="item_doDelete"><CODE>doDelete()</CODE></A></STRONG><BR>
+<DD>
+for HTTP DELETE requests
+<P></P>
+<DT><STRONG><A NAME="item_init"><CODE>init()</CODE> and <CODE>destroy()</CODE></A></STRONG><BR>
+<DD>
+to manage resources that are held for the life of the servlet
+<P></P>
+<DT><STRONG><A NAME="item_getServletInfo"><CODE>getServletInfo()</CODE></A></STRONG><BR>
+<DD>
+which the servlet uses to provide information about itself
+<P></P></DL>
+<P>There's almost no reason to override the <A HREF="#item_service"><CODE>service()</CODE></A> method, which
+handles standard HTTP requests by dispatching them to the handler
+methods for each HTTP request type (the <CODE>doXXX()</CODE> methods listed
+above).</P>
+<P>Likewise, there's almost no reason to override the <A HREF="#item_doOptions"><CODE>doOptions()</CODE></A> and
+<CODE>doTrace()</CODE> methods.</P>
+<P>Servlets typically run on multithreaded servers, so be aware that a
+servlet must handle concurrent requets and be careful to synchronize
+access to shared resources. Shared resources include in-memory data
+such as instance or class variables and external objects such as
+files, database connections, and network connections. See
+<EM>perlthrtut</EM> for more information on handling multiple threads in a
+Perl program.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new()</CODE></A></STRONG><BR>
+<DD>
+Does nothing. All of the servlet initialization is done by the
+<A HREF="#item_init"><CODE>init()</CODE></A> method.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG>doDelete($request, $response)</STRONG><BR>
+<DD>
+Called by the server (via the <A HREF="#item_service"><CODE>service()</CODE></A> method) to allow a servlet
+to handle a DELETE request. The DELETE operation allows a client to
+remove a document or Web page from the server.
+<P>This method does not need to be either safe or idempotent. Operations
+requested through DELETE can have side effects for which users can be
+held accountable. When using this method, it may be useful to save a
+copy of the affected resource in temporary storage.</P>
+<P>If the request is incorrectly formatted, the method returns an HTTP
+``Bad Request'' message.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24request"><EM>$request</EM></A></STRONG><BR>
+<DD>
+the <STRONG>Servlet::Http::HttpServletRequest</STRONG> object that contains the
+client request
+<P></P>
+<DT><STRONG><A NAME="item_%24response"><EM>$response</EM></A></STRONG><BR>
+<DD>
+the <STRONG>Servlet::Http::HttpServletResponse</STRONG> object that contains the
+servlet response
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AServletException"><STRONG>Servlet::ServletException</STRONG></A></STRONG><BR>
+<DD>
+if the request cannot be handled
+<P></P>
+<DT><STRONG><A NAME="item_Servlet%3A%3AUtil%3A%3AIOException"><STRONG>Servlet::Util::IOException</STRONG></A></STRONG><BR>
+<DD>
+if an input or output error occurs
+<P></P></DL>
+<DT><STRONG>doGet($request, $response)</STRONG><BR>
+<DD>
+Called by the server (via the <A HREF="#item_service"><CODE>service()</CODE></A> method) to allow a servlet
+to handle a GET request.
+<P>Overriding this method to support a GET request also automatically
+supports an HTTP HEAD request. A HEAD request is a GET request that
+returns no body in the response, only the response headers.</P>
+<P>When overriding this method, read the request data, write the response
+headers, get the response's writer or output handle object, and
+finally, write the response data. It's best to include content type
+and encoding.</P>
+<P>The servlet container must write the headers before committing the
+response, because in HTTP the headers must be sent before the response
+body.</P>
+<P>Where possible, set the content length, to allow the servlet container
+to use a persistent connection to return its response to the client,
+improving performance. The content length is automatically set if the
+entire response fits inside the response buffer.</P>
+<P>The GET method should be safe, that is, without any side effects for
+which users are held responsible. For example, most form queries have
+no side effects. If a client request is intended to change stored
+data, the request should use some other HTTP method.</P>
+<P>The GET method should also be idempotent, meaning that it can be
+safely repeated. Sometimes making a method safe also makes it
+idempotent. For example, repeating queries is both safe and
+idempotent, but buying a product online or modifying data is neither
+safe nor idempotent.</P>
+<P>If the request is incorrectly formatted, the method returns an HTTP
+``Bad Request'' message.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><EM>$request</EM></STRONG><BR>
+<DD>
+the <STRONG>Servlet::Http::HttpServletRequest</STRONG> object that contains the
+client request
+<P></P>
+<DT><STRONG><EM>$response</EM></STRONG><BR>
+<DD>
+the <STRONG>Servlet::Http::HttpServletResponse</STRONG> object that contains the
+servlet response
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::ServletException</STRONG></STRONG><BR>
+<DD>
+if the request cannot be handled
+<P></P>
+<DT><STRONG><STRONG>Servlet::Util::IOException</STRONG></STRONG><BR>
+<DD>
+if an input or output error occurs
+<P></P></DL>
+<DT><STRONG><A NAME="item_doHead">doHead($request, $response)</A></STRONG><BR>
+<DD>
+Called by the server (via the <A HREF="#item_service"><CODE>service()</CODE></A> method) to allow a servlet
+to handle a HEAD request. The client sends a HEAD request when it
+wants to see only the headers. The HEAD method counts the output bytes
+in the response to set the content length accurately.
+<P>If you override this method, you can avoide computing the response
+body and just set the response ehaders directly to improve
+performance. Make sure the method you write is both safe and
+idempotent.</P>
+<P>If the request is incorrectly formatted, the method returns an HTTP
+``Bad Request'' message.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><EM>$request</EM></STRONG><BR>
+<DD>
+the <STRONG>Servlet::Http::HttpServletRequest</STRONG> object that contains the
+client request
+<P></P>
+<DT><STRONG><EM>$response</EM></STRONG><BR>
+<DD>
+the <STRONG>Servlet::Http::HttpServletResponse</STRONG> object that contains the
+servlet response
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::ServletException</STRONG></STRONG><BR>
+<DD>
+if the request cannot be handled
+<P></P>
+<DT><STRONG><STRONG>Servlet::Util::IOException</STRONG></STRONG><BR>
+<DD>
+if an input or output error occurs
+<P></P></DL>
+<DT><STRONG><A NAME="item_doOptions">doOptions($request, $response)</A></STRONG><BR>
+<DD>
+Called by the server (via the <A HREF="#item_service"><CODE>service()</CODE></A> method) to allow a servlet
+to handle a OPTIONS request. The OPTIONS request determines which HTTP
+methods the server supports and returns an appropriate header. For
+example, if a servlet overrides <A HREF="#item_doGet"><CODE>doGet()</CODE></A>, this method returns the
+following header:
+<PRE>
+  Allow: GET, HEAD, TRACE, OPTIONS</PRE>
+<P>There's no need to override this method unless the servlet implements
+new HTTP methods beyond those implemented by HTTP 1.1.</P>
+<P>If the request is incorrectly formatted, the method returns an HTTP
+``Bad Request'' message.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><EM>$request</EM></STRONG><BR>
+<DD>
+the <STRONG>Servlet::Http::HttpServletRequest</STRONG> object that contains the
+client request
+<P></P>
+<DT><STRONG><EM>$response</EM></STRONG><BR>
+<DD>
+the <STRONG>Servlet::Http::HttpServletResponse</STRONG> object that contains the
+servlet response
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::ServletException</STRONG></STRONG><BR>
+<DD>
+if the request cannot be handled
+<P></P>
+<DT><STRONG><STRONG>Servlet::Util::IOException</STRONG></STRONG><BR>
+<DD>
+if an input or output error occurs
+<P></P></DL>
+<DT><STRONG>doPost($request, $response)</STRONG><BR>
+<DD>
+Called by the server (via the <A HREF="#item_service"><CODE>service()</CODE></A> method) to allow a servlet
+to handle a POST request. The POST method allows the client to send
+data of unlimited length to the Web server.
+<P>When overriding this method, read the request data, write the response
+headers, get the response's writer or output handle object, and
+finally, write the response data. It's best to include content type
+and encoding.</P>
+<P>The servlet container must write the headers before committing the
+response, because in HTTP the headers must be sent before the response
+body.</P>
+<P>Where possible, set the content length, to allow the servlet container
+to use a persistent connection to return its response to the client,
+improving performance. The content length is automatically set if the
+entire response fits inside the response buffer.</P>
+<P>When using HTTP 1.1 chunked encoding (which means that the response
+has a Transfer-Encoding header), do not set the content length.</P>
+<P>This method does not need to be either safe or idempotent. Operations
+requested through POST can have side effects for which the user can be
+held accountable, for example, updating stored data or buying items
+online.</P>
+<P>If the request is incorrectly formatted, the method returns an HTTP
+``Bad Request'' message.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><EM>$request</EM></STRONG><BR>
+<DD>
+the <STRONG>Servlet::Http::HttpServletRequest</STRONG> object that contains the
+client request
+<P></P>
+<DT><STRONG><EM>$response</EM></STRONG><BR>
+<DD>
+the <STRONG>Servlet::Http::HttpServletResponse</STRONG> object that contains the
+servlet response
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::ServletException</STRONG></STRONG><BR>
+<DD>
+if the request cannot be handled
+<P></P>
+<DT><STRONG><STRONG>Servlet::Util::IOException</STRONG></STRONG><BR>
+<DD>
+if an input or output error occurs
+<P></P></DL>
+<DT><STRONG>doPut($request, $response)</STRONG><BR>
+<DD>
+Called by the server (via the <A HREF="#item_service"><CODE>service()</CODE></A> method) to allow a servlet
+to handle a Put request. The PUT operation allows a client to place a
+file on the server and is similar to sending a file by FTP.
+<P>When overriding this method, leave intact any content headers sent
+with the request (including Content-Length, Content-Type,
+Content-Transfer-Encoding, Content-Encoding, Content-Base,
+Content-Language, Content-Location, Content-MD5 and Content-Range). If
+your method cannot handle a content header, it must issue an error
+message (HTTP 501 - Not Implemented) and discard the request. For more
+information on HTTP 1.1, see RFC 2068.</P>
+<P>This method does not need to be either safe or idempotent. Operations
+that it performs can have side effects for which the user can be held
+accountable. When using this method, it may be useful to save a copy
+of the affected URL in temporary storage.</P>
+<P>If the request is incorrectly formatted, the method returns an HTTP
+``Bad Request'' message.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><EM>$request</EM></STRONG><BR>
+<DD>
+the <STRONG>Servlet::Http::HttpServletRequest</STRONG> object that contains the
+client request
+<P></P>
+<DT><STRONG><EM>$response</EM></STRONG><BR>
+<DD>
+the <STRONG>Servlet::Http::HttpServletResponse</STRONG> object that contains the
+servlet response
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::ServletException</STRONG></STRONG><BR>
+<DD>
+if the request cannot be handled
+<P></P>
+<DT><STRONG><STRONG>Servlet::Util::IOException</STRONG></STRONG><BR>
+<DD>
+if an input or output error occurs
+<P></P></DL>
+<DT><STRONG><A NAME="item_getLastModified"><CODE>getLastModified($request)</CODE></A></STRONG><BR>
+<DD>
+Returns the time the requested resource was last modified, in
+milliseconds since midnight January 1, 1970 GMT. IF the time is
+unknown, this method returns a negative number (the default).
+<P>Servlets that support HTTP GET requests and can quickly determine
+their last modification time should override this method. This makes
+browser and proxy caches work more effectively, reducing the load on
+server and network resources.</P>
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><EM>$request</EM></STRONG><BR>
+<DD>
+the <STRONG>Servlet::Http::HttpServletRequest</STRONG> object that contains the
+client request
+<P></P></DL>
+<DT><STRONG><A NAME="item_service">service($request, $response)</A></STRONG><BR>
+<DD>
+Dispatches client requests to the <EM>doXXX</EM> methods defined in this
+class. There's no need to override this method.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><EM>$request</EM></STRONG><BR>
+<DD>
+the <STRONG>Servlet::Http::HttpServletRequest</STRONG> object that contains the
+client request
+<P></P>
+<DT><STRONG><EM>$response</EM></STRONG><BR>
+<DD>
+the <STRONG>Servlet::Http::HttpServletResponse</STRONG> object that contains the
+servlet response
+<P></P></DL>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><STRONG>Servlet::ServletException</STRONG></STRONG><BR>
+<DD>
+if the request cannot be handled
+<P></P>
+<DT><STRONG><STRONG>Servlet::Util::IOException</STRONG></STRONG><BR>
+<DD>
+if an input or output error occurs
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../api/Servlet/GenericServlet.html">the Servlet::GenericServlet manpage</A>,
+<A HREF="../../../api/Servlet/Http/HttpServletRequest.html">the Servlet::Http::HttpServletRequest manpage</A>,
+<A HREF="../../../api/Servlet/Http/HttpServletResponse.html">the Servlet::Http::HttpServletResponse manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

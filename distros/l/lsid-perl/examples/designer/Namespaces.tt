@@ -1,0 +1,112 @@
+#!/usr/bin/perl
+# =====================================================================
+# Copyright (c) 2002,2003,2004 IBM Corporation 
+# All rights reserved.   This program and the accompanying materials
+# are made available under the terms of the Common Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.opensource.org/licenses/cpl.php
+# 
+# =====================================================================
+
+package Namespaces;
+
+use strict;
+use warnings;
+
+use vars qw( $CONSTRUCTORS );
+
+sub BEGIN {
+
+	$CONSTRUCTORS = [
+[% FOREACH ns IN namespaces %]
+			  '[% ns %]',
+[% END %]
+			];
+}
+
+for my $field (@{ $CONSTRUCTORS } ) {
+
+        no strict "refs";
+
+        *$field = sub {
+
+                return $field->new();
+        }
+}
+
+
+[% FOREACH ns IN namespaces %]
+package [% ns %];
+
+use strict;
+use warnings;
+
+use LS;
+use LS::Service;
+
+use base 'LS::Service::Namespace';
+
+#
+# new( ) - Construct a new namespace class for LSIDs of the
+# 		   form:
+#
+#			urn:lsid:myauthority.org:[% ns %]:object
+#
+sub new {
+
+	my $self = shift;
+
+	return $self->SUPER::new(name=> '[% ns %]');
+}
+
+
+#
+# getData( $lsid ) - This namespace's implementation of the getData method.
+#
+sub getData {
+
+	my ($self, $lsid) = @_;
+
+	#
+	# Add the code necessary to retrieve the data for the given LSID.
+	#
+	# Be sure to return an LS::Service::Response object of the results.
+	#
+	# If your namespace or LSIDs do not have data associated with them it
+	# is safe to remove this method.
+	#
+	
+	return LS::Service::Response->new(response=> 'DATA');
+}
+
+
+#
+# getMetadata( $lsid, $format ) - This namespace's implementation of the getMetdata
+#								  service method.
+#
+sub getMetadata {
+
+	my ($self, $lsid, $format) = @_;
+
+	#
+	# Add the code necessary to retrieve the metadata for the given LSID
+	#
+	# Be sure to return an LS::Service::Response object with the its
+	# output format set approriately. 
+	#
+	# If your namespace or LSIDs do not have metadata associated with them,
+	# it is safe to remove this method.
+	#
+	
+	$format = 'application/rdf+xml' if(!$format);
+	return LS::Service::Response->new(response=> '<?xml version="1.0"?>', 
+									  format=> $format);
+}
+
+
+## End namespace definition for: [% ns %]
+
+[% END %]
+
+
+1;

@@ -1,0 +1,107 @@
+Common Public License (CPL) Frequently asked questions   
+ 
+For informational purposes only
+
+June 2002   (See http://www-106.ibm.com/developerworks/library/os-cplfaq.html for latest version)
+
+This FAQ provides answers to commonly asked questions related to the CPL. It is provided for informational purposes only. It is not part of, nor does it modify, amend, or supplement the terms of the CPL. The CPL is a legal agreement that governs the rights granted to material licensed under it, so please read it carefully. If there is any conflict between this FAQ and the CPL, the terms of the CPL shall govern. This FAQ should not be regarded as legal advice. If you need legal advice, you must contact your own lawyer.
+What is the relationship between the IBM Public License (IPL) and the Common Public License (CPL)? 
+The IPL was IBM's first Open Source license. The CPL is essentially the next version of the IPL. 
+
+
+Why was the IPL written? 
+The IPL (and the CPL) goes to great lengths to support and encourage the collaborative Open Source development of the code base, while maximizing the code's ability to be used and integrated with software licensed under other licenses, including many commercial licenses. 
+
+
+Why was the CPL written? 
+The CPL was written to generalize the usage terms of the IPL so that any Open Source originator could use the terms found in the IPL . Thus, the CPL is suitable to be used by all. 
+
+
+What is the latest version of the CPL? 
+Version 1.0 is the latest version. The initial version was designated 0.5 before its widespread use with the introduction of Eclipse, an Open Source project focused on a development platform for integrated application development tools. For more information on Eclipse, visit eclipse.org. 
+
+
+Is the CPL approved by the Open Source Initiative (OSI)? 
+Yes, the CPL has been approved. Version 0.5 was approved in May 2001. Version 1.0, which corrected a minor typographical error, was posted on the OSI site in June 2002. The IPL was approved in August 1999. See the complete list of OSI-approved licenses.
+
+
+What is required for OSI license approval? 
+A license qualifies for OSI approval if it conforms to the OSI's "Open Source Definition" or "OSD." The OSD covers nine topics of concern. Chief among these is the requirement that a license not restrict any party from selling or giving away the software. Further, the Program must include source code, must allow distribution in source code as well as compiled form, and must allow modifications and derived works. Find more information on the OSD at opensource.org.
+
+
+What are the business advantages of the Open Source model? 
+An Open Source community provides a way for individuals and companies to collaborate on projects that none could achieve on their own. 
+
+
+What are the technical advantages of the Open Source model? 
+The Open Source model has the technical advantage of turning users into potential co-developers. With source code readily available, users will help you debug quickly and promote rapid code enhancements. "Given a bit of encouragement, your users will diagnose problems, suggest fixes, and help improve the code far more quickly than you could unaided." (The Cathedral and the Bazaar, Eric Steven Raymond. See http://tuxedo.org/~esr/writings/cathedral-bazaar/) 
+
+
+How are the parties defined in the CPL? 
+There are two types of parties to the CPL. They are "Contributors" and "Recipients." Contributors include an initial Contributor, who is the person or entity that creates the initial code distributed under the CPL, and subsequent Contributors, who originate changes or additions to the code (the combination referred to as the "Program"). Any person or entity that redistributes the Program is also a Contributor. Recipients include anyone who receives the Program under the CPL, including Contributors. 
+
+
+Can a Contributor remain anonymous? 
+No. Except for those who simply redistribute the Program, each Contributor must identify itself as the originator of its Contribution in a way that later Recipients will be able to readily see. 
+
+
+What rights do Contributors grant Recipients under CPL? 
+Contributors license Recipients under the rights that they have in their Contributions. 
+
+
+Does the CPL allow me to take the Source Code for a Program licensed under it and include all or part of it in another program licensed under the GNU General Public License (GPL), Berkeley Software Distribution (BSD) license or other Open Source license? 
+No. Only the owner of software can decide whether and how to license it to others. Contributors to a Program licensed under the CPL understand that source code for the Program will be made available under the terms of the CPL. Unless you are the owner of the software or have received permission from the owner, you are not authorized to apply the terms of another license to the Program by including it in a program licensed under another Open Source license. By the way, the same answer applies if you want to include source code licensed under another Open Source license in a program licensed under the CPL. 
+
+
+Can I take a Program licensed under the CPL, compile it without modification, and commercially license the result? 
+Yes. You may compile a Program licensed under the CPL without modification and commercially license the result in accordance with the terms of the CPL. 
+
+
+Do I need to include the source code for such Program with the object code distribution? 
+No. But you do need to include a statement that the source code is available from you and information on how to obtain it. 
+
+
+When I incorporate a portion of a Program licensed under the CPL into my own proprietary product distributed in object code form, can I use a single license for the full product, in other words, covering the portion of the Program plus my own code? 
+Yes. The object code for the product may be distributed under a single license as long as it references the CPL portion and complies, for that portion, with the terms of the CPL. 
+
+
+The CPL states that it can be changed by the Agreement Steward. Does a Contributor have the choice of redistributing a previously distributed Program under the old or the new version of the CPL? 
+While Contributions are licensed under the version of the License under which they are originally distributed, the CPL provides for the ability of any Contributor to choose between that version or a later version. 
+
+
+If I modify a Program licensed under the CPL, but never distribute it to anyone else, do I have to make my modifications available to others? 
+No. If you do not distribute the modified Program, you do not have to make your modifications available to others. 
+
+
+If I modify a Program licensed under the CPL and distribute the object code of the modified Program for free, must I make the source code available? 
+Yes. By distributing the modified Program, even if it is only a free version of the object code, you are obligated to make the source code to the modified Program available to others. 
+
+
+If I write a module to add to a Program licensed under the CPL and distribute the object code of the module along with the rest of the Program, must I make the source code to my module available in accordance with the terms of the CPL? 
+No, as long as the module is not a derivative work of the Program. 
+
+
+Does the CPL offer any warranty with regard to the Program? 
+No. The Program released under the CPL is provided on an "as is" basis, without warranties or conditions of any kind. 
+
+
+You didn't have the answer to my question. How can I get my question answered? 
+Please send a note to opensrc@us.ibm.com, and we will do our best to get back to you.
+
+
+The following scenarios further illustrate how the CPL works:
+
+Company X contributes the initial code and documentation distributed under the CPL. For example, the initial Eclipse code was contributed by IBM. Therefore, under the CPL, IBM is the initial Contributor and the initial Eclipse code is referred to both as IBM's Contribution, the initial code, and the Program.
+
+
+Company A redistributes the Program without changing or adding to it. Under the CPL, Company A is considered a Contributor.
+
+
+Company A changes or adds to the Program. Company A is a subsequent Contributor and the change or addition is a Contribution and becomes part of the Program.
+
+
+Company A creates a software module to be distributed in conjunction with the Program under its own license agreement. The module is not derived from the Program itself. The software module is not considered a Contribution and is not subject to the terms of the CPL.
+
+
+Company B downloads the Program from the Eclipse.org Web site. Company B is a Recipient. Under the terms of the CPL, each Contributor grants to Company B and other Recipients a royalty-free license to the Contributor's Contributions to the Program. 
+ 

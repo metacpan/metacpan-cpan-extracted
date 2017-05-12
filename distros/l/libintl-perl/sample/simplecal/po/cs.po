@@ -1,0 +1,96 @@
+# Czech translations for SimpleCal.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: SimpleCal\n"
+"Report-Msgid-Bugs-To: Edit the file PACAKGE to change this.\n"
+"POT-Creation-Date: 2013-01-14 18:14+0200\n"
+"PO-Revision-Date: 2003-07-28 04:21+0200\n"
+"Last-Translator: Jan Tomášek <jan@tomasek.cz>\n"
+"Language-Team: Czech <guido.flohr@cantanea.com>\n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../lib/SimpleCal.pm:26
+msgid "January"
+msgstr "Leden"
+
+#: ../lib/SimpleCal.pm:28
+msgid "February"
+msgstr "Únor"
+
+#: ../lib/SimpleCal.pm:30
+msgid "March"
+msgstr "Březen"
+
+#: ../lib/SimpleCal.pm:32
+msgid "April"
+msgstr "Duben"
+
+#: ../lib/SimpleCal.pm:34
+msgid "May"
+msgstr "Květen"
+
+#: ../lib/SimpleCal.pm:36
+msgid "June"
+msgstr "Červen"
+
+#: ../lib/SimpleCal.pm:38
+msgid "July"
+msgstr "Červenec"
+
+#: ../lib/SimpleCal.pm:40
+msgid "August"
+msgstr "Září"
+
+#: ../lib/SimpleCal.pm:42
+msgid "September"
+msgstr "Říjen"
+
+#: ../lib/SimpleCal.pm:44
+msgid "October"
+msgstr "Listopad"
+
+#: ../lib/SimpleCal.pm:46
+msgid "November"
+msgstr "Prosinec"
+
+#: ../lib/SimpleCal.pm:48
+msgid "December"
+msgstr "Prosinec"
+
+#: ../lib/SimpleCal.pm:70
+msgid "Sun"
+msgstr "Ne"
+
+#: ../lib/SimpleCal.pm:71
+msgid "Mon"
+msgstr "Po"
+
+#: ../lib/SimpleCal.pm:72
+msgid "Tue"
+msgstr "Út"
+
+#: ../lib/SimpleCal.pm:73
+msgid "Wed"
+msgstr "St"
+
+#: ../lib/SimpleCal.pm:74
+msgid "Thu"
+msgstr "Čt"
+
+#: ../lib/SimpleCal.pm:75
+msgid "Fri"
+msgstr "Pá"
+
+#: ../lib/SimpleCal.pm:76
+msgid "Sat"
+msgstr "So"
+
+#~ msgid "Welcome to {package}!\n"
+#~ msgstr "Vítejte v {package}!\n"
+
+#~ msgid "Bye.\n"
+#~ msgstr "Nashledanou!\n"

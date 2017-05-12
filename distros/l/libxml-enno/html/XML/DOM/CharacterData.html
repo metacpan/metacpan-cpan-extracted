@@ -1,0 +1,85 @@
+<HTML><HEAD><TITLE>XML::DOM::CharacterData - Common interface for Text, CDATASections and Comments</TITLE></HEAD><BODY><H1><A NAME="NAME">NAME
+
+</A></H1><P>XML::DOM::CharacterData - Common interface for Text, CDATASections and Comments
+
+<P><HR><H1><A NAME="DESCRIPTION">DESCRIPTION
+
+</A></H1><P>XML::DOM::CharacterData extends <A HREF="Node.html">XML::DOM::Node</A>
+
+<P>The CharacterData interface extends Node with a set of attributes and
+methods for accessing character data in the DOM. For clarity this set
+is defined here rather than on each object that uses these attributes
+and methods. No DOM objects correspond directly to CharacterData,
+though Text, Comment and CDATASection do inherit the interface from it. 
+All offsets in this interface start from 0.
+
+<H2><A NAME="METHODS">METHODS
+
+</A></H2><DL><DT><A NAME="getData_and_setData_data_"><STRONG><P>getData and setData (data)
+
+</STRONG></A><DD>The character data of the node that implements this
+interface. The DOM implementation may not put arbitrary
+limits on the amount of data that may be stored in a
+CharacterData node. However, implementation limits may mean
+that the entirety of a node's data may not fit into a single
+DOMString. In such cases, the user may call substringData to
+retrieve the data in appropriately sized pieces.
+
+<DT><A NAME="getLength_"><STRONG><P>getLength
+
+</STRONG></A><DD>The number of characters that are available through data and
+the substringData method below. This may have the value zero,
+i.e., CharacterData nodes may be empty.
+
+<DT><A NAME="substringData_offset_count_"><STRONG><P>substringData (offset, count)
+
+</STRONG></A><DD>Extracts a range of data from the node.
+
+<P>Parameters:
+ <I>offset</I>  Start offset of substring to extract.
+ <I>count</I>   The number of characters to extract.
+
+<P>Return Value: The specified substring. If the sum of offset and count
+exceeds the length, then all characters to the end of
+the data are returned.
+
+<DT><A NAME="appendData_str_"><STRONG><P>appendData (str)
+
+</STRONG></A><DD>Appends the string to the end of the character data of the
+node. Upon success, data provides access to the concatenation
+of data and the DOMString specified.
+
+<DT><A NAME="insertData_offset_arg_"><STRONG><P>insertData (offset, arg)
+
+</STRONG></A><DD>Inserts a string at the specified character offset.
+
+<P>Parameters:
+ <I>offset</I>  The character offset at which to insert.
+ <I>arg</I>     The DOMString to insert.
+
+<DT><A NAME="deleteData_offset_count_"><STRONG><P>deleteData (offset, count)
+
+</STRONG></A><DD>Removes a range of characters from the node. 
+Upon success, data and length reflect the change.
+If the sum of offset and count exceeds length then all characters 
+from offset to the end of the data are deleted.
+
+<P>Parameters: 
+ <I>offset</I>  The offset from which to remove characters. 
+ <I>count</I>   The number of characters to delete. 
+
+<DT><A NAME="replaceData_offset_count_arg_"><STRONG><P>replaceData (offset, count, arg)
+
+</STRONG></A><DD>Replaces the characters starting at the specified character
+offset with the specified string.
+
+<P>Parameters:
+ <I>offset</I>  The offset from which to start replacing.
+ <I>count</I>   The number of characters to replace. 
+ <I>arg</I>     The DOMString with which the range must be replaced.
+
+<P>If the sum of offset and count exceeds length, then all characters to the end of
+the data are replaced (i.e., the effect is the same as a remove method call with 
+the same range, followed by an append method invocation).
+
+</DL><P><HR><I><FONT SIZE="-1">Last updated: Fri Oct 22 18:47:24 1999</FONT></I></BODY></HTML>

@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
+  "http://www.w3.org/TR/REC-html40/loose.dtd">
+
+<html>
+<head>
+<title>libservlet</title>
+<link rel="stylesheet" href="./libservlet.css">
+</head>
+<body>
+<h1>Writing Servlet Applications</h1>
+<ul>
+<li><a href="#servlets">Servlets</a>
+<li><a href="#filters">Filters</a>
+<li><a href="#event listeners">Event Listeners</a>
+<li><a href="#exceptions">Exceptions</a>
+</ul>
+<hr noshade>
+<h2><a name="servlets">Servlets</a></h2>
+<p>
+The classes <a
+href="./api/Servlet/GenericServlet.html"><strong>Servlet::GenericServlet</strong></a>
+and its descendent <a
+href="./api/Servlet/Http/HttpServlet.html"><strong>Servlet::Http::HttpServlet</strong></a>
+are provided by the API as aids to servlet application developers. To
+build a custom HTTP servlet, simply create a subclass of
+<strong>Servlet::Http::HttpServlet</strong> and override the method/s
+of your choice (typically some combination of <code>service()</code>,
+<code>doGet()</code>, <code>doPost()</code>, etc). To build a servlet
+for another protocol, create a subclass of
+<strong>Servlet::GenericServlet</strong> and override
+<code>service()</code>.
+</p>
+<h2><a name="filters">Filters</a></h2>
+<p>
+<h2><a name="event listeners">Event Listeners</a></h2>
+<p>
+<h2><a name="exceptions">Exceptions</a></h2>
+<p>
+Custom exceptions developed for a servlet application should inherit
+from <a
+href="./api/Servlet/Util/Exception.html"><strong>Servlet::Util::Exception</strong></a>.
+Any exception caught by a servlet during processing should be wrapped
+in a <a
+href="./api/Servlet/ServletException.html"><strong>Servlet::ServletException</strong></a>
+and re-thrown.
+<p>
+</body>
+</html>

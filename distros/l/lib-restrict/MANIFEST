@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/lib-restrict.t
+lib/lib/restrict.pm
+META.yml                                 Module meta-data (added by MakeMaker)

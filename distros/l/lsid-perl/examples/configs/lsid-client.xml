@@ -1,0 +1,57 @@
+<lsidClient>
+	<caching>
+		<!-- whether or not to perform caching, default false. -->
+		<useCache>false</useCache>
+		<!-- The location of the cache dir. By default, the cache
+             is placed in LSID_CLIENT_HOME/cache. If use-cache == false, this
+			 argument will be ignored. -->
+		<lsidCacheDir>/mycachedir</lsidCacheDir>
+	</caching>
+	<!-- authority mappings which short-cut the DNS lookup for an authority name.
+		 If no mappings are present, all authority names will be resolved by DNS.
+		 -->
+	<hostMappings>
+		<hostMapping>
+			<authority>myauthorityname</authority>
+			<endpoint>http://localhost:9080/authority/</endpoint>
+		</hostMapping>
+		<hostMapping>
+			<authority>myauthorityname2</authority>
+			<endpoint>http://localhost:9080/authority/</endpoint>
+		</hostMapping>
+	</hostMappings>
+	<!-- foreign authorities are additional authorities that should be asked about a given LSID or set of LSIDs in addition
+	     to the actual authority of those LSIDs -->
+	<foreignAuthorities>
+		<!-- foreign authorities may be specified for a set of LSIDs with given authorities or namespace.  The auth and ns
+		     attributes may each be simple wild cards (*) -->
+		<pattern auth="myauthorityname" ns="ns">
+			<authority>myotherauthority</authority>
+			<authority>myotherauthority</authority>
+		</pattern>
+		<!-- foreign authorities may be specified for a given LSID.  -->
+		<lsid lsid="urn:lsid:myauthority:ns:myobj">
+			<authority>myotherauthority</authority>
+			<authority>myotherauthority</authority>
+		</lsid>
+		<pattern auth="myauthorityname" ns="ns">
+			<authority>myotherauthority</authority>
+		</pattern>
+		<!-- foreign authorities may be specified for a given LSID.  -->
+		<lsid lsid="urn:lsid:myauthority:ns:myobj">
+			<authority>myotherauthority</authority>
+		</lsid>
+	</foreignAuthorities>
+	<!-- foreign authorities are additional authorities that should be asked about a given LSID or set of LSIDs in addition
+	     to the actual authority of those LSIDs -->
+	<metadataStore meta-data-factory="com.ibm.lsid.client.metadata.rdf.xslt.XSLTMetaDataFactory">
+		<properties>
+			<property name="one-store">
+				<value>true</value>
+			</property>
+			<property name="other">
+				<value>my value</value>
+			</property>
+		</properties>
+	</metadataStore>
+</lsidClient>

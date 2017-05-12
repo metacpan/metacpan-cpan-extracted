@@ -1,0 +1,40 @@
+<HTML><HEAD><TITLE>XML::DOM::NodeList - A node list as used by XML::DOM</TITLE></HEAD><BODY><H1><A NAME="NAME">NAME
+
+</A></H1><P>XML::DOM::NodeList - A node list as used by XML::DOM
+
+<P><HR><H1><A NAME="DESCRIPTION">DESCRIPTION
+
+</A></H1><P>The NodeList interface provides the abstraction of an ordered
+collection of nodes, without defining or constraining how this
+collection is implemented.
+
+<P>The items in the NodeList are accessible via an integral index,
+starting from 0.
+
+<P>Although the DOM spec states that all NodeLists are "live" in that they
+allways reflect changes to the DOM tree, the NodeList returned by
+getElementsByTagName is not live in this implementation. See <A>CAVEATS</A>
+for details.
+
+<H2><A NAME="METHODS">METHODS
+
+</A></H2><DL><DT><A NAME="item_index_"><STRONG><P>item (index)
+
+</STRONG></A><DD>Returns the indexth item in the collection. If index is
+greater than or equal to the number of nodes in the list,
+this returns undef.
+
+<DT><A NAME="getLength_"><STRONG><P>getLength
+
+</STRONG></A><DD>The number of nodes in the list. The range of valid child
+node indices is 0 to length-1 inclusive.
+
+</DL><H2><A NAME="Additional_methods_not_in_the_DOM_Spec">Additional methods not in the DOM Spec
+
+</A></H2><DL><DT><A NAME="dispose_"><STRONG><P>dispose
+
+</STRONG></A><DD>Removes all circular references in this NodeList and its descendants so the 
+objects can be claimed for garbage collection. The objects should not be used
+afterwards.
+
+</DL><P><HR><I><FONT SIZE="-1">Last updated: Fri Oct 22 18:47:30 1999</FONT></I></BODY></HTML>

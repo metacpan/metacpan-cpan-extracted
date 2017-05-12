@@ -1,0 +1,2 @@
+XML::Checker ERROR-159: unspecified value for #REQUIRED attribute [NAME]
+	Context: Element TEST, Attr NAME, line 11, column 0, byte 126

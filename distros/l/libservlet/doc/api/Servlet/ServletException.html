@@ -1,0 +1,93 @@
+<HTML>
+<HEAD>
+<TITLE>Servlet::ServletException - general servlet exception</TITLE>
+<LINK REL="stylesheet" HREF="../../libservlet.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Servlet::ServletException - general servlet exception</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  package My::Servlet;</PRE>
+<PRE>
+  use base qw(Servlet::GenericServlet);
+  use Servlet::ServletException ();</PRE>
+<PRE>
+  sub service {</PRE>
+<PRE>
+      # ...</PRE>
+<PRE>
+      eval {
+          # ...
+      };</PRE>
+<PRE>
+      if ($@) {
+          Servlet::ServletException-&gt;throw('something broke',
+                                           root =&gt; $@);
+      };</PRE>
+<PRE>
+      # ...</PRE>
+<PRE>
+  }</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Defines a general exception a servlet can throw when it encounters
+difficulty.</P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new">new($msg, $root)</A></STRONG><BR>
+<DD>
+Constructs a new servlet exception. Optional arguments include an
+error message and the ``root cause'' exception that was encountered by
+the servlet.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24msg"><EM>$msg</EM></A></STRONG><BR>
+<DD>
+the error message
+<P></P>
+<DT><STRONG><A NAME="item_%24root"><EM>$root</EM></A></STRONG><BR>
+<DD>
+the exception that is the root cause of this exception
+<P></P></DL>
+<DT><STRONG><A NAME="item_getRootCause"><CODE>getRootCause()</CODE></A></STRONG><BR>
+<DD>
+Returns the exception that caused this servlet exception.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../api/Servlet/Util/Exception.html">the Servlet::Util::Exception manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

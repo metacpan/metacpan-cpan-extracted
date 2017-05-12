@@ -1,0 +1,4 @@
+XML::Checker ERROR-154: bad order of Elements Found=[a,b,c,a] RE=[((a)(b)(c))]
+	Context: line 14, column 22, byte 227
+XML::Checker ERROR-154: bad order of Elements Found=[c,c] RE=[((c))?]
+	Context: line 17, column 14, byte 278

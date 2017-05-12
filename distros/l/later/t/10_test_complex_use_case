@@ -1,0 +1,28 @@
+#
+#   $Id: 10_test_complex_use_case,v 1.2 2007-01-25 15:51:10 erwan Exp $
+#
+#   test that using later a module that can't compile makes the code die
+#
+
+package main;
+
+use strict;
+use warnings;
+
+use lib "../lib/",".";        # when run from t/
+use lib "t/","lib/";          # when running from root 
+
+# hihi, this is so funny...
+use later 'Test::More', tests => 5;
+
+use later "My::Module2", qw(bar); 
+use later 'My::Module6';
+
+BEGIN { $later::DEBUG = 1; }
+
+is(bar(),"bar","bar() from My::Module2");
+is(My::Module2::foo(),"foo","foo() from My::Module2");
+is(My::Module2::oops(),"oops","oops() from My::Module2");
+is(My::Module6::module6_test1(),"yaph","foo() from My::Module3");
+is(My::Module6::module6_test2(),"something","say() from My::Module1");
+

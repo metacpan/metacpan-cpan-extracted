@@ -1,0 +1,176 @@
+#!/usr/bin/perl -w
+
+# If your Perl implementation resides somewhere other than
+# /usr/bin/perl, change the above line to reflect that.
+
+## pcmplay -- libao-based raw PCM data player
+
+## Created:    <Sun Oct 22 14:56:52 EDT 2000>
+## Time-stamp: <Mon Oct 23 18:44:13 EDT 2000>
+## Author:     Alex Shinn <foof@debian.org>
+
+=head1 NAME
+
+pcmplay - utility to play raw PCM data
+
+=head1 SYNOPSIS
+
+  pcmplay [options] [file1.pcm file2.pcm...]
+
+=head1 DESCRIPTION
+
+pcmplay is a simple filter for sending raw PCM data to the
+cross-platform ao audio library.  It will read from files specified on
+the command line, or standard input if no files are specified.
+
+To obtain PCM data, check if your audio programs have an option to
+redirect output to a file.  With mpg123 this is the -s option.
+Included with the Ogg Vorbis library is a sample decoder that
+generates PCM output.  Many mixers and audio programs come with PCM
+samples.
+
+=head1 OPTIONS
+
+=over 4
+
+=item -h, --help
+
+Print a brief usage message.
+
+=item -v, --version
+
+Display version info.
+
+=item -d, --device DEVICE
+
+Add a device to play to.  The device may be any of oss, esd, alsa,
+irix or solaris as the output device, or wav to write to a wav file.
+You may specify additional options to a device by appending a colon
+and comma-separated list of key=value pairs.  Examples:
+
+  pcmplay file.pcm -d wav:file=output.wav
+  pcmplay file.pcm -d esd -d alsa:card=0,dev=1
+
+=item -b, --bits BITS
+
+Set the number of bits per sample (8 or 16, default 16).
+
+=item -r, --rate RATE
+
+Set the number of samples per second (default 44100).
+
+=item -c, --channels CHANNELS
+
+Set the number of channels (1 = mono, 2 = stereo).
+
+=item -s, --buffer SIZE
+
+Set buffer size (default 4096).
+
+=back
+
+=cut
+
+# Modules
+use strict;
+use Getopt::Long;
+use Ao;
+
+# Variables
+my $VERSION = '0.1';
+my %options = ('bits' => 16,
+               'rate' => 44100,
+               'channels' => 2,
+               'buffer' => 4096);
+my @devices = ();
+my $buffer;
+
+# Parse Options
+GetOptions(\%options,'help|h|?','version|v','device|dev|d=s@',
+           'bits|b=i','rate|r=i','channels|c=i','buffer|s=i')
+  or usage();
+usage() if $options{help};
+version() if $options{version};
+# Default to OSS driver
+$options{device} = ['oss'] unless $options{device};
+# Create buffer
+$buffer = 'x' x $options{buffer};
+
+# Open Devices
+foreach my $dev (@{$options{device}}) {
+  my $opt_string = '';
+  my %dev_opts = ();
+  if ($dev =~ /([^:]*):(.*)/) {
+    $dev = $1;
+    $opt_string = $2;
+    %dev_opts = split(/[,=]/, $opt_string);
+  }
+  my $dev_id = Ao::get_driver_id($dev);
+  print "Opening device $dev($dev_id):$opt_string\n";
+  my $ao = Ao::open($dev_id, $options{bits}, $options{rate},
+		    $options{channels}, \%dev_opts) ||
+	die "error: couldn't open device $dev\n";
+  push @devices, $ao;
+}
+
+# Play each file (or stdin)
+push @ARGV, '-' unless @ARGV;
+foreach my $file (@ARGV) {
+  my $len;
+  open(INPUT, "< $file");
+  while ($len = sysread(INPUT, $buffer, $options{buffer})) {
+    # Play to each device
+    foreach my $ao (@devices) {
+      $ao->play($buffer, $len);
+    }
+  }
+  close(INPUT);
+}
+
+# Close devices
+foreach my $ao (@devices) {
+  $ao->close();
+}
+
+
+# Print a usage summary
+sub usage {
+  print <<EOF;
+usage: $0 [options] [file ...]
+
+  -h, --help                 display this message
+  -v, --version              print version info
+  -d, --device DEVICE        add a device to play to
+  -b, --bits BITS            set bits per sample (8 or 16)
+  -r, --rate RATE            set samples per second (default 44100)
+  -c, --channels CHANNELS    set channels (1 = mono, 2 = stereo)
+  -s, --buffer SIZE          set default buffer size
+
+where device is any of oss, esd, alsa, irix, solaris or wav, and can
+be followed by an optional colon with a comma separated list of
+key=value parameters.
+
+Examples:
+
+  pcmplay file1.pcm file2.pcm -d wav:file=output.wav
+  cat file1.pcm | pcmplay -d esd -d alsa:card=0,dev=1
+
+EOF
+ exit 0;
+}
+
+# Print version info
+sub version {
+  print "$0 $VERSION\n";
+  exit 0;
+}
+
+=head1 AUTHOR
+
+Alex Shinn, foof@debian.org
+
+=head1 SEE ALSO
+
+Ao(3pm), perl(1).
+
+=cut

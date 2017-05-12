@@ -1,0 +1,54 @@
+<HTML>
+<HEAD>
+<TITLE>Servlet::SingleThreadModel - serialized servlet access interface</TITLE>
+<LINK REL="stylesheet" HREF="../../libservlet.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Servlet::SingleThreadModel - serialized servlet access interface</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This tagging interface ensures that servlets handle only one request
+at a time. This interface has no methods.</P>
+<P>If a servlet implements this interface, you are <EM>guaranteed</EM> that no
+two threads will execute concurrently in the servlet's <CODE>service()</CODE>
+method. The servlet container can make this guarantee by synchronizing
+access to a single instance of the servlet, or by maintaining a pool
+of servlet instances and dispatching each new request to a free
+servlet.</P>
+<P>This interface does not prevent synchronization problems that result
+from servlets accessing shared resources such as class variables or
+classes outside the scope of the servlet.</P>
+<P><STRONG>NOTE</STRONG>: No provisions have been made for usage of the Servlet API in
+a threaded environment. This interface is only provided for
+completeness.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

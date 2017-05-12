@@ -1,0 +1,591 @@
+<HTML><HEAD><TITLE>XML::Checker - A perl module for validating XML</TITLE></HEAD><BODY><H1><A NAME="NAME">NAME
+
+</A></H1><P>XML::Checker - A perl module for validating XML
+
+<P><HR><H1><A NAME="SYNOPSIS">SYNOPSIS
+
+</A></H1><P><A HREF="Checker/Parser.html">XML::Checker::Parser</A> - an <A HREF="Parser.html">XML::Parser</A> that validates at parse time
+
+<P><A HREF="DOM/ValParser.html">XML::DOM::ValParser</A> - an <A HREF="DOM/Parser.html">XML::DOM::Parser</A> that validates at parse time
+
+<P>(Some of the package names may change! This is only an alpha release...)
+
+<P><HR><H1><A NAME="DESCRIPTION">DESCRIPTION
+
+</A></H1><P>XML::Checker can be used in different ways to validate XML. See the manual
+pages of <A HREF="Checker/Parser.html">XML::Checker::Parser</A> and <A HREF="DOM/ValParser.html">XML::DOM::ValParser</A>
+for more information. 
+
+<P>This document only describes common topics like error handling
+and the XML::Checker class itself.
+
+<P>WARNING: Not all errors are currently checked. Almost everything is subject to
+change. Some reported errors may not be real errors.
+
+<P><HR><H1><A NAME="ERROR_HANDLING">ERROR HANDLING
+
+</A></H1><P>Whenever XML::Checker (or one of the packages that uses XML::Checker) detects a
+potential error, the 'fail handler' is called. It is currently also called 
+to report information, like how many times an Entity was referenced. 
+(The whole error handling mechanism is subject to change, I'm afraid...)
+
+<P>The default fail handler is XML::Checker::print_error(), which prints an error 
+message to STDERR. It does not stop the XML::Checker, so it will continue 
+looking for other errors. 
+The error message is created with XML::Checker::error_string().
+
+<P>You can define your
+own fail handler in two ways, locally and globally. Use a local variable to
+temporarily override the fail handler. This way the default fail handler is restored
+when the local variable goes out of scope, esp. when exceptions are thrown e.g.
+
+<PRE> # Using a local variable to temporarily override the fail handler (preferred)
+ { # new block - start of local scope
+   local $XML::Checker::FAIL = \&amp;my_fail;
+   ... your code here ...
+ } # end of block - the previous fail handler is restored
+
+</PRE><P>You can also set the error handler globally, risking that your code may not 
+be reusable or may clash with other modules that use XML::Checker.
+
+<PRE> # Globally setting the fail handler (not recommended)
+ $XML::Checker::FAIL = \&amp;my_fail;
+ ... rest of your code ...
+
+</PRE><P>The fail handler is called with the following parameters ($code, $msg, @context), 
+where $code is the error code, $msg is the error description and 
+@context contains information on where the error occurred. The @context is
+a (ordered) list of (key,value) pairs and can easily be turned into a hash.
+It contains the following information:
+
+<PRE> Element - tag name of Element node (if applicable)
+ Attr - attribute name (if applicable)
+ ChildElementIndex - if applicable (see error 157)
+ line - only when parsing
+ column - only when parsing
+ byte - only when parsing (-1 means: end of file)
+
+</PRE><P>Some examples of fail handlers:
+
+<PRE> # Don't print info messages
+ sub my_fail
+ {
+     my $code = shift;
+     print STDERR XML::Checker::error_message ($code, @_)
+         if $code &lt; 300;
+ }
+
+</PRE><PRE> # Die when the first error is encountered - this will stop
+ # the parsing process. Ignore information messages.
+ sub my_fail
+ {
+     my $code = shift;
+     die XML::Checker::error_message ($code, @_) if $code &lt; 300;
+ }
+
+</PRE><PRE> # Count the number of undefined NOTATION references
+ # and print the error as usual
+ sub my_fail
+ {
+     my $code = shift;
+     $count_undef_notations++ if $code == 100;
+     XML::Checker::print_error ($code, @_);
+ }
+
+</PRE><PRE> # Die when an error is encountered.
+ # Don't die if a warning or info message is encountered, just print a message.
+ sub my_fail {
+     my $code = shift;
+     die XML::Checker::error_string ($code, @_) if $code &lt; 200;
+     XML::Checker::print_error ($code, @_);
+ }
+
+</PRE><P><HR><H1><A NAME="INSIGNIFICANT_WHITESPACE">INSIGNIFICANT WHITESPACE
+
+</A></H1><P>XML::Checker keeps track of whether whitespace found in character data 
+is significant or not. It is considered insignicant if it is found inside
+an element that has a ELEMENT rule that is not of type Mixed or of type ANY. 
+(A Mixed ELEMENT rule does contains the #PCDATA keyword. 
+An ANY rule contains the ANY keyword. See the XML spec for more info.)
+
+<P>XML::Checker can not determine whether whitespace is insignificant in those two 
+cases, because they both allow regular character data to appear within
+XML elements and XML::Checker can therefore not deduce whether whitespace 
+is part of the actual data or was just added for readability of the XML file.
+
+<P>XML::Checker::Parser and XML::DOM::ValParser both have the option to skip
+insignificant whitespace when setting <B>SkipInsignifWS</B> to 1 in their constructor.
+If set, they will not call the Char handler when insignificant whitespace is
+encountered. This means that in XML::DOM::ValParser no Text nodes are created
+for insignificant whitespace.
+
+<P>Regardless of whether the SkipInsignifWS options is set, XML::Checker always 
+keeps track of whether whitespace is insignificant. After making a call to
+XML::Checker's Char handler, you can find out if it was insignificant whitespace
+by calling the isInsignifWS method.
+
+<P>When using multiple (nested) XML::Checker instances or when using XML::Checker
+without using XML::Checker::Parser or XML::DOM::ValParser (which hardly anybody
+probably will), make sure to set a local variable in the scope of your checking
+code, e.g.
+
+<PRE>  { # new block - start of local scope
+    local $XML::Checker::INSIGNIF_WS = 0;
+    ... insert your code here ...
+  } # end of scope
+
+</PRE><P><HR><H1><A NAME="ERROR_CODES">ERROR CODES
+
+</A></H1><P>There are 3 categories, errors, warnings and info messages.
+(The codes are still subject to change, as well the error descriptions.) 
+
+<P>Most errors have a link to the appropriate Validaty Constraint (<B>VC</B>)
+or other section in the XML specification.
+
+<H2><A NAME="ERROR_Messages">ERROR Messages
+
+</A></H2><H3><A NAME="100_109">100 - 109
+
+</A></H3><UL><LI><P><B>100</B> - undefined NOTATION [$notation] in ATTLIST
+
+<P>The ATTLIST contained a Notation reference that was not defined in a
+NOTATION definition. 
+<B>VC:</B> <A HREF="http://www.w3.org/TR/REC-xml#notatn">Notation Attributes</A>
+ 
+<PRE>
+</PRE><LI><P><B>101</B> - undefined ELEMENT [$tagName]
+
+<P>The specified Element was never defined in an ELEMENT definition.
+This is not an error according to the XML spec.
+See <A HREF="http://www.w3.org/TR/REC-xml#elemdecls">Element Type Declarations</A>
+ 
+<PRE>
+</PRE><LI><P><B>102</B> - undefined unparsed ENTITY [$entity]
+
+<P>The attribute value referenced an undefined unparsed entity.
+<B>VC:</B> <A HREF="http://www.w3.org/TR/REC-xml#entname">Entity Name</A>
+ 
+<PRE>
+</PRE><LI><P><B>103</B> - undefined attribute [$attrName]
+
+<P>The specified attribute was not defined in an ATTLIST for that Element.
+<B>VC:</B> <A HREF="http://www.w3.org/TR/REC-xml#ValueType">Attribute Value Type</A>
+ 
+<PRE>
+</PRE></UL><H3><A NAME="110_119">110 - 119
+
+</A></H3><UL><LI><P><B>110</B> - attribute [$attrName] of element [$tagName] already defined
+
+<P>The specified attribute was already defined in this ATTLIST definition or
+in a previous one.
+This is not an error according to the XML spec.
+See <A HREF="http://www.w3.org/TR/REC-xml#attdecls">Attribute-List Declarations</A>
+ 
+<PRE>
+</PRE><LI><P><B>111</B> - ID [$value] already defined
+
+<P>An ID with the specified value was already defined in an attribute
+within the same document.
+<B>VC:</B> <A HREF="http://www.w3.org/TR/REC-xml#id">ID</A>
+ 
+<PRE>
+</PRE><LI><P><B>112</B> - unparsed ENTITY [$entity] already defined
+
+<P>This is not an error according to the XML spec.
+See <A HREF="http://www.w3.org/TR/REC-xml#sec-entity-decl">Entity Declarations</A>
+ 
+<PRE>
+</PRE><LI><P><B>113</B> - NOTATION [$notation] already defined
+ 
+<PRE>
+</PRE><LI><P><B>114</B> - ENTITY [$entity] already defined
+
+<P>This is not an error according to the XML spec.
+See <A HREF="http://www.w3.org/TR/REC-xml#sec-entity-decl">Entity Declarations</A>
+ 
+<PRE>
+</PRE><LI><P><B>115</B> - ELEMENT [$name] already defined
+<B>VC:</B> <A HREF="http://www.w3.org/TR/REC-xml#EDUnique">Unique Element Type Declaration</A>
+ 
+<PRE>
+</PRE></UL><H3><A NAME="120_129">120 - 129
+
+</A></H3><UL><LI><P><B>120</B> - invalid default ENTITY [$default]
+
+<P>(Or IDREF or NMTOKEN instead of ENTITY.)
+The ENTITY, IDREF or NMTOKEN reference in the default attribute 
+value for an attribute with types ENTITY, IDREF or NMTOKEN was not
+valid.
+<B>VC:</B> <A HREF="http://www.w3.org/TR/REC-xml#defattrvalid">Attribute Default Legal</A>
+ 
+<PRE>
+</PRE><LI><P><B>121</B> - invalid default [$token] in ENTITIES [$default]
+
+<P>(Or IDREFS or NMTOKENS instead of ENTITIES)
+One of the ENTITY, IDREF or NMTOKEN references in the default attribute 
+value for an attribute with types ENTITIES, IDREFS or NMTOKENS was not
+valid.
+<B>VC:</B> <A HREF="http://www.w3.org/TR/REC-xml#defattrvalid">Attribute Default Legal</A>
+ 
+<PRE>
+</PRE><LI><P><B>122</B> - invalid default attribute value [$default]
+
+<P>The specified default attribute value is not a valid attribute value.
+<B>VC:</B> <A HREF="http://www.w3.org/TR/REC-xml#defattrvalid">Attribute Default Legal</A>
+ 
+<PRE>
+</PRE><LI><P><B>123</B> - invalid default ID [$default], must be #REQUIRED or #IMPLIED
+
+<P>The default attribute value for an attribute of type ID has to be 
+#REQUIRED or #IMPLIED.
+<B>VC:</B> <A HREF="http://www.w3.org/TR/REC-xml#id-default">ID Attribute Default</A>
+ 
+<PRE>
+</PRE><LI><P><B>124</B> - bad model [$model] for ELEMENT [$name]
+
+<P>The model in the ELEMENT definition did not conform to the XML syntax 
+for Mixed models.
+See <A HREF="http://www.w3.org/TR/REC-xml#sec-mixed-content">Mixed Content</A>
+ 
+<PRE>
+</PRE></UL><H3><A NAME="130_139">130 - 139
+
+</A></H3><UL><LI><P><B>130</B> - invalid NMTOKEN [$attrValue]
+
+<P>The attribute value is not a valid NmToken token.
+<B>VC:</B> <A HREF="http://www.w3.org/TR/REC-xml#enum">Enumeration</A>
+ 
+<PRE>
+</PRE><LI><P><B>131</B> - invalid ID [$attrValue]
+
+<P>The specified attribute value is not a valid Name token.
+<B>VC:</B> <A HREF="http://www.w3.org/TR/REC-xml#id">ID</A>
+ 
+<PRE>
+</PRE><LI><P><B>132</B> - invalid IDREF [$value]
+
+<P>The specified attribute value is not a valid Name token.  
+<B>VC:</B> <A HREF="http://www.w3.org/TR/REC-xml#idref">IDREF</A>
+ 
+<PRE>
+</PRE><LI><P><B>133</B> - invalid ENTITY name [$name]
+
+<P>The specified attribute value is not a valid Name token.  
+<B>VC:</B> <A HREF="http://www.w3.org/TR/REC-xml#entname">Entity Name</A>
+ 
+<PRE>
+</PRE><LI><P><B>134</B> - invalid Enumeration value [$value] in ATTLIST
+
+<P>The specified value is not a valid NmToken (see XML spec for def.)
+See definition of <A HREF="http://www.w3.org/TR/REC-xml#NT-Nmtoken">NmToken</A>
+ 
+<PRE>
+</PRE><LI><P><B>135</B> - empty NOTATION list in ATTLIST
+
+<P>The NOTATION list of the ATTLIST definition did not contain any NOTATION
+references.
+See definition of <A HREF="http://www.w3.org/TR/REC-xml#NT-NotationType">NotationType</A>
+ 
+<PRE>
+</PRE><LI><P><B>136</B> - empty Enumeration list in ATTLIST
+
+<P>The ATTLIST definition of the attribute of type Enumeration did not
+contain any values.
+See definition of <A HREF="http://www.w3.org/TR/REC-xml#NT-Enumeration">Enumeration</A>
+ 
+<PRE>
+</PRE><LI><P><B>137</B> - invalid ATTLIST type [$type]
+
+<P>The attribute type has to be one of: ID, IDREF, IDREFS, ENTITY, ENTITIES, 
+NMTOKEN, NMTOKENS, CDATA, NOTATION or an Enumeration.
+See definition of <A HREF="http://www.w3.org/TR/REC-xml#NT-AttType">AttType</A>
+ 
+<PRE>
+</PRE></UL><H3><A NAME="150_159">150 - 159
+
+</A></H3><UL><LI><P><B>150</B> - bad #FIXED attribute value [$value], it should be [$default]
+
+<P>The specified attribute was defined as #FIXED in the ATTLIST definition
+and the found attribute $value differs from the specified $default value.
+<B>VC:</B> <A HREF="http://www.w3.org/TR/REC-xml#FixedAttr">Fixed Attribute Default</A>
+
+<PRE>
+</PRE><LI><P><B>151</B> - only one ID allowed in ATTLIST per element first=[$attrName]
+
+<P>The ATTLIST definitions for an Element may contain only one attribute
+with the type ID. The specified $attrName is the one that was found first.
+<B>VC:</B> <A HREF="http://www.w3.org/TR/REC-xml#one-id-per-el">One ID per Element Type</A>
+
+<PRE>
+</PRE><LI><P><B>152</B> - Element should be EMPTY, found Element [$tagName]
+
+<P>The ELEMENT definition for the specified Element said it should be
+EMPTY, but a child Element was found.
+<B>VC:</B> <A HREF="http://www.w3.org/TR/REC-xml#elementvalid">Element Valid (sub1)</A>
+ 
+<PRE>
+</PRE><LI><P><B>153</B> - Element should be EMPTY, found text [$text]
+
+<P>The ELEMENT definition for the specified Element said it should be
+EMPTY, but text was found. Currently, whitespace is not allowed between the
+open and close tag. (This may be wrong, please give feedback.)
+To allow whitespace (subject to change), set:
+
+<PRE>    $XML::Checker::Context::EMPTY::ALLOW_WHITE_SPACE = 1;
+
+</PRE><P><B>VC:</B> <A HREF="http://www.w3.org/TR/REC-xml#elementvalid">Element Valid (sub1)</A>
+ 
+<PRE>
+</PRE><LI><P><B>154</B> - bad order of Elements Found=[$found] RE=[$re]
+
+<P>The child elements of the specified Element did not match the
+regular expression found in the ELEMENT definition. $found contains
+a comma separated list of all the child element tag names that were found.
+$re contains the (decoded) regular expression that was used internally.
+<B>VC:</B> <A HREF="http://www.w3.org/TR/REC-xml#elementvalid">Element Valid</A>
+ 
+<PRE>
+</PRE><LI><P><B>155</B> - more than one root Element [$tags]
+
+<P>An XML Document may only contain one Element.
+$tags is a comma separated list of element tag names encountered sofar.
+<A HREF="Parser.html">XML::Parser</A> (expat) throws 'no element found' exception.
+See two_roots.xml for an example.
+See definition of <A HREF="http://www.w3.org/TR/REC-xml#dt-root">document</A>
+ 
+<PRE>
+</PRE><LI><P><B>156</B> - unexpected root Element [$tagName], expected [$rootTagName]
+
+<P>The tag name of the root Element of the XML Document differs from the name 
+specified in the DOCTYPE section.
+<A HREF="Parser.html">XML::Parser</A> (expat) throws 'not well-formed' exception.
+See bad_root.xml for an example.
+<B>VC:</B> <A HREF="http://www.w3.org/TR/REC-xml#vc-roottype">Root Element Type</A>
+ 
+<PRE>
+</PRE><LI><P><B>157</B> - unexpected Element [$tagName]
+
+<P>The ELEMENT definition for the specified Element does not allow child
+Elements with the specified $tagName.
+<B>VC:</B> <A HREF="http://www.w3.org/TR/REC-xml#elementvalid">Element Valid</A>
+
+<P>The error context contains ChildElementIndex which is the index within 
+its parent Element (counting only Element nodes.)
+ 
+<PRE>
+</PRE><LI><P><B>158</B> - unspecified value for #IMPLIED attribute [$attrName]
+
+<P>The ATTLIST for the specified attribute said the attribute was #IMPLIED,
+which means the user application should supply a value, but the attribute
+value was not specified. (User applications should pass a value and set
+$specified to 1 in the Attr handler.)
+ 
+<PRE>
+</PRE><LI><P><B>159</B> - unspecified value for #REQUIRED attribute [$attrName]
+
+<P>The ATTLIST for the specified attribute said the attribute was #REQUIRED,
+which means that a value should have been specified.
+<B>VC:</B> <A HREF="http://www.w3.org/TR/REC-xml#RequiredAttr">Required Attribute</A>
+ 
+<PRE>
+</PRE></UL><H3><A NAME="160_169">160 - 169
+
+</A></H3><UL><LI><P><B>160</B> - invalid Enumeration value [$attrValue]
+
+<P>The specified attribute value does not match one of the Enumeration values
+in the ATTLIST.
+<B>VC:</B> <A HREF="http://www.w3.org/TR/REC-xml#enum">Enumeration</A>
+ 
+<PRE>
+</PRE><LI><P><B>161</B> - invalid NOTATION value [$attrValue]
+
+<P>The specifed attribute value was not found in the list of possible NOTATION 
+references as found in the ATTLIST definition.
+<B>VC:</B> <A HREF="http://www.w3.org/TR/REC-xml#notatn">Notation Attributes</A>
+ 
+<PRE>
+</PRE><LI><P><B>162</B> - undefined NOTATION [$attrValue]
+
+<P>The NOTATION referenced by the specified attribute value was not defined.
+<B>VC:</B> <A HREF="http://www.w3.org/TR/REC-xml#notatn">Notation Attributes</A>
+ 
+<PRE>
+</PRE></UL><H2><A NAME="WARNING_Messages_200_and_up_">WARNING Messages (200 and up)
+
+</A></H2><UL><LI><P><B>200</B> - undefined ID [$id] was referenced [$n] times
+
+<P>The specified ID was referenced $n times, but never defined in an attribute
+value with type ID.
+<B>VC:</B> <A HREF="http://www.w3.org/TR/REC-xml#idref">IDREF</A>
+ 
+<PRE>
+</PRE></UL><H2><A NAME="INFO_Messages_300_and_up_">INFO Messages (300 and up)
+
+</A></H2><UL><LI><P><B>300</B> - [$n] references to ID [$id]
+
+<P>The specified ID was referenced $n times.
+ 
+<PRE>
+</PRE></UL><H2><A NAME="Not_checked">Not checked
+
+</A></H2><P>The following errors are already checked by <A HREF="Parser.html">XML::Parser</A> (expat) and
+are currently not checked by XML::Checker:
+
+<P>(?? TODO - add more info)
+
+<DL><DT><A NAME="root_element_is_missing_"><STRONG><P>root element is missing
+
+</STRONG></A><DD><A HREF="Parser.html">XML::Parser</A> (expat) throws 'no element found' exception. 
+See no_root.xml for an example.
+
+</DL><P><HR><H1><A NAME="XML_Checker">XML::Checker
+
+</A></H1><P>XML::Checker can be easily plugged into your application. 
+It uses mostly the same style of event handlers (or callbacks) as <A HREF="Parser.html">XML::Parser</A>.
+See <A HREF="Parser.html">XML::Parser</A> manual page for descriptions of most handlers. 
+ 
+<P>It also implements PerlSAX style event handlers. See <A HREF="#PerlSAX_interface">PerlSAX interface</A>.
+
+<P>Currently, the XML::Checker object is a blessed hash with the following 
+(potentially useful) entries:
+
+<PRE> $checker-&gt;{RootElement} - root element name as found in the DOCTYPE
+ $checker-&gt;{NOTATION}-&gt;{$notation} - is 1 if the NOTATION was defined
+ $checker-&gt;{ENTITY}-&gt;{$name} - contains the (first) ENTITY value if defined
+ $checker-&gt;{Unparsed}-&gt;{$entity} - is 1 if the unparsed ENTITY was defined
+ $checker-&gt;{ID}-&gt;{$id} - is 1 if the ID was defined
+ $checker-&gt;{IDREF}-&gt;{$id} - number of times the ID was referenced
+
+</PRE><PRE> # Less useful:
+ $checker-&gt;{ERule}-&gt;{$tag} - the ELEMENT rules by Element tag name
+ $checker-&gt;{ARule}-&gt;{$tag} - the ATTLIST rules by Element tag name
+ $checker-&gt;{Context} - context stack used internally
+ $checker-&gt;{CurrARule} - current ATTLIST rule for the current Element
+
+</PRE><H2><A NAME="XML_Checker_methods">XML:Checker methods
+
+</A></H2><P>This section is only interesting when using XML::Checker directly.
+XML::Checker supports most event handlers that <A HREF="Parser.html">XML::Parser</A> supports with minor 
+differences. Note that the XML::Checker event handler methods are 
+instance methods and not static, so don't forget to call them like this,
+without passing $expat (as in the <A HREF="Parser.html">XML::Parser</A>) handlers:
+
+<PRE> $checker-&gt;Start($tagName);
+
+</PRE><DL><DT><A NAME="Constructor_"><STRONG><P>Constructor
+
+</STRONG></A><PRE> $checker = new XML::Checker;
+ $checker = new XML::Checker (%user_args);
+
+</PRE><DD>User data may be stored by client applications. Only $checker-&gt;{User} is
+guaranteed not to clash with internal hash keys.
+
+<DT><A NAME="getRootElement_"><STRONG><P>getRootElement ()
+
+</STRONG></A><PRE> $tagName = $checker-&gt;getRootElement;
+
+</PRE><DD>Returns the root element name as found in the DOCTYPE
+
+</DL><H3><A NAME="Expat_interface">Expat interface
+
+</A></H3><P>XML::Checker supports what I call the <I>Expat</I> interface, which is 
+the collection of methods you normally specify as the callback handlers
+when using XML::Parser.
+
+<P>Only the following <A HREF="Parser.html">XML::Parser</A> handlers are currently supported:
+Init, Final, Char, Start, End, Element, Attlist, Doctype,
+Unparsed, Entity, Notation. 
+
+<P>I don't know how to correctly support the Default handler for all <A HREF="Parser.html">XML::Parser</A>
+releases. The Start handler works a little different (see below) and I
+added Attr, InitDomElem, FinalDomElem, CDATA and EntityRef handlers.
+See <A HREF="Parser.html">XML::Parser</A> for a description of the handlers that are not listed below.
+
+<P>Note that this interface may disappear, when the PerlSAX interface stabilizes.
+
+<DL><DT><A NAME="Start_tag_"><STRONG><P>Start ($tag)
+
+</STRONG></A><PRE> $checker-&gt;Start($tag);
+
+</PRE><DD>Call this when an Element with the specified $tag name is encountered.
+Different from the Start handler in <A HREF="Parser.html">XML::Parser</A>, in that no attributes 
+are passed in (use the Attr handler for those.)
+
+<DT><A NAME="Attr_tag_attrName_attrValue_isSpecified_"><STRONG><P>Attr ($tag, $attrName, $attrValue, $isSpecified)
+
+</STRONG></A><PRE> $checker-&gt;Attr($tag,$attrName,$attrValue,$spec);
+
+</PRE><DD>Checks an attribute with the specified $attrName and $attrValue against the
+ATTLIST definition of the element with the specified $tag name.
+$isSpecified means whether the attribute was specified (1) or defaulted (0).
+
+<DT><A NAME="EndAttr_"><STRONG><P>EndAttr ()
+
+</STRONG></A><PRE> $checker-&gt;EndAttr;
+
+</PRE><DD>This should be called after all attributes are passed with Attr().
+It will check which of the #REQUIRED attributes were not specified and generate
+the appropriate error (159) for each one that is missing.
+
+<DT><A NAME="CDATA_text_"><STRONG><P>CDATA ($text)
+
+</STRONG></A><PRE> $checker-&gt;CDATA($text);
+
+</PRE><DD>This should be called whenever CDATASections are encountered.
+Similar to Char handler (but might perform different checks later...)
+
+<DT><A NAME="EntityRef_entity_isParameterEntity_"><STRONG><P>EntityRef ($entity, $isParameterEntity)
+
+</STRONG></A><PRE> $checker-&gt;EntityRef($entity,$isParameterEntity);
+
+</PRE><DD>Checks the ENTITY reference. Set $isParameterEntity to 1 for 
+entity references that start with '%'.
+
+<DT><A NAME="InitDomElem_and_FinalDomElem_"><STRONG><P>InitDomElem () and FinalDomElem ()
+
+</STRONG></A><DD>Used by XML::DOM::Element::check() to initialize (and cleanup) the 
+context stack when checking a single element.
+
+</DL><H3><A NAME="PerlSAX_interface">PerlSAX interface
+
+</A></H3><P>XML::Checker now also supports the PerlSAX interface, so you can use XML::Checker
+wherever you use PerlSAX handlers.
+
+<P>XML::Checker implements the following methods: start_document, end_document,
+start_element, end_element, characters, processing_instruction, comment,
+start_cdata, end_cdata, entity_reference, notation_decl, unparsed_entity_decl,
+entity_decl, element_decl, attlist_decl, doctype_decl, xml_decl
+
+<P>Not implemented: set_document_locator, ignorable_whitespace
+
+<P>See PerlSAX.pod for details. (It is called lib/PerlSAX.pod in the libxml-perl 
+distribution which can be found at CPAN.)
+
+<P><HR><H1><A NAME="CAVEATS">CAVEATS
+
+</A></H1><P>This is an alpha release. Almost everything is subject to change.
+
+<P><HR><H1><A NAME="AUTHOR">AUTHOR
+
+</A></H1><P>Send bug reports, hints, tips, suggestions to Enno Derksen at
+&lt;<I>enno@att.com</I>&gt;. 
+
+<P><HR><H1><A NAME="SEE_ALSO">SEE ALSO
+
+</A></H1><P>The home page of XML::Checker at <A HREF="http://www.erols.com/enno/checker/index.html">http://www.erols.com/enno/checker/index.html</A>
+
+<P>The XML spec (Extensible Markup Language 1.0) at <A HREF="http://www.w3.org/TR/REC-xml">http://www.w3.org/TR/REC-xml</A>
+
+<P>The <A HREF="Parser.html">XML::Parser</A> and <A HREF="Parser/Expat.html">XML::Parser::Expat</A> manual pages.
+
+<P>The other packages that come with XML::Checker: 
+<A HREF="Checker/Parser.html">XML::Checker::Parser</A>, <A HREF="DOM/ValParser.html">XML::DOM::ValParser</A>
+
+<P>The DOM Level 1 specification at <A HREF="http://www.w3.org/TR/REC-DOM-Level-1">http://www.w3.org/TR/REC-DOM-Level-1</A>
+
+<P>The PerlSAX specification. It is currently in lib/PerlSAX.pod in the
+libxml-perl distribution by Ken MacLeod. 
+
+<P>The original SAX specification (Simple API for XML) can be found at 
+<A HREF="http://www.megginson.com/SAX">http://www.megginson.com/SAX</A> and <A HREF="http://www.megginson.com/SAX/SAX2">http://www.megginson.com/SAX/SAX2</A>
+<P><HR><I><FONT SIZE="-1">Last updated: Fri Oct 22 18:47:20 1999</FONT></I></BODY></HTML>

@@ -1,0 +1,206 @@
+Revision history for lib-filter
+
+0.27    2016-08-24 (PERLANCAR)
+
+	- No functional changes.
+
+	- [test] Use overload.pm instead of base.pm when testing for core
+	  module, because base.pm is dual-life.
+
+
+0.26    2016-08-23 (PERLANCAR)
+
+        - No functional changes.
+
+        - [test] Replace dumping all installed modules when diagnosing require
+          test failure to just printing the require'd module's path.
+
+
+0.25    2016-07-09 (PERLANCAR)
+
+        - No functional changes.
+
+        - Document, add test and example for allow_is_recursive=1.
+
+        - [doc] Fix typos in examples.
+
+
+0.24    2016-07-08 (PERLANCAR)
+
+	- Also deduce caller package name from filename, this handles e.g.
+	  Getopt::Long::Callback inside Getopt/Long.pm requiring other
+	  modules.
+
+
+0.23    2016-07-08 (PERLANCAR)
+
+	- Add option: allow_is_recursive.
+
+	- Make it possible to disallow modules that are already loaded,
+	  e.g. strict, warnings, Config, etc.
+
+	- [doc] Mention File::Which::Patch::Hide.
+
+
+0.22    2016-05-19 (PERLANCAR)
+
+        - No functional changes.
+
+        - [test] Replace Module::List::WithPath with PERLANCAR::Module::List,
+          make it optional.
+
+
+0.21    2016-05-18 (PERLANCAR)
+
+	- Show error message "Can't locate FILE (...)" to fool Test::Needs.
+
+
+0.20    2015-07-01 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Rework documentation, present alternatives to using
+	  lib::filter for some tasks.
+
+
+0.19    2015-06-30 (PERLANCAR)
+
+	- Add lib::coreplus.
+
+
+0.18    2015-06-29 (PERLANCAR)
+
+	- Update example because using 'allow_noncore=0 + allow some
+	  non-core XS modules' doesn't work because the non-core XS modules
+	  will still search for loadable object in @INC; instead we'll use
+	  custom filter for this.
+
+	- Add option: debug.
+
+
+0.17    2015-06-28 (PERLANCAR)
+
+	- No functional changes.
+
+	- [testing] Included Module::List::WithPath in t/lib/Module/List.pm
+	  instead of t/lib/Module/List/WithPath.pm, derp.
+
+
+0.16    2015-06-28 (PERLANCAR)
+
+	- No functional changes.
+
+	- [testing] Replace Exporter with base, due to failure reports in
+	  some system where Exporter is located in non-core dir [CT].
+
+
+0.15    2015-06-28 (PERLANCAR)
+
+        - Add option: filter.
+
+
+0.14    2015-06-28 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Put Module::List::WithPath as TestSuggests to mark where
+	  that module is used as prereq.
+
+
+0.13    2015-06-28 (PERLANCAR)
+
+        - [testing] Print list of modules on failure to require.
+
+        - [testing] Remove the use of Test::Exception (unused) and
+          IPC::System::Options (replaced with plain system()) so that lib-filter
+          now does not depend on any non-core modules.
+
+
+0.12    2015-06-26 (PERLANCAR)
+
+	- No functional changes.
+
+	- Allow running in perl 5.8.
+
+
+0.11    2015-06-26 (PERLANCAR)
+
+	- [testing] Use dummy modules for most testing [GH#4].
+
+
+0.10    2015-06-25 (PERLANCAR)
+
+        - [testing] Fix test failures.
+
+
+0.09    2015-06-24 (PERLANCAR)
+
+        - [testing] Change tests to use external Perl interpreters instead of
+          in-process, to isolate from internals of Test::More, etc.
+
+
+0.08    2015-06-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- [testing] Preload Scalar::Util because it's used by Test::More (delay
+	  loading).
+
+	- [testing] Remove stacktrace printer.
+
+
+0.07    2015-06-18 (PERLANCAR)
+
+        - No functional changes.
+
+        - [testing] [build] Rebuild with updated/fixed stacktrace printer from
+          Code::Embeddable.
+
+
+0.06    2015-06-18 (PERLANCAR)
+
+        - [testing] Preload Test::Builder's prerequisites before loading Test::*
+          (thanks Sinan Ünür).
+
+        - [testing] Install a simple stacktrace printer in the tests, to help
+          debug problems.
+
+        - Doc tweaks.
+
+
+0.05    2015-05-27 (PERLANCAR)
+
+        - No functional changes.
+
+        - [testing] Fix tests [GH #2].
+
+        - [testing] Add more tests.
+
+
+0.04    2015-05-26 (PERLANCAR)
+
+        - Add lib::allow, lib::disallow.
+
+        - Tweak POD & examples.
+
+        - Reduce use of modules (we're now down to Config, strict, warnings; no
+          more experimental).
+
+
+0.03    2015-05-22 (PERLANCAR)
+
+        - Add unimport().
+
+        - [testing] Add minimal tests.
+
+
+0.02    2015-05-19 (PERLANCAR)
+
+	- No functional changes.
+
+	- Fix/add examples in Synopsis.
+
+
+0.01    2015-04-12 (PERLANCAR)
+
+        - First release.

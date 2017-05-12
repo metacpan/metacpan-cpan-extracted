@@ -1,0 +1,32 @@
+<HTML><HEAD><TITLE>XML::XQL::DOM - Adds XQL support to XML::DOM nodes</TITLE></HEAD><BODY><H1><A NAME="NAME">NAME
+
+</A></H1><P>XML::XQL::DOM - Adds XQL support to XML::DOM nodes
+
+<P><HR><H1><A NAME="SYNOPSIS">SYNOPSIS
+
+</A></H1><PRE> use XML::XQL;
+ use XML::XQL::DOM;
+
+</PRE><PRE> $parser = new XML::DOM::Parser;
+ $doc = $parser-&gt;parsefile ("file.xml");
+
+</PRE><PRE> # Return all elements with tagName='title' under the root element 'book'
+ $query = new XML::XQL::Query (Expr =&gt; "book/title");
+ @result = $query-&gt;solve ($doc);
+
+</PRE><PRE> # Or (to save some typing)
+ @result = XML::XQL::solve ("book/title", $doc);
+
+</PRE><PRE> # Or (see XML::DOM::Node)
+ @result = $doc-&gt;xql ("book/title");
+
+</PRE><P><HR><H1><A NAME="DESCRIPTION">DESCRIPTION
+
+</A></H1><P>XML::XQL::DOM adds methods to <A HREF="../DOM.html">XML::DOM</A> nodes to support XQL queries
+on XML::DOM document structures.
+
+<P>See <A HREF="../XQL.html">XML::XQL</A> and <A HREF="Query.html">XML::XQL::Query</A> for more details.
+<A HREF="../DOM/Node.html">XML::DOM::Node</A> describes the <B>xql()</B> method.
+
+<PRE>
+</PRE><P><HR><I><FONT SIZE="-1">Last updated: Fri Oct 22 18:47:40 1999</FONT></I></BODY></HTML>

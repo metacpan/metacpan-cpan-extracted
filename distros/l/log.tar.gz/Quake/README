@@ -1,0 +1,32 @@
+NAME
+
+  Games::Quake::Log - information held in a Quake2 logfile
+
+SYNOPSIS
+
+  my $q_log = Games::Quake::Log->new($log_file_with_dir_path_if_necessary);
+ 
+  my %kills        = %{ $q_log->kills        };
+  my %suicides     = %{ $q_log->suicides     };
+  my %game         = %{ $q_log->game         };
+  my %time_in_gmae = %{ $q_log->time_in_game };
+  my %frequency    = %{ $q_log->frequency    }; 
+
+INSTALLATION 
+
+  perl Makefile.pl
+  make
+  make install
+
+D'oh! no tests! Sorry. I have been a bad, bad boy...
+
+AUTHOR
+
+  Stray Toaster, quake@stray-toaster.co.uk
+
+COPYRIGHT
+
+  Copyright (C) 2001 mwk. All rights reserved.
+ 
+  This module is free software. It may be used, redistributed
+  and/or modified under the same terms as Perl itself. 

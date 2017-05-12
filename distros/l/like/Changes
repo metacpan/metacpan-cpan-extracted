@@ -1,0 +1,7 @@
+Revision history for like
+
+0.01    2009-06-24
+        - Initial release.
+
+0.02    2009-06-24
+        - Don't clobber existing @ISA for interface class.

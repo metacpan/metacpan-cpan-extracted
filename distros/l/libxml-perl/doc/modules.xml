@@ -1,0 +1,298 @@
+<?xml version="1.0"?>
+
+<modules>
+  <module>
+    <name>Apache-MimeXML</name>
+    <package>
+      <name>Apache-MimeXML</name>
+      <category>XML</category>
+    </package>
+  </module>
+
+  <module>
+    <name>CGI-Formalware</name>
+    <package>
+      <name>CGI::Formalware</name>
+      <category>XML</category>
+      <category>XML::Parser</category>
+    </package>
+  </module>
+
+  <module>
+    <name>CGI-XML</name>
+    <package>
+      <name>CGI::XML</name>
+      <category>XML::Parser</category>
+      <category>XML Conversion</category>
+    </package>
+  </module>
+
+  <module>
+    <name>CGI-XMLForm</name>
+    <package>
+      <name>CGI::XMLForm</name>
+      <category>XML::Parser</category>
+      <category>XML Conversion</category>
+    </package>
+  </module>
+
+  <module>
+    <name>DBIx-XML_RDB</name>
+    <package>
+      <name>DBIx::XML_RDB</name>
+      <category>XML Conversion</category>
+    </package>
+  </module>
+
+  <module>
+    <name>libxml-perl</name>
+    <package>
+      <name>Data::Grove</name>
+      <category>XML</category>
+    </package>
+    <package>
+      <name>Data::Grove::Visitor</name>
+      <category>Data::Grove</category>
+    </package>
+    <package>
+      <name>XML::ESISParser</name>
+      <category>PerlSAX</category>
+    </package>
+    <package>
+      <name>XML::Handler::CanonXMLWriter</name>
+      <category>PerlSAX</category>
+      <category>XML Conversion</category>
+    </package>
+    <package>
+      <name>XML::Handler::Sample</name>
+      <category>PerlSAX</category>
+      <category>XML Conversion</category>
+    </package>
+    <package>
+      <name>XML::Handler::Subs</name>
+      <category>PerlSAX</category>
+      <category>XML Conversion</category>
+    </package>
+    <package>
+      <name>XML::Handler::XMLWriter</name>
+      <category>PerlSAX</category>
+      <category>XML Conversion</category>
+    </package>
+    <package>
+      <name>XML::Parser::PerlSAX</name>
+      <category>PerlSAX</category>
+      <category>XML::Parser</category>
+    </package>
+    <package>
+      <name>XML::PatAct::ActionTempl</name>
+      <category>PatAct</category>
+      <category>PatAct Action</category>
+    </package>
+    <package>
+      <name>XML::PatAct::Amsterdam</name>
+      <category>PerlSAX</category>
+      <category>XML Conversion</category>
+      <category>PatAct</category>
+      <category>PatAct Action</category>
+    </package>
+    <package>
+      <name>XML::PatAct::MatchName</name>
+      <category>PatAct</category>
+      <category>PatAct Pattern</category>
+    </package>
+    <package>
+      <name>XML::PatAct::PatternTempl</name>
+      <category>PatAct</category>
+      <category>PatAct Pattern</category>
+    </package>
+    <package>
+      <name>XML::PatAct::ToObjects</name>
+      <category>PatAct</category>
+      <category>PatAct Action</category>
+      <category>XML Conversion</category>
+    </package>
+    <package>
+      <name>XML::Perl2SAX</name>
+      <category>PerlSAX</category>
+    </package>
+    <package>
+      <name>XML::SAX2Perl</name>
+      <category>PerlSAX</category>
+    </package>
+  </module>
+
+  <module>
+    <name>Frontier-RPC</name>
+    <package>
+      <name>Frontier::RPC2</name>
+      <category>XML::Parser</category>
+      <category>XML Conversion</category>
+    </package>
+    <package>
+      <name>Frontier::Client</name>
+    </package>
+    <package>
+      <name>Frontier::Daemon</name>
+    </package>
+  </module>
+
+  <module>
+    <name>XML-DOM</name>
+    <package>
+      <name>XML::DOM</name>
+      <category>XML::Parser</category>
+      <category>XML Objects</category>
+      <category>XML Query</category>
+      <category>XML Conversion</category>
+    </package>
+    <package>
+      <name>XML::DOM::UTF8</name>
+      <category>XML::DOM</category>
+    </package>
+  </module>
+
+  <module>
+    <name>XML-Dumper</name>
+    <package>
+      <name>XML::Dumper</name>
+      <category>XML Conversion</category>
+    </package>
+  </module>
+
+  <module>
+    <name>XML-Edifact</name>
+    <package>
+      <name>XML::Edifact</name>
+      <category>XML Conversion</category>
+    </package>
+  </module>
+
+  <module>
+    <name>XML-Encoding</name>
+    <package>
+      <name>XML::Encoding</name>
+      <category>XML::Parser</category>
+    </package>
+  </module>
+
+  <module>
+    <name>XML-Generator</name>
+    <package>
+      <name>XML::Generator</name>
+      <category>XML Writer</category>
+    </package>
+  </module>
+
+  <module>
+    <name>XML-Grove</name>
+    <package>
+      <name>XML::Grove</name>
+      <category>XML Objects</category>
+      <category>Data::Grove</category>
+    </package>
+    <package>
+      <name>XML::Grove::AsCanonXML</name>
+      <category>XML::Grove</category>
+      <category>XML Writer</category>
+    </package>
+    <package>
+      <name>XML::Grove::AsString</name>
+      <category>XML::Grove</category>
+      <category>XML Conversion</category>
+    </package>
+    <package>
+      <name>XML::Grove::Builder</name>
+      <category>XML::Grove</category>
+      <category>PerlSAX</category>
+    </package>
+    <package>
+      <name>XML::Grove::IDs</name>
+      <category>XML::Grove</category>
+      <category>XML Query</category>
+    </package>
+    <package>
+      <name>XML::Grove::Path</name>
+      <category>XML::Grove</category>
+      <category>XML Query</category>
+    </package>
+    <package>
+      <name>XML::Grove::PerlSAX</name>
+      <category>XML::Grove</category>
+      <category>PerlSAX</category>
+    </package>
+    <package>
+      <name>XML::Grove::Sub</name>
+      <category>XML::Grove</category>
+    </package>
+    <package>
+      <name>XML::Grove::Subst</name>
+      <category>XML::Grove</category>
+    </package>
+  </module>
+
+  <module>
+    <name>XML-Parser</name>
+    <package>
+      <name>XML::Parser</name>
+      <category>XML</category>
+    </package>
+    <package>
+      <name>XML::ParserDebug</name>
+      <category>XML::Parser</category>
+      <category>XML Conversion</category>
+    </package>
+    <package>
+      <name>XML::Parser::Objects</name>
+      <category>XML::Parser</category>
+      <category>XML Objects</category>
+    </package>
+    <package>
+      <name>XML::Parser::Stream</name>
+      <category>XML::Parser</category>
+      <category>XML Conversion</category>
+    </package>
+    <package>
+      <name>XML::Parser::Subs</name>
+      <category>XML::Parser</category>
+    </package>
+    <package>
+      <name>XML::Parser::Tree</name>
+      <category>XML::Parser</category>
+      <category>XML Objects</category>
+    </package>
+  </module>
+
+  <module>
+    <name>XML-QL</name>
+    <package>
+      <name>XML::QL</name>
+      <category>XML::Parser</category>
+      <category>XML Query</category>
+    </package>
+  </module>
+
+  <module>
+    <name>XML-Registry</name>
+    <package>
+      <name>XML::Registry</name>
+      <category>XML</category>
+    </package>
+  </module>
+
+  <module>
+    <name>XML-Writer</name>
+    <package>
+      <name>XML::Writer</name>
+      <category>XML Writer</category>
+    </package>
+  </module>
+
+  <module>
+    <name>XML-XQL</name>
+    <package>
+      <name>XML::XQL</name>
+      <category>XML::DOM</category>
+      <category>XML Query</category>
+    </package>
+  </module>
+</modules>

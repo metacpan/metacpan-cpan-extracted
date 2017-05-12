@@ -1,0 +1,30 @@
+<HTML><HEAD><TITLE>XML::DOM::ProcessingInstruction - An XML processing instruction in XML::DOM</TITLE></HEAD><BODY><H1><A NAME="NAME">NAME
+
+</A></H1><P>XML::DOM::ProcessingInstruction - An XML processing instruction in XML::DOM
+
+<P><HR><H1><A NAME="DESCRIPTION">DESCRIPTION
+
+</A></H1><P>XML::DOM::ProcessingInstruction extends <A HREF="Node.html">XML::DOM::Node</A>.
+
+<P>It represents a "processing instruction", used in XML as a way to keep 
+processor-specific information in the text of the document. An example:
+
+<PRE> &lt;?PI processing instruction?&gt;
+
+</PRE><P>Here, "PI" is the target and "processing instruction" is the data.
+
+<H2><A NAME="METHODS">METHODS
+
+</A></H2><DL><DT><A NAME="getTarget_"><STRONG><P>getTarget
+
+</STRONG></A><DD>The target of this processing instruction. XML defines this
+as being the first token following the markup that begins the
+processing instruction.
+
+<DT><A NAME="getData_and_setData_data_"><STRONG><P>getData and setData (data)
+
+</STRONG></A><DD>The content of this processing instruction. This is from the
+first non white space character after the target to the
+character immediately preceding the ?&gt;.
+
+</DL><P><HR><I><FONT SIZE="-1">Last updated: Fri Oct 22 18:47:31 1999</FONT></I></BODY></HTML>

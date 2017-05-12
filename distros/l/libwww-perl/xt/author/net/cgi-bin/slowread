@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+# You might post large amount of data to this script.  It will read
+# it slowly.
+
+{ local($!) = 1; print "Content-Type: text/plain\n\n"; }
+
+my $len = $ENV{CONTENT_LENGTH};
+
+unless ($len) {
+    system "env";
+    exit;
+}
+
+my $size = 20;  # chunk size
+
+my $content = '';
+my $bytes = 0;
+
+sleep(1);
+while ($len > 0) {
+    my $buff;
+    my $n = sysread(STDIN, $buff, $size);
+    last if $n <= 0;
+    $len -= $n;
+    $bytes += $n;
+    $content .= $buff;
+    sleep(1);
+}
+print "$bytes bytes read\n";

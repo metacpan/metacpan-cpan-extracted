@@ -1,0 +1,78 @@
+
+<h1 id="title">Authority Location</h1>
+
+The authority for the LSID &nbsp;&nbsp;
+<span class="largeBold"><TMPL_VAR name="lsid"></span> &nbsp;&nbsp; can be found at:
+
+<br/>
+<br/>
+<br/>
+
+<div align="center">
+
+<span style="font-family: sans-serif; font-weight: bold; font-size: x-large">
+
+<a href="<TMPL_VAR name="authority">" target="_blank"><TMPL_VAR name="authority"></a>
+
+</span>
+
+</div>
+
+<br/>
+<br/>
+
+<p id="description">
+There are <span class="largeBold"><TMPL_VAR name="numData"> Data locations</span>
+and <span class="largeBold"><TMPL_VAR name="numMetadata"> Metadata locations</span>
+for this LSID.
+</p>
+
+<TMPL_IF NAME="dataAvailable">
+
+<h2>Data Locations</h2>
+<TMPL_LOOP NAME="dataDetails">
+
+   <h4>Service Name: <span class="serviceName"><TMPL_VAR NAME="name"><span class="serviceName"></h4>
+   <TMPL_LOOP NAME="locations">
+        <li>
+        <TMPL_IF NAME="link">
+          <a href="<TMPL_VAR NAME="link">" target="_blank"><TMPL_VAR NAME="link"></a> <br/>
+        <TMPL_ELSE>
+          Use protocol: <span class="protocol"><TMPL_VAR NAME="protocol"></span> at location:
+          <span class="location"><TMPL_VAR NAME="url"></span>
+        </TMPL_IF>
+        </li>
+   </TMPL_LOOP>
+   </li>
+</TMPL_LOOP>
+
+</TMPL_IF>
+
+
+<TMPL_IF NAME="metadataAvailable">
+
+<h2>Metadata Locations</h2>
+<ol>
+<TMPL_LOOP NAME="metadataDetails">
+
+   <h4>Service Name: <span class="serviceName"><TMPL_VAR NAME="name"></span></h4>
+   <ul>
+   <TMPL_LOOP NAME="locations">
+        <li>
+        <TMPL_IF NAME="link">
+          <a href="<TMPL_VAR NAME="link">" target="_blank"><TMPL_VAR NAME="link"></a> <br/>
+        <TMPL_ELSE>
+          Use protocol: <span class="protocol"><TMPL_VAR NAME="protocol"></span> at location:
+          <span class="location"><TMPL_VAR NAME="url"></span>
+        </TMPL_IF>
+        </li>
+   </TMPL_LOOP>
+   </ul>
+</TMPL_LOOP>
+
+</TMPL_IF>
+
+<div class="controls">
+<TMPL_VAR name="submit"> <TMPL_VAR name="getData">
+</div>
+

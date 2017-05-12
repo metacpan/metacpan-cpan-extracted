@@ -1,0 +1,157 @@
+lsid-perl version 1.1.4
+=======================
+
+* ABOUT
+
+This module implements an object-oriented interface for building clients
+and servers that resolve LSIDs and perform metadata queries on LSIDs.
+
+
+* What's new in this release
+
+This release contains updates and many bug fixes. Specific issues
+resolved:
+
+	- Fixed bug in Perl use statements
+	- Minor code style cleanups
+        - Documentation updates
+
+This release is based on the specification submitted to the Object
+Management Group (OMG) and is not compatible with all previous releases.
+Clients and authorities based on previous versions should still
+interoperate with minimal changes to each. Most changes involve port
+types and the addition of a Services WSDL document that describes how to
+invoke the authority. Please see the examples/ for more information.
+
+
+* IMPORTANT: You need SOAP::Lite 0.60a installed for this release. You should 
+			 also install File::Temp from CPAN as the File::Temp included
+			 with Perl is not sufficient for this module.
+
+
+
+
+* MODIFICATIONS TO AUTHORITIES
+
+This release modifies how ports are added to authorities. The OLD method
+of adding ports should still work. However the new method is much cleaner:
+
+NOTE: $authority is a LS::Service::Authority object reference
+
+$authority->addMetadataPort(
+	serviceName=> 'myService',
+	endpoint=> "$location/authority/metadata",
+	protocol=> $LS::Authority::WSDL::Constants::Protocols::SOAP,
+	);
+
+$authority->addDataPort(
+	serviceName=> 'myService',
+	endpoint=> "$location/authority/data",
+	protocol=> $LS::Authority::WSDL::Constants::Protocols::SOAP,
+	);
+
+Notice the 'serviceName' and 'protocol' parameters. We recommend 
+that you use different service names for each protocol. For example, 
+if you have SOAP and HTTP ports for metadata, add each port to 
+a service named for its respective protocol (ie. authoritySOAP 
+or authorityHTTP).
+
+
+
+
+FEATURES
+
+
+
+* LSID Assigning Service
+
+This release provides a client and the necessary framework for
+implementing an LSID Assigning Service. See examples/assigning for more
+information about how to use the framework and client.
+
+
+* Foreign Authority Notification service
+
+The LSID Authority framework has been updated to support FAN. See
+rfcfan.txt for more information about FAN.
+
+
+* Authority Framework
+
+The Authority framework has been moved to LS::Service and underwent
+significant changes. In many cases, crating a SOAP based authority
+has become easier. See the examples/ subdirectory for two authority
+examples.
+
+
+
+* Caching
+
+The cache modules have been updated to return LS::Service::Response
+objects containing IO::File objects in the response.
+
+The client stack now caches all metadata, data and WSDL queries. The
+default path is stored in /tmp/lsid-client and can be change through
+then evironment variable LSID_CACHE_ROOT.
+
+
+
+DEPENDENCIES
+
+lsid-perl requires these other modules and libraries:
+
+SOAP-Lite-0.60a
+URI-1.21
+libwww-perl-5.53
+Net::FTP 2.65
+Net-DNS-0.28
+XML-XPath-1.12
+MIME-Base64-2.12
+File::Temp 0.12 (Install from CPAN, File::Temp in the Perl distribution is not enough)
+RDF-Core-0.30
+MIME-tools >6.100 (Needed for Apache AXIS compatibility)
+
+This module is known to work with the versions given, but later and
+earlier ones may also work.
+
+
+
+INSTALLATION
+
+lsid-perl can be installed like any Perl module found on CPAN. In short:
+
+On Unix or Linux:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+   
+On Windows:
+
+Download the nmake utility from
+ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe, then
+
+   perl Makefile.PL
+   nmake
+   nmake test
+   nmake install
+
+OR
+
+   Copy LS.pm and the LS folder into your Perl's lib directory. You can
+   find the lib directory by typing
+
+    perl -e 'print "@INC"'
+
+For more information on installing Perl modules, see
+http://search.cpan.org/author/JHI/perl-5.8.0/pod/perlmodinstall.pod
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) 2002,2003 IBM Corporation 
+All rights reserved.   This program and the accompanying materials
+are made available under the terms of the Common Public License v1.0
+which accompanies this distribution, and is available at
+http://www.opensource.org/licenses/cpl.php

@@ -1,0 +1,35 @@
+
+body { background: #FFFFFF;
+       color: #000000;
+       font-family: Arial,Helvetica;
+       font-size: 12pt; }
+
+p, ul { font-family: Arial,Helvetica;
+        font-size: 12pt; }
+
+pre { font-family: mono-space;
+      white-space: pre;
+      font-color: #333333;
+      font-weight: 100; 
+      font-size: 9pt;
+      background-color: #eeeeee;
+      padding: 5pt;
+      width: 90%;
+      border-style: solid;
+      border-width: 2pt;
+      border-color: #bebebe; }
+
+h1 { color: #660033;
+     font-size: 18pt;
+     font-weight: bold;
+     font-family: Verdana,Geneva,Arial,Helvetica; }
+	
+h2 { color: #333333;
+     font-size: 14pt;
+     font-weight: bold;
+     font-family: Verdana,Geneva,Arial,Helvetica; }	 
+
+a:link { color: #660033; text-decoration: none }
+a:visited { color: #660033; text-decoration: none }
+
+code { font-size: 9pt; font-family: mono-space; }

@@ -1,0 +1,11 @@
+
+0.9.2
+
+  - turn on stack tracing explicitly in each servlet class
+  - add Servlet::Util::Principal class
+  - rename "Stream" to "Handle" for all classes and methods
+  - remove stream classes from the api and use IO::Handle instead
+
+0.9.1
+
+  - initial public release

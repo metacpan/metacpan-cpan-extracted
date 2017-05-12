@@ -1,0 +1,112 @@
+			Perl module: libxml-enno
+
+Copyright (c) 1999 Enno Derksen
+All rights reserved.
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. 
+
+libxml-enno contains the modules XML::DOM, XML::XQL, XML::Checker and
+several other packages. These modules are no longer distributed separately.
+It's easier for me to distribute it this way and to crosslink the documentation.
+Also, it avoids synchronization problems and users only have to download one
+file.
+
+The XML::DOM code is fairly stable and has been used quite a bit.
+The other code should be considered alpha code.
+
+See the documentation in the html/ directory. It can be found online at
+http://www.erols.com/enno
+
+For bug reports or suggestions send email to enno@att.com
+
+========= DEPENDENCIES =========================================================
+
+You need the following modules (all available at CPAN):
+
+- XML::Parser (At least version 2.23, I'm using 2.27)
+- Parse::Yapp (Used by XML::XQL. I'm using 0.16)
+- Date::Manip (Used by XML::XQL::Date. 
+	       I'm using 5.33. I know 5.20 or less doesn't work)
+
+I used PodToHTML-0.04 to generate the html documentation. You only need this
+if you want to re-generate it.
+
+========= INSTALLATION =========================================================
+
+To configure this module, cd to the directory that contains this README file
+and type the following.
+
+	perl Makefile.PL
+
+Alternatively, if you plan to install XML::Parser somewhere other than
+your system's perl library directory. You can type something like this:
+
+	perl Makefile.PL PREFIX=/home/me/perl INSTALLDIRS=perl
+
+Then to build you run make.
+
+	make
+
+You can then test the module by typing:
+
+	make test
+
+If you have write access to the perl library directories, you may then
+install by typing:
+
+	make install
+
+============= XML::DOM =========================================================
+
+This is a Perl extension to XML::Parser. It adds a new 'Style' to XML::Parser,
+called 'Dom', that allows XML::Parser to build an Object Oriented datastructure 
+with a DOM Level 1 compliant interface.
+For a description of the DOM (Document Object Model), see http://www.w3.org/DOM/
+
+XML::Parser is a Perl extension interface to James Clark's XML parser, expat.
+It requires at least version 5.004 of perl and can be found on CPAN.
+
+This is a beta version and although there will not be any major API changes,
+minor changes may occur as we get feedback
+from the people on the perl-xml mailing list. [You can subscribe to
+this list by sending a message to subscribe-perl-xml@lyris.activestate.com.]
+
+============= XML::XQL =========================================================
+
+This is a Perl extension that allows you to perform XQL queries on XML
+object trees. Currently only the XML::DOM module is supported, but
+other implementations, like XML::Grove, may soon follow.
+
+See the XML::XQL and XML::XQL::Tutorial man pages that come with this 
+distribution. See the XQL specification for more details,
+it's at: http://www.w3.org/TandS/QL/QL98/pp/xql.html
+Look at the test cases in the 't' directory for examples.
+
+Check out xql.pl, which is a nice command line utility for performing XQL 
+queries on XML documents and formatting the results in several ways.
+
+XML::XQL needs the following modules to be installed: XML::DOM, XML::Parser,
+Parse::Yapp (I use 0.16) and Date::Manip (I use 5.33). All can be found at CPAN.
+
+See the To-do list at the top of XQL.pm for all open issues. 
+
+============= XML::Checker =====================================================
+
+The XML::Checker Perl module contains several classes:
+
+XML::Checker         - contains the XML::Checker class that is used by the others
+XML::Checker::Parser - an XML::Parser that validates at parse time
+XML::DOM::ValParser  - an XML::DOM::Parser that validates at parse time
+
+============= Other packages ===================================================
+
+XML::Filter::SAXT    - Replicates SAX events to several SAX event handlers 
+		       (like the Unix 'tee' command)
+XML::RegExp          - Contains regular expressions for XML tokens
+
+--------------------------------------------------------------------------------
+
+Have fun!
+
+Enno Derksen
+enno@att.com

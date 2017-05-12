@@ -1,0 +1,292 @@
+#!/usr/local/bin/perl -w
+
+###
+# an ldap shell
+# all the work is done in Net::LDAP::Shell
+
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+use Net::LDAP::Shell;
+
+my ($help,$opt_result,$source,$server,$uid,$password,$base,$debug,
+	%args,$D,$config,$anonymous);
+
+$opt_result = GetOptions (
+	"help" => \$help,
+	"anonymous" => \$anonymous,
+	"config=s" => \$config,
+	"source=s" => \$source,
+	"server=s" => \$server,
+	"password=s" => \$password,
+	"D=s" => \$D,
+	"uid=s" => \$uid,
+	"base=s" => \$base,
+	"debug=i" => \$debug,
+);
+
+if (! $opt_result) {
+	pod2usage('-exitval' => 1, '-verbose' => 0);
+	exit(1);
+}
+
+if ($help) {
+	pod2usage('-exitval' => 1, '-verbose' => 2);
+	exit;
+}
+
+if ($anonymous) {
+	$args{'anonymous'} = 1;
+}
+
+if ($config) {
+	$args{'config'} = $config;
+}
+
+if ($source) {
+	$args{'source'} = $source;
+}
+
+if ($server) {
+	$args{'server'} = $server;
+}
+
+if ($password) {
+	$args{'password'} = $password;
+}
+
+if ($D) {
+	$args{'dn'} = $D;
+}
+
+if ($uid) {
+	$args{'uid'} = $uid;
+}
+
+if ($base) {
+	$args{'base'} = $base;
+}
+
+my ($shell);
+
+$shell = Net::LDAP::Shell->new(%args);
+$shell->run;
+
+
+=head1 NAME
+
+ldapsh - an interactive LDAP shell
+
+=head1 SYNOPSIS
+
+ldapsh [--help] [-D <dn>] [--source <source>] [--uid <uid>]
+	[--base <search base>] [--password <password>] 
+	[--server <server>] [--debug <debug level>]
+
+=head1 DESCRIPTION
+
+B<ldapsh> is an interactive LDAP shell, written entirely in perl
+and using Net::LDAP.  It's extensible in that it is relatively easy
+to add new commands to it.  It is largely modeled after the Unix
+shell, but does not at this point allow multiple tokens through
+a mechanism like pipes.
+
+=head1 OPTIONS
+
+=over 4
+
+=item help
+
+Prints out help page.
+
+=item source
+
+Select the source to authenticate to, as defined by 
+Net::LDAP::Shell::Config.  By default, the source 'default'
+is used.
+
+=item server
+
+Select the individual server.  If this server is not configured
+in Net::LDAP::Shell::Config, you will also have to specify the
+base.
+
+=item D
+
+Select the DN to authenticate as.  If you do not provide this,
+you will be prompted for it.  Once this information is provided
+once for a server or a source (either through a flag or through
+prompting) it will be cached and not required again.
+
+=item uid
+
+Select the unqualified uid to bind as; this is actually equivalent
+in functionality to -D, because they do the same thing on the back
+end.
+
+=item base
+
+Select the search base to start at.  This will also be your effective
+root once you are in the shell, and you will not be able to go to
+a higher level of the directory.
+
+=item password
+
+Uh, the password.  If this is not provided, it is prompted for.
+
+=item debug
+
+The debug level.  At this point, any number will suffice.
+
+=back
+
+B<Example>
+
+	ldapsh --server ldap.domain.com -D uid=me,ou=People,dc=domain,dc=com
+	password:
+	default:dc=madstop,dc=com> ls
+	ou=People
+	ou=Hosts
+	ou=Group
+	ou=Config
+	default:dc=madstop,dc=com> cd ou=people
+	default:ou=People,dc=madstop,dc=com> ls
+	uid=luke
+	uid=hostmaster
+	uid=testing
+	uid=admin
+	default:ou=People,dc=madstop,dc=com> ls -l
+	Creator       Created             Modifier      Modified            Sub  Name
+	------------------------------------------------------------------------
+	cn=Manager    05/06/2004 21:47:58 -             05/06/2004 21:47:58 -    uid=luke
+	uid=luke      07/21/2004 11:36:29 -             07/21/2004 11:40:57 -    uid=hostmaster
+	uid=luke      07/26/2004 21:57:39 -             07/29/2004 16:03:19 -    uid=testing
+	uid=luke      07/26/2004 23:59:14 -             07/26/2004 23:59:14 -    uid=admin
+	default:ou=People,dc=madstop,dc=com> cat uid=luke
+	dn: uid=luke,ou=People,dc=madstop,dc=com
+	objectClass: top
+	objectClass: inetOrgPerson
+	uid: luke
+	cn: Luke Kanies
+	sn: Kanies
+
+	default:dc=madstop,dc=com> edit uid=luke
+	[...]
+	default:dc=madstop,dc=com> cd ..
+	default:dc=madstop,dc=com> search objectclass=iphost
+	cn=host,ou=Hosts,dc=madstop,dc=com
+	cn=host2,ou=Hosts,dc=madstop,dc=com
+	cn=host3,ou=Hosts,dc=madstop,dc=com
+	cn=host4,ou=Hosts,dc=madstop,dc=com
+	cn=host5,ou=Hosts,dc=madstop,dc=com
+	cn=host6,ou=Hosts,dc=madstop,dc=com
+	cn=host7,ou=Hosts,dc=madstop,dc=com
+	cn=host8,ou=Hosts,dc=madstop,dc=com
+	cn=host9,ou=Hosts,dc=madstop,dc=com
+	default:dc=madstop,dc=com>
+
+=head1 USING IT
+
+B<ldapsh> was modeled as closely as possible after a normal Unix shell.
+It currently supports ReadLine (meaning command editing) but without command
+completion just yet.  RSN, hopefully.
+
+Just like the normal shell, it has two classes of commands:  builtin
+commands and commands found via a search path.  Builtin commands can be listed
+by running 'builtins' at the ldapsh prompt.  Non-builtin commands are
+currently only listed in the COMMANDS file included in this distribution, but
+hopefully that will be fixed soon.
+
+Unlike the normal shell, there is not a real parser just yet, which means you
+can't do things like set variables on the CLI.  This is likely to be one of
+the features in 2.0, with the main other one being command completion.  Feature
+requests are welcome.
+
+=head1 CONFIGURATION
+
+B<ldapsh> relies on the Net::LDAP::Config library, which is useful for
+configuring one or more LDAP sources.  You can use it to store the server
+name(s), base DNs, whether or not to use SSL, and a few other things.  
+B<ldapsh> searches for its config at B</etc/ldapsh_config>,
+B</usr/local/etc/ldapsh_config>, and B<~/.ldapsh_profile>.
+
+An example is included with the distribution, but here's another:
+
+	[primary]
+	servers: ldap.domain.com ldap2.domain.com
+	base: dc=domain,dc=com
+	ssl: prefer
+
+	[external]
+	servers: ldap.otherdomain.com
+	base: dc=otherdomain,dc=com
+	ssl: require
+
+	[main]
+	default: primary
+
+head1 ENVIRONMENT VARIABLES
+
+=over 4
+
+=item LDAPSH_HISTFILE
+
+Where B<ldapsh> stores its history.  This only works if you have a
+Term::ReadLine other than 'Stub' installed (e.g., Perl or Gnu).  Defaults
+to ~/.ldapsh_history.
+
+=item LDAPSH_PROFILE
+
+Where B<ldapsh> looks for its initial configuration, just like a "real" shell.
+Also just like a real shell, this should contain commands you want B<ldapsh>
+to execute as it is starting up (they will be executed after connecting
+to the server).
+
+This file is probably not incredibly useful just yet, but watch this space.
+Defaults to ~/.ldapsh_config.
+
+=back
+
+=head1 EXTENDING
+
+If you want to add your own commands, you can use the B<stub.pm> file
+as an example.  Please send me any commands you add, and I'll include
+them in the distribution.
+
+=head1 TODO
+
+Add completion support.
+	I'm working on this, but I just can't get it to work... Help is appreciated.
+	Everything is theoretically set up correctly, but tabs just don't do
+	anything.
+
+Create a real parser using YAPP et all, so that I can add things like
+variable storage and stuff like that.
+
+Write better documentation.
+
+=head1 BUGS
+
+Thousands, millions.  Oh my god this has so many bugs I don't even think
+I can count that high.  Because of my lack of counting ability, I need each
+and every one of you to spend some time tracking down some of these bugs,
+so that I can begin figuring out exactly how many there are.
+
+Oh, and I'll try to fix them too.
+
+=head1 SEE ALSO
+
+L<Net::LDAP>,
+L<Net::LDAP::Shell>,
+L<Net::LDAP::Config>,
+L<ldapsh_config>
+
+=head1 AUTHOR
+
+Luke A. Kanies, luke@madstop.com
+
+=for html <hr>
+
+I<$Id: ldapsh,v 1.4 2004/07/26 22:33:08 luke Exp $>
+
+=cut

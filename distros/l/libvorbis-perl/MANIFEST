@@ -1,0 +1,6 @@
+Changes
+MANIFEST
+Makefile.PL
+Vorbis.pm
+Vorbis.xs
+test.pl

@@ -1,0 +1,1005 @@
+<!-- $Id: sax-2.0-adv.html,v 1.6 2001/11/09 18:19:48 darobin Exp $ -->
+<html>
+  <head>
+    <title>Advanced Features of the Perl SAX 2.0 Binding</title>
+    <meta name="keywords" content="XML SGML SAX Perl libxml libxml-perl" />
+  </head>
+  <body>
+
+<h1>Advanced SAX</h1>
+
+<p>The classes, methods, and features described below are
+not commonly used in most applications and can be ignored by most
+users. If however you find that you are not getting the granularity
+you expect from Basic SAX, this would be the place to look for more.
+Advanced SAX isn't advanced in the sense that it is harder, or requires
+better programming skills. It is simply more complete, and has been
+separated to keep Basic SAX simple in terms of the number of events
+one would have to deal with.
+</p>
+
+<h2><a name="Parsers">SAX Parsers</a></h2>
+
+<p>SAX supports several classes of event handlers: content handlers,
+declaration handlers, DTD handlers, error handlers, entity resolvers,
+and other extensions.  For each class of events, a seperate handler
+can be used to handle those events.  If a handler is not defined for a
+class of events, then the default handler, <tt>Handler</tt>, is used.
+Each of these handlers is described in the sections below.
+Applications may change an event handler in the middle of the parse
+and the SAX parser will begin using the new handler immediately.</p>
+
+<p>SAX's basic interface defines methods for parsing system
+identifiers (URIs), open files, and strings.  Behind the scenes,
+though, SAX uses a <tt>Source</tt> hash that contains that
+information, plus encoding, system and public identifiers if
+available.  These are described below under the <tt>Source</tt>
+option.</p>
+
+<p>SAX parsers accept all features as options to the <tt>parse()</tt>
+methods and on the parser's constructor.  Features are described in
+the next section.</p>
+
+<p>
+<dl><dt><b><tt class='function'>parse</tt></b>(<var>options</var>)</dt>
+<dd>
+Parses the XML instance identified by the <tt>Source</tt> option.
+<var>options</var> can be a list of option, value pairs or a hash.
+<tt>parse()</tt> returns the result of calling the
+<tt>end_document()</tt> handler.</dd></dl></p>
+
+<p>
+<dl><dt><b><tt>ContentHandler</tt></b></dt>
+<dd>
+Object to receive document content events.  The
+<tt>ContentHandler</tt>, with additional events defined below, is the
+class of events described in <a href="sax-2.0.html#BasicHandler">Basic
+SAX Handler</a>.If the application does not register a content handler
+or content event handlers on the default handler, content events
+reported by the SAX parser will be silently ignored.</dd></dl></p>
+
+<p>
+<dl><dt><b><tt>DTDHandler</tt></b></dt>
+<dd>
+Object to receive basic DTD events.  If the application does not
+register a DTD handler or DTD event handlers on the default handler,
+DTD events reported by the SAX parser will be silently
+ignored.</dd></dl></p>
+
+<p>
+<dl><dt><b><tt>EntityResolver</tt></b></dt>
+<dd>
+Object to resolve external entities.  If the application does not
+register an entity resolver or entity events on the default handler,
+the SAX parser will perform its own default resolution.</dd></dl></p>
+
+<p>
+<dl><dt><b><tt>ErrorHandler</tt></b></dt>
+<dd>
+Object to receive error-message events.  If the application does not
+register an error handler or error event handlers on the default
+handler, all error events reported by the SAX parser will be silently
+ignored; however, normal processing may not continue. It is highly
+recommended that all SAX applications implement an error handler to
+avoid unexpected bugs.</dd></dl></p>
+
+<p>
+<dl><dt><b><tt>Source</tt></b></dt>
+<dd>
+A hash containing information about the XML instance to be parsed.
+See <a href="#InputSources">Input Sources</a> below. Note that
+<tt>Source</tt> cannot be changed during the parse</dd></dl></p>
+
+<p>
+	<dl>
+		<dt><strong><tt>Features</tt></strong></dt>
+		<dd>
+			A hash containing Feature information, as described below.
+			Features can be set at runtime but not directly on the Features
+			hash (at least, not reliably. You can do it, but the results
+			might not be what you expect as it doesn't give the parser a
+			chance to look at what you've set so that it can't react properly
+			to errors, or Features that it doesn't support). You should use
+			the <code>set_feature()</code> method instead.
+		</dd>
+	</dl>
+</p>
+
+
+<h2><a name="Features">Features</a></h2>
+
+<p>Features are as defined in <a
+href="http://sax.sourceforge.net/apidoc/org/xml/sax/package-summary.html#package_description">SAX2: Features
+and Properties</a>, but not of course limited to those. You may add
+your own Features. Also, Java has an artificial distinction between
+Features and Properties which is unnecessary. In Perl, both have been
+merged under the same name.
+</p>
+
+<p>Features can be passed as options when creating a parser or calling
+a <tt>parse()</tt> method. They may also be set using the
+set_feature().
+</p>
+
+<pre>
+    $parser = AnySAXParser->new(
+                                Features => {
+                                             'http://xml.org/sax/features/namespaces' => 0,
+                                             },
+                                );
+    $parser->parse(
+                   Features => {
+                               'http://xml.org/sax/features/namespaces' => 0,
+                               },
+                   );
+    $parser->set_feature('http://xml.org/sax/properties/xml-string', 1);
+    $string = $parser->get_feature('http://xml.org/sax/properties/xml-string');
+</pre>
+
+<p>
+	When performing namespace processing, Perl SAX parsers always provide
+	both the raw tag name in <tt>Name</tt> and the namespace names in
+	<tt>NamespaceURI</tt>, <tt>LocalName</tt>, and <tt>Prefix</tt>.
+	Therefore, the
+	"<tt>http://xml.org/sax/features/namespace-prefixes</tt>" Feature is
+	ignored.
+</p>
+
+<p>
+	Also, Features are things that are supposed to be <strong>turned
+	on</strong>, and thus should normally be off by default, especially if
+	the parser doesn't support turning them off. Due to backwards
+	compatibility problems, the one exception to this rule is the
+	"<tt>http://xml.org/sax/features/namespaces</tt>" Feature which is on by
+	default and which a number of parsers may not be able to turn off. Thus,
+	a parser claiming to support this Feature (and all SAX2 parsers must
+	support	it) may in fact only support turning it on. This is only a minor
+	problem as turning it off basically amounts to returning to SAX1, which
+	can be accomplished by a filter (eg XML::Filter::SAX2toSAX1).
+</p>
+
+<p>
+  In addition to the Features described in the SAX spec
+  itself, a number of new ones may be defined for Perl. An example of
+  this would be http://xmlns.perl.org/sax/node-factory which
+  when supported by the parser would be settable to a NodeFactory object
+  that would be in charge of creating SAX nodes different from those that
+  are normally received by event handlers. See
+  <a href='http://xmlns.perl.org/'>http://xmlns.perl.org/</a> (currently
+  in alpha state) for details on how to register Features.
+</p>
+
+<p>
+	The following methods are used to get and set features:
+</p>
+
+<p>
+<dl><dt><b><tt class='function'>get_feature</tt></b>(<var>name</var>)</dt>
+<dd>
+Look up the value of a feature.
+
+<p>The feature name is any fully-qualified URI.  It is possible for an
+SAX parser to recognize a feature name but to be unable to return its
+value; this is especially true in the case of an adapter for a SAX1
+Parser, which has no way of knowing whether the underlying parser is
+validating, for example.</p>
+
+<p>Some feature values may be available only in specific contexts,
+such as before, during, or after a parse.</p>
+
+<tt>get_feature()</tt> returns the value of the feature, which is usually
+either a boolean or an object, and will throw
+<tt>XML::SAX::Exception::NotRecognized</tt> when the SAX parser does not
+recognize the feature name and <tt>XML::SAX::Exception::NotSupported</tt>
+when the SAX parser recognizes the feature name but cannot determine its
+value at this time.</dd></dl></p>
+
+<p>
+<dl><dt><b><tt class='function'>set_feature</tt></b>(<var>name</var>,
+<var>value</var>)</dt>
+<dd>
+Set the state of a feature.
+
+<p>The feature name is any fully-qualified URI. It is possible for an
+SAX parser to recognize a feature name but to be unable to set its
+value; this is especially true in the case of an adapter for a SAX1
+Parser, which has no way of affecting whether the underlying parser is
+validating, for example.</p>
+
+<p>Some feature values may be immutable or mutable only in specific
+contexts, such as before, during, or after a parse.</p>
+
+<tt>set_feature()</tt> will throw <tt>XML::SAX::Exception::NotRecognized</tt>
+when the SAX parser does not recognize the feature name and
+<tt>XML::SAX::Exception::NotSupported</tt> when the SAX parser recognizes the
+feature name but cannot set the requested value.
+
+<p>
+	This method is also the standard mechanism for setting extended	handlers,
+	such as "<code>http://xml.org/sax/handlers/DeclHandler</code>".
+</p>
+</dd></dl></p>
+
+
+<p>
+	<dl>
+		<dt><strong><code class='function'>get_features</code></strong>()</dt>
+		<dd>
+			Look up all Features that this parser claims to support.
+			<p>
+				This method returns a hash of Features which the parser
+				claims to support. The value of the hash is currently
+				unspecified though it may be used later. This method is meant
+				to be inherited so that Features supported by the base parser
+				class (XML::SAX::Base) are declared to be supported by
+				subclasses.
+			</p>
+			<p>
+				Calling this method is probably only moderately useful to end
+				users. It is mostly meant for use by XML::SAX, so that it can
+				query parsers for Feature support and return an appropriate
+				parser depending on the Features that are required.
+			</p>
+		</dd>
+	</dl>
+</p>
+
+
+
+<h2><a name="InputSources">Input Sources</a></h2>
+
+<p>Input sources may be provided to parser objects or are returned by
+entity resolvers.  An input source is a hash with these
+properties:</p>
+
+<dl>
+<dt><b><tt>PublicId</tt></b></dt>
+<dd>The public identifier of this input source.
+
+<p>The public identifier is always optional: if the application writer
+includes one, it will be provided as part of the location
+information.</p></dd>
+
+<dt><b><tt>SystemId</tt></b></dt>
+<dd>The system identifier (URI) of this input source.
+
+<p>The system identifier is optional if there is a byte stream or a
+character stream, but it is still useful to provide one, since the
+application can use it to resolve relative URIs and can include it in
+error messages and warnings (the parser will attempt to open a
+connection to the URI only if there is no byte stream or character
+stream specified).</p>
+
+If the application knows the character encoding of the object
+pointed to by the system identifier, it can register the encoding
+using the <tt>Encoding</tt> property.</dd>
+
+<dt><b><tt>ByteStream</tt></b></dt>
+<dd>The byte stream for this input source.
+
+<p>The SAX parser will ignore this if there is also a character stream
+specified, but it will use a byte stream in preference to opening a
+URI connection itself.</p>
+
+If the application knows the character encoding of the byte stream, it
+should set the <tt>Encoding</tt> property.</dd>
+
+<dt><b><tt>CharacterStream</tt></b></dt>
+<dd>The character stream for this input source.
+
+<p>If there is a character stream specified, the SAX parser will
+ignore any byte stream and will not attempt to open a URI connection
+to the system identifier.</p>
+
+<p>Note: A CharacterStream is a filehandle that does not need any encoding
+translation done on it. This is implemented as a regular filehandle
+and only works under Perl 5.7.2 or higher using PerlIO. To get a single
+character, or number of characters from it, use the perl core read()
+function. To get a single byte from it (or number of bytes), you can
+use sysread(). The encoding of the stream should be in the Encoding
+entry for the Source.</p>
+
+</dd>
+
+<dt><b><tt>Encoding</tt></b></dt>
+<dd>The character encoding, if known.
+
+<p>The encoding must be a string acceptable for an XML encoding
+declaration (see section 4.3.3 of the XML 1.0 recommendation).</p>
+
+This property has no effect when the application provides a character
+stream.</dd>
+</dl>
+
+<h2><a name="Handlers">SAX Handlers</a></h2>
+
+<p>SAX supports several classes of event handlers: content handlers,
+declaration handlers, DTD handlers, error handlers, entity resolvers,
+and other extensions.  This section defines each of these classes of
+events.</p>
+
+<h3>Content Events</h3>
+
+<p>This is the main interface that most SAX applications implement: if
+the application needs to be informed of basic parsing events, it
+implements this interface and registers an instance with the SAX
+parser using the <tt>ContentHandler</tt> property. The parser uses
+the instance to report basic document-related events like the start
+and end of elements and character data.</p>
+
+<p>The order of events in this interface is very important, and
+mirrors the order of information in the document itself. For example,
+all of an element's content (character data, processing instructions,
+and/or subelements) will appear, in order, between the
+<tt>start_element</tt> event and the corresponding
+<tt>end_element</tt> event.</p>
+
+
+<p>
+<dl><dt><b><tt class='function'>set_document_locator</tt></b>(<var>locator</var>)</dt>
+<dd>
+Receive an object for locating the origin of SAX document events.
+
+<p>SAX parsers are strongly encouraged (though not absolutely
+required) to supply a locator: if it does so, it must supply the
+locator to the application by invoking this method before invoking any
+of the other methods in the ContentHandler interface.</p>
+
+<p>The locator allows the application to determine the end position of
+any document-related event, even if the parser is not reporting an
+error.  Typically, the application will use this information for
+reporting its own errors (such as character content that does not
+match an application's business rules).  The information provided by
+the locator is probably not sufficient for use with a search
+engine.</p>
+
+<p>Note that the locator will provide correct information only during
+the invocation of the events in this interface. The application should
+not attempt to use it at any other time.</p>
+
+<p>The locator is a hash with these properties:</p>
+
+<blockquote>
+<table>
+<tr><td><b><tt>ColumnNumber</tt></b></td>
+<td>The column number of the end of the text where the exception
+occurred.</td></tr>
+<tr><td><b><tt>LineNumber</tt></b></td>
+<td>The line number of the end of the text where the exception
+occurred.</td></tr>
+<tr><td><b><tt>PublicId</tt></b></td>
+<td>The public identifier of the entity where the exception
+occurred.</td></tr>
+<tr><td><b><tt>SystemId</tt></b></td>
+<td>The system identifier of the entity where the exception
+occurred.</td></tr>
+</table>
+</blockquote></dd>
+</dl></p>
+
+<p>
+<dl><dt><b><tt class='function'>start_prefix_mapping</tt></b>(<var>mapping</var>)</dt>
+<dd>
+Begin the scope of a prefix-URI Namespace mapping.
+
+<p>The information from this event is not necessary for normal
+Namespace processing: the SAX XML reader will automatically replace
+prefixes for element and attribute names when the
+"<tt>http://xml.org/sax/features/namespaces</tt>" feature is true (the
+default).</p>
+
+<p>There are cases, however, when applications need to use prefixes in
+character data or in attribute values, where they cannot safely be
+expanded automatically; the start/end_prefix_mapping event supplies the
+information to the application to expand prefixes in those contexts
+itself, if necessary.</p>
+
+<p>Note that <tt>start</tt>/<tt>end_prefix_mapping()</tt> events are
+not guaranteed to be properly nested relative to each-other: all
+<tt>start_prefix_apping()</tt> events will occur before the
+corresponding <tt>start_element()</tt> event, and all
+<tt>end_prefix_mapping</tt> events will occur after the corresponding
+<tt>end_element()</tt> event, but their order is not
+guaranteed.
+</p>
+
+<p><var>mapping</var> is a hash with these properties:</p>
+
+<blockquote>
+<table>
+<tr><td><b><tt>Prefix</tt></b></td>
+<td>The Namespace prefix being declared.</td></tr>
+<tr><td><b><tt>NamespaceURI</tt></b></td>
+<td>The Namespace URI the prefix is mapped to.</td></tr>
+</table>
+</blockquote></dd>
+</dl></p>
+
+<p>
+<dl><dt><b><tt class='function'>end_prefix_mapping</tt></b>(<var>mapping</var>)</dt>
+<dd>
+End the scope of a prefix-URI mapping.
+
+<p>See <tt>start_prefix_mapping()</tt> for details. This event will
+always occur after the corresponding <tt>end_element</tt> event, but
+the order of <tt>end_prefix_mapping</tt> events is not otherwise
+guaranteed.</p>
+
+<p><var>mapping</var> is a hash with this property:</p>
+
+<blockquote>
+<table>
+<tr><td><b><tt>Prefix</tt></b></td>
+<td>The Namespace prefix that was being mapped.</td></tr>
+</table>
+</blockquote></dd>
+</dl></p>
+
+<p>
+<dl><dt><b><tt class='function'>processing_instruction</tt></b>(<var>pi</var>)</dt>
+<dd>
+Receive notification of a processing instruction.
+
+<p>The Parser will invoke this method once for each processing
+instruction found: note that processing instructions may occur before
+or after the main document element.</p>
+
+<p>A SAX parser should never report an XML declaration (XML 1.0,
+section 2.8) or a text declaration (XML 1.0, section 4.3.1) using this
+method.</p>
+
+<p><var>pi</var> is a hash with these properties:</p>
+
+<blockquote>
+<table>
+<tr><td><b><tt>Target</tt></b></td>
+<td>The processing instruction target.</td></tr>
+<tr><td><b><tt>Data</tt></b></td>
+<td>The processing instruction data, or null if none was
+supplied.</td></tr>
+</table>
+</blockquote></dd>
+</dl></p>
+
+<p>
+<dl><dt><b><tt class='function'>skipped_entity</tt></b>(<var>entity</var>)</dt>
+<dd>
+Receive notification of a skipped entity.
+
+<p>The Parser will invoke this method once for each entity skipped.
+Non-validating processors may skip entities if they have not seen the
+declarations (because, for example, the entity was declared in an
+external DTD subset). All processors may skip external entities,
+depending on the values of the
+"<tt>http://xml.org/sax/features/external-general-entities</tt>" and the
+"<tt>http://xml.org/sax/features/external-parameter-entities</tt>"
+Features.</p>
+
+<p><var>entity</var> is a hash with these properties:</p>
+
+<blockquote>
+<table>
+<tr><td><b><tt>Name</tt></b></td>
+<td>The name of the skipped entity. If it is a parameter
+entity, the name will begin with '<tt>%</tt>'.</td></tr>
+</table>
+</blockquote></dd>
+</dl></p>
+
+<h3>Declaration Events</h3>
+
+<p>This is an optional extension handler for SAX2 to provide
+information about DTD declarations in an XML document. XML readers are
+not required to support this handler.</p>
+
+<p>Note that data-related DTD declarations (unparsed entities and
+notations) are already reported through the DTDHandler interface.</p>
+
+<p>If you are using the declaration handler together with a lexical
+handler, all of the events will occur between the <tt>start_dtd</tt>
+and the <tt>end_dtd</tt> events.</p>
+
+<p>To set a seperate DeclHandler for an XML reader, set the
+"<tt>http://xml.org/sax/handlers/DeclHandler</tt>" Feature with the
+object to received declaration events.  If the reader does not support
+declaration events, it will throw a <tt>XML::SAX::Exception::NotRecognized</tt>
+or a <tt>XML::SAX::Exception::NotSupported</tt> when you attempt to register
+the handler.  Declaration event handlers on the default handler are
+automatically recognized and used.</p>
+
+
+<p>
+<dl><dt><b><tt class='function'>element_decl</tt></b>(<var>element</var>)</dt>
+<dd>
+Report an element type declaration.
+
+<p>The content model will consist of the string "EMPTY", the string
+"ANY", or a parenthesised group, optionally followed by an occurrence
+indicator. The model will be normalized so that all whitespace is
+removed, and will include the enclosing parentheses.</p>
+
+<p><var>element</var> is a hash with these properties:</p>
+
+<blockquote>
+<table>
+<tr><td><b><tt>Name</tt></b></td>
+<td>The element type name.</td></tr>
+<tr><td><b><tt>Model</tt></b></td>
+<td>The content model as a normalized string.</td></tr>
+</table>
+</blockquote></dd>
+</dl></p>
+
+<p>
+<dl><dt><b><tt class='function'>attribute_decl</tt></b>(<var>attribute</var>)</dt>
+<dd>
+Report an attribute type declaration.
+
+<p>Only the effective (first) declaration for an attribute will be
+reported.  The type will be one of the strings "<tt>CDATA</tt>",
+"<tt>ID</tt>", "<tt>IDREF</tt>", "<tt>IDREFS</tt>",
+"<tt>NMTOKEN</tt>", "<tt>NMTOKENS</tt>", "<tt>ENTITY</tt>",
+"<tt>ENTITIES</tt>", or "<tt>NOTATION</tt>", or a parenthesized token
+group with the separator "<tt>|</tt>" and all whitespace removed.</p>
+
+<p><var>attribute</var> is a hash with these properties:</p>
+
+<blockquote>
+<table>
+<tr><td><b><tt>eName</tt></b></td>
+<td>The name of the associated element.</td></tr>
+<tr><td><b><tt>aName</tt></b></td>
+<td>The name of the attribute.</td></tr>
+<tr><td><b><tt>Type</tt></b></td>
+<td>A string representing the attribute type.</td></tr>
+<tr><td><b><tt>ValueDefault</tt></b></td>
+<td>A string representing the attribute default ("<tt>#IMPLIED</tt>",
+"<tt>#REQUIRED</tt>", or "<tt>#FIXED</tt>") or undef if none of these
+applies.</td></tr>
+<tr><td><b><tt>Value</tt></b></td>
+<td>A string representing the attribute's default value, or null if
+there is none.</td></tr>
+</table>
+</blockquote></dd>
+</dl></p>
+
+<p>
+<dl><dt><b><tt class='function'>internal_entity_decl</tt></b>(<var>entity</var>)</dt>
+<dd>
+Report an internal entity declaration.
+
+<p>Only the effective (first) declaration for each entity will be
+reported.</p>
+
+<p><var>entity</var> is a hash with these properties:</p>
+
+<blockquote>
+<table>
+<tr><td><b><tt>Name</tt></b></td>
+<td>The name of the entity. If it is a parameter entity, the name will
+begin with '%'.</td></tr>
+<tr><td><b><tt>Value</tt></b></td>
+<td>The replacement text of the entity.</td></tr>
+</table>
+</blockquote></dd>
+</dl></p>
+
+<p>
+<dl><dt><b><tt class='function'>external_entity_decl</tt></b>(<var>entity</var>)</dt>
+<dd>
+Report a parsed external entity declaration.
+
+<p>Only the effective (first) declaration for each entity will be
+reported.</p>
+
+<p><var>entity</var> is a hash with these properties:</p>
+
+<blockquote>
+<table>
+<tr><td><b><tt>Name</tt></b></td>
+<td>The name of the entity. If it is a parameter entity, the name will
+begin with '%'.</td></tr>
+<tr><td><b><tt>PublicId</tt></b></td>
+<td>The public identifier of the entity, or <tt>undef</tt> if none was
+declared.</td></tr>
+<tr><td><b><tt>SystemId</tt></b></td>
+<td>The system identifier of the entity.</td></tr>
+</table>
+</blockquote></dd>
+</dl></p>
+
+<h3>DTD Events</h3>
+
+<p>If a SAX application needs information about notations and unparsed
+entities, then the application implements this interface.  The parser
+uses the instance to report notation and unparsed entity declarations
+to the application.</p>
+
+<p>The SAX parser may report these events in any order, regardless of
+the order in which the notations and unparsed entities were declared;
+however, all DTD events must be reported after the document handler's
+<tt>start_document()</tt> event, and before the first
+<tt>start_element()</tt> event.</p>
+
+<p>It is up to the application to store the information for future use
+(perhaps in a hash table or object tree). If the application
+encounters attributes of type "<tt>NOTATION</tt>", "<tt>ENTITY</tt>",
+or "<tt>ENTITIES</tt>", it can use the information that it obtained
+through this interface to find the entity and/or notation
+corresponding with the attribute value.</p>
+
+<p>
+<dl><dt><b><tt class='function'>notation_decl</tt></b>(<var>notation</var>)</dt>
+<dd>
+Receive notification of a notation declaration event.
+
+<p>It is up to the application to record the notation for later
+reference, if necessary.</p>
+
+<p>If a system identifier is present, and it is a URL, the SAX parser
+must resolve it fully before passing it to the application.</p>
+
+<p><var>notation</var> is a hash with these properties:</p>
+
+<blockquote>
+<table>
+<tr><td><b><tt>Name</tt></b></td>
+<td>The notation name.</td></tr>
+<tr><td><b><tt>PublicId</tt></b></td>
+<td>The public identifier of the entity, or <tt>undef</tt> if none was
+declared.</td></tr>
+<tr><td><b><tt>SystemId</tt></b></td>
+<td>The system identifier of the entity, or <tt>undef</tt> if none was
+declared.</td></tr>
+</table>
+</blockquote></dd>
+</dl></p>
+
+<p>
+<dl><dt><b><tt class='function'>unparsed_entity_decl</tt></b>(<var>entity</var>)</dt>
+<dd>
+Receive notification of an unparsed entity declaration event.
+
+<p>Note that the notation name corresponds to a notation reported by
+the <tt>notation_decl()</tt> event. It is up to the application to
+record the entity for later reference, if necessary.</p>
+
+<p>If the system identifier is a URL, the parser must resolve it fully
+before passing it to the application.</p>
+
+<p><var>entity</var> is a hash with these properties:</p>
+
+<blockquote>
+<table>
+<tr><td><b><tt>Name</tt></b></td>
+<td>The unparsed entity's name.</td></tr>
+<tr><td><b><tt>PublicId</tt></b></td>
+<td>The public identifier of the entity, or <tt>undef</tt> if none was
+declared.</td></tr>
+<tr><td><b><tt>SystemId</tt></b></td>
+<td>The system identifier of the entity.</td></tr>
+<tr><td><b><tt>Notation</tt></b></td>
+<td>The name of the associated notation.</td></tr>
+</table>
+</blockquote></dd>
+</dl></p>
+
+<h3>Entity Resolver</h3>
+
+<p>If a SAX application needs to implement customized handling for
+external entities, it must implement this interface.</p>
+
+<p>The parser will then allow the application to intercept any
+external entities (including the external DTD subset and external
+parameter entities, if any) before including them.</p>
+
+<p>
+  Many SAX applications will not need to implement this interface,
+  but it will be especially useful for applications that build XML
+  documents from databases or other specialised input sources, or for
+  applications that use URI types that are either not URLs, or that
+  have schemes unknown to the parser.
+</p>
+
+<p>
+<dl><dt><b><tt class='function'>resolve_entity</tt></b>(<var>entity</var>)</dt>
+<dd>
+Allow the application to resolve external entities.
+
+<p>The Parser will call this method before opening any external entity
+except the top-level document entity (including the external DTD
+subset, external entities referenced within the DTD, and external
+entities referenced within the document element): the application may
+request that the parser resolve the entity itself, that it use an
+alternative URI, or that it use an entirely different input
+source.</p>
+
+<p>Application writers can use this method to redirect external system
+identifiers to secure and/or local URIs, to look up public identifiers
+in a catalogue, or to read an entity from a database or other input
+source (including, for example, a dialog box).</p>
+
+<p>If the system identifier is a URL, the SAX parser must resolve it
+fully before reporting it to the application.</p>
+
+<p><var>entity</var> is a hash with these properties:</p>
+
+<blockquote>
+<table>
+<tr><td><b><tt>PublicId</tt></b></td>
+<td>The public identifier of the entity being referenced, or
+<tt>undef</tt> if none was declared.</td></tr>
+<tr><td><b><tt>SystemId</tt></b></td>
+<td>The system identifier of the entity being referenced.</td></tr>
+</table>
+</blockquote></dd>
+</dl></p>
+
+<h3>Error Events</h3>
+
+<p>If a SAX application needs to implement customized error handling,
+it must implement this interface.  The parser will then report all
+errors and warnings through this interface.</p>
+
+<p>The parser shall use this interface to report errors instead or in
+addition to throwing an exception: for errors and warnings the recommended
+approach is to leave the application throw its own exceptions and to not
+throw them in the parser. For fatal errors however, it is not uncommon that
+the parser will throw an exception after having reported the error as it
+renders any continuation of parsing impossible.
+</p>
+
+<p>All error handlers receive a hash, <var>exception</var>, with the
+properties defined in <a
+href="sax-2.0.html#Exceptions">Exceptions</a>.</p>
+
+<p>
+<dl><dt><b><tt class='function'>warning</tt></b>(<var>exception</var>)</dt>
+<dd>
+Receive notification of a warning.
+
+<p>SAX parsers will use this method to report conditions that are not
+errors or fatal errors as defined by the XML 1.0 recommendation. The
+default behaviour is to take no action.</p>
+
+The SAX parser must continue to provide normal parsing events after
+invoking this method: it should still be possible for the application
+to process the document through to the end.</dd></dl></p>
+
+<p>
+<dl><dt><b><tt class='function'>error</tt></b>(<var>exception</var>)</dt>
+<dd>
+Receive notification of a recoverable error.
+
+<p>This corresponds to the definition of "error" in section 1.2 of the
+W3C XML 1.0 Recommendation.  For example, a validating parser would use
+this callback to report the violation of a validity constraint.  The
+default behaviour is to take no action.</p>
+
+The SAX parser must continue to provide normal parsing events after
+invoking this method: it should still be possible for the application
+to process the document through to the end.  If the application cannot
+do so, then the parser should report a fatal error even if the XML 1.0
+recommendation does not require it to do so.</dd></dl></p>
+
+<p>
+<dl><dt><b><tt class='function'>fatal_error</tt></b>(<var>exception</var>)</dt>
+<dd>
+Receive notification of a non-recoverable error.
+
+<p>This corresponds to the definition of "fatal error" in section 1.2
+of the W3C XML 1.0 Recommendation.  For example, a parser would use
+this callback to report the violation of a well-formedness
+constraint.</p>
+
+The application must assume that the document is unusable after the
+parser has invoked this method, and should continue (if at all) only
+for the sake of collecting addition error messages: in fact, SAX
+parsers are free to stop reporting any other events once this method
+has been invoked.</dd></dl></p>
+
+<h3>Lexical Events</h3>
+
+<p>This is an optional extension handler for SAX2 to provide lexical
+information about an XML document, such as comments and CDATA section
+boundaries; XML readers are not required to support this handler.</p>
+
+<p>The events in the lexical handler apply to the entire document, not
+just to the document element, and all lexical handler events must
+appear between the content handler's <tt>start_document()</tt> and
+<tt>end_document()</tt> events.</p>
+
+<p>To set the LexicalHandler for an XML reader, set the Feature
+"<tt>http://xml.org/sax/handlers/LexicalHandler</tt>" on the parser to
+the object to receive lexical events.  If the reader does not support
+lexical events, it will throw a <tt>XML::SAX::Exception::NotRecognized</tt> or
+a <tt>XML::SAX::Exception::NotSupported</tt> when you attempt to register the
+handler.</p>
+
+<p>
+<dl><dt><b><tt class='function'>start_dtd</tt></b>(<var>dtd</var>)</dt>
+<dd>
+Report the start of DTD declarations, if any.
+
+<p>Any declarations are assumed to be in the internal subset unless
+otherwise indicated by a start_entity event.</p>
+
+<p>Note that the <tt>start</tt>/<tt>end_dtd()</tt> events will appear
+within the <tt>start</tt>/<tt>end_document()</tt> events from Content
+Handler and before the first <tt>start_element()</tt> event.</p>
+
+<p><var>dtd</var> is a hash with these properties:</p>
+
+<blockquote>
+<table>
+<tr><td><b><tt>Name</tt></b></td>
+<td>The document type name.</td></tr>
+<tr><td><b><tt>PublicId</tt></b></td>
+<td>The declared public identifier for the external DTD subset, or
+<tt>undef</tt> if none was declared.</td></tr>
+<tr><td><b><tt>SystemId</tt></b></td>
+<td>The declared system identifier for the external DTD subset, or
+<tt>undef</tt> if none was declared.</td></tr>
+</table>
+</blockquote></dd>
+</dl></p>
+
+<p>
+<dl><dt><b><tt class='function'>end_dtd</tt></b>(<var>dtd</var>)</dt>
+<dd>
+Report the end of DTD declarations.
+
+<p>No properties are defined for this event (<var>dtd</var> is
+empty).</p></dd></dl></p>
+
+<p>
+<dl><dt><b><tt class='function'>start_entity</tt></b>(<var>entity</var>)</dt>
+<dd>
+Report the beginning of an entity in content.
+
+<p><b>NOTE</b>: entity references in attribute values -- and the start
+and end of the document entity -- are never reported.</p>
+
+<p>The start and end of the external DTD subset are reported using the
+pseudo-name "[dtd]". All other events must be properly nested within
+start/end entity events.</p>
+
+<p>Note that skipped entities will be reported through the
+<tt>skipped_entity()</tt> event, which is part of the ContentHandler
+interface.</p>
+
+<p><var>entity</var> is a hash with these properties:</p>
+
+<blockquote>
+<table>
+<tr><td><b><tt>Name</tt></b></td>
+<td>The name of the entity. If it is a parameter entity, the
+name will begin with '%'.</td></tr>
+</table>
+</blockquote></dd>
+</dl></p>
+
+<p>
+<dl><dt><b><tt class='function'>end_entity</tt></b>(<var>entity</var>)</dt>
+<dd>
+Report the end of an entity.
+
+<p><var>entity</var> is a hash with these properties:</p>
+
+<blockquote>
+<table>
+<tr><td><b><tt>Name</tt></b></td>
+<td>The name of the entity that is ending.</td></tr>
+</table>
+</blockquote></dd>
+</dl></p>
+
+<p>
+<dl><dt><b><tt class='function'>start_cdata</tt></b>(<var>cdata</var>)</dt>
+<dd>
+Report the start of a CDATA section.
+
+<p>The contents of the CDATA section will be reported through the
+regular characters event.</p>
+
+<p>No properties are defined for this event (<var>cdata</var> is
+empty).</p></dd></dl></p>
+
+<p>
+<dl><dt><b><tt class='function'>end_cdata</tt></b>(<var>cdata</var>)</dt>
+<dd>
+Report the end of a CDATA section.
+
+<p>No properties are defined for this event (<var>cdata</var> is
+empty).</p></dd></dl></p>
+
+<p>
+<dl><dt><b><tt class='function'>comment</tt></b>(<var>comment</var>)</dt>
+<dd>
+Report an XML comment anywhere in the document.
+
+<p>This callback will be used for comments inside or outside the
+document element, including comments in the external DTD subset (if
+read).</p>
+
+<p><var>comment</var> is a hash with these properties:</p>
+
+<blockquote>
+<table>
+<tr><td><b><tt>Data</tt></b></td>
+<td>The comment characters.</td></tr>
+</table>
+</blockquote></dd>
+</dl></p>
+
+<h2><a name="Filters">SAX Filters</a></h2>
+
+<p>An XML filter is like an XML event generator, except that it
+obtains its events from another XML event generator rather than a
+primary source like an XML document or database.  Filters can modify a
+stream of events as they pass on to the final application.</p>
+
+<p>
+<dl><dt><b><tt>Parent</tt></b></dt>
+<dd>
+The parent reader.
+
+<p>This Feature allows the application to link the filter to a parent
+event generator (which may be another filter).</p></dd></dl></p>
+
+<p>
+  See the XML::SAX::Base module for more on filters. It is meant to be
+  used as a base class for filters and drivers, and makes them much
+  easier to implement.
+</p>
+
+<h2><a name="Java">Java Compatibility</a></h2>
+
+The Perl SAX 2.0 binding differs from the Java binding in these ways:
+
+<ul>
+
+<li>Takes parameters to <tt>new()</tt>, to <tt>parse()</tt>, and to be
+set directly in the object, instead of requiring set/get calls (see
+below).</li>
+
+<li>Allows a default <tt>Handler</tt> parameter to be used for all
+handlers.</li>
+
+<li>
+  No base classes are enforced. Instead, parsers dynamically
+  check the handlers for what methods they support. Note however that
+  using XML::SAX::Base as your base class for Drivers and Filters will
+  make your code a lot simpler, less error prone, and probably much more
+  correct with regard to this spec. Only reimplement that functionality
+  if you really need to.
+</li>
+
+<li>The Attribute, InputSource, and SAXException (XML::SAX::Exception)
+classes are only described as hashes (see below).</li>
+
+<li>Handlers are passed a hash (Node) containing properties as an
+argument instead of positional arguments.</li>
+
+<li><tt>parse()</tt> methods return the value returned by calling the
+<tt>end_document()</tt> handler.</li>
+
+<li>
+  Method names have been converted to lower-case with underscores.
+  Parameters are all mixed case with initial upper-case.
+</li>
+</ul>
+
+<p>
+  If compatibility is a problem for you consider writing a Filter that
+  converts from this style to the one you want. It is likely that such
+  a Filter will be available from CPAN in the not distant future.
+</p>
+
+<!--
+<p>[FIXME: need to list package/class name equivalents for all
+hashes.]</p>
+-->
+
+</body>
+</html>

@@ -1,0 +1,126 @@
+<?xml version="1.0"?>
+<!-- 
+LSID HTTP Binding Standard for the LSIDDataServicePortType 
+and the LSIDMetadataServicePortType 
+
+
+Jordi Albornoz and Ben Szekely
+12 November 2003 - Initial Draft
+-->
+
+<definitions xmlns:tns="http://www.omg.org/LSID/2003/DataServiceHTTPBindings"
+		targetNamespace="http://www.omg.org/LSID/2003/DataServiceHTTPBindings"
+		xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+		xmlns="http://schemas.xmlsoap.org/wsdl/"
+		xmlns:http="http://schemas.xmlsoap.org/wsdl/http/"
+		xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+		xmlns:sns="http://www.omg.org/LSID/2003/Standard/WSDL">
+
+	<import namespace="http://www.omg.org/LSID/2003/Standard/WSDL" location="LSIDPortTypes.wsdl" />
+
+	<binding name="LSIDDataHTTPBinding" type="sns:LSIDDataServicePortType">
+		<http:binding verb="GET" />
+		<operation name="getData">
+			<http:operation location=""/>
+			<input>
+				<http:urlEncoded/>
+			</input>
+			<output>
+				<mime:multipartRelated>
+					<mime:part>
+						<mime:content part="data-attachment" type="application/octet-stream" />
+					</mime:part>
+				</mime:multipartRelated>
+			</output>
+		</operation>
+		<operation name="getDataByRange">
+			<http:operation location=""/>
+			<input>
+				<http:urlEncoded/>
+			</input>
+			<output>
+				<mime:multipartRelated>
+					<mime:part>
+						<mime:content part="data-attachment" type="application/octet-stream" />
+					</mime:part>
+				</mime:multipartRelated>
+			</output>
+		</operation>
+	</binding>
+
+	<binding name="LSIDMetadataHTTPBinding" type="sns:LSIDMetadataServicePortType">
+		<http:binding verb="GET" />
+		<operation name="getMetadata">
+			<http:operation location="" />
+			<input>
+				<http:urlEncoded/>
+			</input>
+			<output>
+				<mime:multipartRelated>
+					<mime:part>
+						<mime:content part="metadata-attachment" type="application/octet-stream" />
+					</mime:part>
+				</mime:multipartRelated>
+			</output>
+		</operation>
+	</binding>
+	
+	<binding name="LSIDMetadataSubsetHTTPBinding" type="sns:LSIDMetadataSubsetServicePortType">
+		<http:binding verb="GET" />
+		<operation name="getMetadataSubset">
+			<http:operation location="" />
+			<input>
+				<http:urlEncoded/>
+			</input>
+			<output>
+				<mime:multipartRelated>
+					<mime:part>
+						<mime:content part="metadata-attachment" type="application/octet-stream" />
+					</mime:part>
+				</mime:multipartRelated>
+			</output>
+		</operation>
+	</binding>
+	
+	<binding name="LSIDDataHTTPBindingDirect" type="sns:LSIDDataServicePortType">
+		<http:binding verb="GET" />
+		<operation name="getData">
+			<http:operation location="" />
+			<input />
+			<output>
+				<mime:multipartRelated>
+					<mime:part>
+						<mime:content part="data-attachment" type="application/octet-stream" />
+					</mime:part>
+				</mime:multipartRelated>
+			</output>
+		</operation>
+		<operation name="getDataByRange">
+			<http:operation location="" />
+			<input />
+			<output>
+				<mime:multipartRelated>
+					<mime:part>
+						<mime:content part="data-attachment" type="application/octet-stream" />
+					</mime:part>
+				</mime:multipartRelated>
+			</output>
+		</operation>
+	</binding>
+
+	<binding name="LSIDMetadataHTTPBindingDirect" type="sns:LSIDMetadataServicePortType">
+		<http:binding verb="GET" />
+		<operation name="getMetadata" >
+			<http:operation  location="" />
+			<input />
+			<output>
+				<mime:multipartRelated>
+					<mime:part>
+						<mime:content part="metadata-attachment" type="application/octet-stream" />
+					</mime:part>
+				</mime:multipartRelated>
+			</output>
+		</operation>
+	</binding>
+		
+</definitions>

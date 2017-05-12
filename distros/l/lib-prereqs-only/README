@@ -1,0 +1,86 @@
+SYNOPSIS
+
+    To test your distribution:
+
+     % cd Your-Dist
+     % PERL5OPT=-Mlib::prereqs::only prove -l
+
+    To allow RuntimeRecommends prereqs too:
+
+     % PERL5OPT=-Mlib::prereqs::only=RuntimeRecommends,1 prove -l
+
+    To test script:
+
+     % PERL5OPT=-Mlib::prereqs::only some-script
+
+    To test script in your distribution (as well as turn debugging on, and
+    allowing core modules even though they are not specified in dist.ini):
+
+     % cd Your-Dist
+     % perl -Mlib::prereqs::only=debug,1,allow_core,1 -Ilib bin/some-script
+
+DESCRIPTION
+
+    This pragma reads the prerequisites found in dist.ini, the modules
+    found in lib/, and uses lib::filter to only allow those modules to be
+    locateable/loadable. It is useful while testing Dist::Zilla-based
+    distribution: it tests that the prerequisites you specify in dist.ini
+    is already complete (at least to run the test suite).
+
+    Some caveats:
+
+      * For using with prove, this pragma currently only works via PERL5OPT
+
+      Using:
+
+       % prove -Mlib::prereqs::only ...
+
+      currently does not work, because the test script is run in a separate
+      process.
+
+    By default, only prereqs specified in RuntimeRequires and TestRequires
+    sections are allowed. But you can include other sections too if you
+    want:
+
+     % PERL5OPT=-Mlib::prereqs::only=RuntimeRecommends,1,TestSuggests,1 prove ...
+
+    Currently only (Runtime|Test)(Requires|Recommends|Suggests) are
+    recognized.
+
+    Other options that can be passed to the pragma:
+
+      * allow_core => bool (default: 1)
+
+      This will be passed to lib::filter. By default (allow_core=1), core
+      modules will also be allowed. If you specify core modules in your
+      prereqs and want to test that, perhaps you want to set this to 0 (but
+      currently XS modules won't work with allow_core set to 0).
+
+      * debug => bool (default: 0)
+
+      If set to 1, will print debug messages.
+
+      * allow => str
+
+      Specify an extra set of modules to allow. Value is a
+      semicolon-separated list of module names. Will be passed to
+      lib::filter.
+
+      * disallow => str
+
+      Specify an extra set of modules to disallow. Value is a
+      semicolon-separated list of module names. Will be passed to
+      lib::filter.
+
+      * allow_re => str
+
+      Specify module pattern to allow. Will be passed to lib::filter.
+
+      * disallow_re => str
+
+      Specify module pattern to disallow. Will be passed to lib::filter.
+
+SEE ALSO
+
+    lib::filter
+

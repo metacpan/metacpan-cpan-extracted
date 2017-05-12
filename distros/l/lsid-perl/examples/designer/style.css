@@ -1,0 +1,127 @@
+
+body {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size:12px;  
+	/* background: #808080; */
+	margin: 0px;
+	border: 0px;
+	padding: 0px;
+}
+
+select.widelist {
+	min-width: 60%;
+	width: 60%;
+	margin-left: 45px;
+	margin-right: 45px;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+h1, h2, h3, h4 {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	padding-left: 10px;
+	color: #f60;
+}
+
+p, pre {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+
+	padding: 0 30px 10px 20px;
+	margin: 0;
+
+	text-align: justify;
+}
+
+#main {
+	background: #ffffff;
+	color: #333333;
+	margin: 0;
+	padding: 0;
+}
+
+#instructions {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: larger;
+
+	border: solid #666666; 
+	background: #e0e0e0;
+
+	border-width: 2px ;
+	padding-top: 10px;
+	padding-bottom: 10px;
+	margin: 20px;
+}
+
+#position {
+
+	font-size: smaller;
+}
+
+#content {
+	padding-left: 20px;
+}
+
+#description {
+	font-size: 125%;
+}
+
+#title {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	text-align: left;
+	margin-top: 0px;
+	color: #f60;
+}
+
+
+#bolden {
+	font-weight: bold;
+}
+
+.options {
+
+	font-weight: bold;
+	color: #f60;
+
+	padding-left: 4px;
+	padding-right: 4px;
+}
+
+.comment {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: x-small;
+
+	padding-top: 5px;
+	padding-bottom: 5px;
+}
+
+.controls {
+	text-align: center;
+	padding: 10px;
+}
+
+
+
+
+/* Services and Namespaces */
+#services {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	width: 80%;
+}
+
+#namespaces {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	width: 80%;
+}
+
+#mappings {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	width: 80%;
+}
+
+
+/* Service Endpoints */
+#ports {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	width: 80%;
+
+}

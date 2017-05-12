@@ -1,0 +1,127 @@
+Revision history for Perl extension lsid-perl.
+
+1.1.7
+	- 1.1.6 cpan release relied on codebase found in the wrong repository.
+	- added back the functionality to fall back on simple http get on the authority followed by /authority
+	- silenced some errros in LS::SOAP::Service.pm
+	- Makefile.pl has been revised to use Module::Install
+
+1.1.4
+	- Fixed bug in Perl use statements
+	- Minor code style cleanups
+
+1.1.3
+	- Updated the WSDL Object to be aware of XML Namespaces
+	- Added default service name processing for LS::Authority::WSDL::Services
+	- Fixed mispelling in MANIFEST file
+	- Converted LS::Client::BasicResolver to use a simple die with error details
+	- Converted to simple die with error details in LS::Authority, LS::Client::SOAP and LS::Client::HTTP. Full conversion to Error.pm is pending
+	- Added several exceptions in LS.pm
+	- Included new Perl module dependency: Error.pm for exceptions
+	- Bug fixes in the LS::Service layer, LS::Client layer and base LS layer
+	- Split LS::Service::* into individual files
+	- 'use base' where possible
+	- Fixed the test suite
+	- Continued to cleanup LS::Authority::WSDL
+	- Removed dependency on SOAP::MIME (had to work around a SOAP::Lite 0.60 bug)
+	- Updated WSDL module to explicitly set XML prefix->URI mappings
+
+1.1.2
+	- Bug fixes to LS/Authority/WSDL/Service.pm
+
+1.1.1
+	- Bug fixes in examples/client/lsid_client.pl
+	- Bug fixes to LS/Authority.pm
+	- Added LS::RDF::ComplexDocument
+	- Added LS::RDF::Bag
+	- Added LS::RDF::Metadata
+	- Made the Format returned in an LS::Service::Response do something to HTTP headers
+	- Documentation update in all Perl modules
+	- Migration from ->isa to UNIVERSAL::isa to avoid dreferencing undefined objects
+	- Added LS::Base as the base class for all LS objects
+	- Added error handline methods to LS::Base
+	- Added stack trace information to LS::Base
+	- Migrated all error handline to LS::Base routines
+	- Added LS::Config that will parse the file examples/config/lsid-client.xml
+	- Cleaned up more code in LS::Authority and LS::Locator
+	- Added LS::Service::AdvancedDataService which allows regular expression matching in the namespace lookup
+	- Added proxy authority example.
+	- Added convenience methods for adding ports to an LS::Service::Authority
+	- Added Web Resolver example
+	- Added Authority designer example
+	- Added test suite use 'make test' before 'make install'
+	- Fixed numerous bugs in the WSDL parser
+	- Created a LS::Authority::WSDL::Constants
+	
+1.1.0
+	- Move to new version
+
+1.0.3
+	- Creation of a Client library
+	- Creation of a basic client resolver
+	- Many small fixes to the Authority framework
+	- Small fixes to the example authorities
+	- Rewrite of the example client
+	- Fixed - [ Bug #3985 ] uri_unescape not called in LS::HTTP::Service::do_data
+	- Rewrite of the cache manager, supports large files
+	- Vanilla HTTP transport supports large file downloads
+	- Initial implementation of LSID Assigning service framework and client
+	- Seperation of LS::SOAP::Fault class to its own package
+	- Removal of LS::Service::Fault::SOAP class (it was redundant)
+	- Standardization of return values (LS::Service::Response or LS::Service::Fault)
+	- LS::Authority::WSDL package and classes have been enhanced and made more general
+	- Implmentation of Foreign Authority Notification service
+	- Updated example authorities to work with new WSDL objects
+	- Added LSID Assigning Service example and template (see examples/tools for the template)
+
+1.0.2
+	- Faults now percolate through the stack
+ 	- getServices is automatically populated with the correct endpoints
+ 	- Fault codes are now updated to the specification
+ 	- Namespaces allow full range of methods defined in the specification
+ 	- LSIDs are now completely case sensitive from the namespace:object:revsion portion
+ 	- WSDL document generation is now simpler
+ 	- LSID port types are now fully specified 
+ 	- Many service cleanups and descriptive error messages 
+ 	- And many more fixes...
+
+1.0.1
+	- Moved to new specification based on the OMG
+	- SOAP with MIME attachments
+	- HTTP Authorities with Faults
+	- SOAP Authorities with Faults
+	- Moved LS::Authority::Service::DataService to LS::Service
+	- LS::SOAP::Service, LS::HTTP::Service are implementations of LS::Service
+	- Touched up cache manager code pending rewrite
+	- Added httpd.conf examples for Apache authorities
+	- Some methods have been deprecated (getAuthorityVersion, getKnownURIs, as well as object methods)
+
+0.07
+	- Added cache manager for all LSID related information
+	- Added HTTP Basic Authentication processing
+	- Created authority framework
+
+0.06
+	- dies from RDF::Core::Model::Parser->parse are now caught
+	- updated sample-client.pl
+	
+0.05
+	- LSID strings are now validated in LS::ID->new
+	- Removed resolveMetaDataQuery SOAP calls and perl interfaces
+	- LS::Resource now uses the getMetaData call, and RDF::Core for processing the metadata
+	- The APIs to LS::Resource and LS::Authority have changed!  See their perldoc for details.
+
+0.03
+	- Added support for SOAP data port bindings
+	- Added support for getMetaData call
+	- Added support for expires header
+	- The APIs to LS::Resource and LS::Authority::WSDL::Simple have changed!
+	  Some methods have been deprecated.  See their perldoc for details.
+
+
+0.01  Mon Feb  3 14:38:15 2003
+	- original version; created by h2xs 1.22 with options
+		-AX -n LS -b 5.6.0
+
+		
+$Id: Changes 1818 2007-11-05 19:33:12Z edwardkawas $

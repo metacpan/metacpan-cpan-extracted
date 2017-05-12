@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<rdf:RDF
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:i3cp="urn:lsid:biopathways.org:predicates:"
+>
+	<rdf:Description rdf:about="urn:lsid:biopathways.org:formats:html">
+		<rdf:type rdf:resource="urn:lsid:biopathways.org:types:format"/>
+		<dc:title>HTML Format</dc:title>
+		<i3cp:hasextension>.htm</i3cp:hasextension>
+		<i3cp:hasextension>.html</i3cp:hasextension>
+	</rdf:Description>
+</rdf:RDF>

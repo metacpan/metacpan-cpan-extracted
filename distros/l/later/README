@@ -1,0 +1,30 @@
+later
+=====
+
+The 'later' pragma enables you to postpone using
+a module until it is actually needed during runtime.
+
+See perldoc 'later' for more information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module has no dependencies.
+
+AUTHOR
+
+Erwan Lemonnier
+
+COPYRIGHT AND LICENCE
+
+See perldoc 'later'
+
+

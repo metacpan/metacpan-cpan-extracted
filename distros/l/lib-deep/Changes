@@ -1,0 +1,13 @@
+Revision history for Perl extension lib::deep.
+
+0.90  Thu Oct 17 13:43:51 2013
+	- original version; created by h2xs 1.23 with options
+		-A -n lib::deep
+0.91  Sun Feb 17 00:43:00 2014
+        - new syntax; 
+        - use lib::deep 0;
+        - use lib::deep -1;
+        - use lib::deep -2;
+
+0.91  Sun Feb 17 00:43:00 2014
+        - tests for linux imporved 

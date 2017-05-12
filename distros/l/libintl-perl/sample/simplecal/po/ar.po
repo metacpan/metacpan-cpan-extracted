@@ -1,0 +1,96 @@
+# Arabic translations for SimpleCal.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: SimpleCal\n"
+"Report-Msgid-Bugs-To: Edit the file PACAKGE to change this.\n"
+"POT-Creation-Date: 2013-01-14 18:14+0200\n"
+"PO-Revision-Date: 2003-07-27 18:56+0200\n"
+"Last-Translator: Guido Flohr <Guido.Flohr@cantanea.com>\n"
+"Language-Team: Arabic <guido.flohr@cantanea.com>\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-6\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../lib/SimpleCal.pm:26
+msgid "January"
+msgstr "ÍÊ«Í—"
+
+#: ../lib/SimpleCal.pm:28
+msgid "February"
+msgstr "·»—«Í—"
+
+#: ../lib/SimpleCal.pm:30
+msgid "March"
+msgstr "Â«—”"
+
+#: ../lib/SimpleCal.pm:32
+msgid "April"
+msgstr "√»—Í‰"
+
+#: ../lib/SimpleCal.pm:34
+msgid "May"
+msgstr "Â«ÍË"
+
+#: ../lib/SimpleCal.pm:36
+msgid "June"
+msgstr "ÍËÊÍË"
+
+#: ../lib/SimpleCal.pm:38
+msgid "July"
+msgstr "ÍË‰ÍË"
+
+#: ../lib/SimpleCal.pm:40
+msgid "August"
+msgstr "√⁄”◊”"
+
+#: ../lib/SimpleCal.pm:42
+msgid "September"
+msgstr "”» Â»—"
+
+#: ../lib/SimpleCal.pm:44
+msgid "October"
+msgstr "√„ Ë»—"
+
+#: ../lib/SimpleCal.pm:46
+msgid "November"
+msgstr "ÊË·Â»—"
+
+#: ../lib/SimpleCal.pm:48
+msgid "December"
+msgstr "œÍ”Â»—"
+
+#: ../lib/SimpleCal.pm:70
+msgid "Sun"
+msgstr "Õ"
+
+#: ../lib/SimpleCal.pm:71
+msgid "Mon"
+msgstr "Ê"
+
+#: ../lib/SimpleCal.pm:72
+msgid "Tue"
+msgstr "À"
+
+#: ../lib/SimpleCal.pm:73
+msgid "Wed"
+msgstr "—"
+
+#: ../lib/SimpleCal.pm:74
+msgid "Thu"
+msgstr "Œ"
+
+#: ../lib/SimpleCal.pm:75
+msgid "Fri"
+msgstr "Ã"
+
+#: ../lib/SimpleCal.pm:76
+msgid "Sat"
+msgstr "”"
+
+#~ msgid "Welcome to {package}!\n"
+#~ msgstr "«Á‰« »„ {package} ·Í\n"
+
+#~ msgid "Bye.\n"
+#~ msgstr "!≈‰È «‰‰‚«¡\n"

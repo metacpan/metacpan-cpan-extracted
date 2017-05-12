@@ -1,0 +1,418 @@
+#!/usr/bin/perl -w
+
+# If your Perl implementation resides somewhere other than
+# /usr/bin/perl, change the above line to reflect that.
+
+## Created:    <Sun Oct 15 02:57:05 EDT 2000>
+## Time-stamp: <2002-04-25 10:23:44 foof>
+## Author:     Alex Shinn <foof@debian.org>
+
+=head1 NAME
+
+pogg - Perl Ogg Vorbis Utility
+
+=head1 SYNOPSIS
+
+  pogg [play]  [options] [file1.ogg file2.ogg...]
+  pogg encode  [options] [file1.wav file2.wav...]
+  pogg decode  [options] [file1.ogg file2.ogg...]
+  pogg convert [options] [file1.mp3 file2.mp3...]
+  pogg comment [options] [file1.ogg file2.ogg...]
+
+=head1 DESCRIPTION
+
+pogg is a general purpose tool for playing, encoding (from .wav),
+decoding (to .wav), converting (from .mp3) and commenting Ogg Vorbis
+files.  External programs must be used to handle mp3 files, and
+currently pogg cannot write .ogg files (and thus cannot modify
+comments, encode to .ogg, or convert from mp3).
+
+=cut
+
+# Modules
+use strict;
+use Getopt::Long;
+use Ogg::Vorbis;
+use Ao;
+
+# Variables
+my $VERSION = '0.1';
+my $MODIFIED = '2000/10/23';
+
+# Config variables (external programs)
+my $mp3play = 'mpg123';
+my $mp3info = 'mp3info';
+my %mp3play_opts = ('buffer' => '-b',
+                    'verbose' => '-v',
+                    'quiet' => '-q');
+my %mp3info_opts = ('TITLE'  => '-t',
+                    'ARTIST' => '-a',
+                    'ALBUM'  => '-l',
+                    'GENRE'  => '-G');
+
+# Data variables
+my @devices = ();  # devices to play to
+my @list = ();     # List of sources to act on
+my $buffer;        # raw data buffer
+my $bitstream=0;   # current bitstream
+my $big_endian_p = 0;
+my $ogg = Ogg::Vorbis->new;  # Ogg Vorbis Stream
+
+# Separate option modes
+my %opts = ('bits' => 16,
+            'rate' => 44100,
+            'channels' => 2,
+            'buffer' => 4096);
+my @play_opts = ('help|h|?!','pogg-version|version|V!','verbose|v!',
+                 'quiet|q!','device|dev|d=s@','bits|b=i','rate|r=i',
+                 'channels|c=i','buffer|s=i','random|rand|R!',
+                 'sort|S=s');
+my @comment_opts = ('help|h|?!','pogg-version|V!','title|t:s',
+                    'VERSION|v:s','ALBUM|l:s','ARTIST|a:s',
+                    'ORGANIZATION|o:s','DESCRIPTION|D:s','GENRE|g:s',
+                    'DATE|d:s','LOCATION|p:s','COPYRIGHT|c:s',
+                    'comment|C:s%');
+my @opts = @play_opts;  # most commands use the play_opts
+my @known_comments = ('TITLE','VERSION','ALBUM','ARTIST','ORGANIZATION',
+                      'DESCRIPTION','GENRE','DATE','LOCATION','COPYRIGHT');
+
+# Get command (sets default devices, etc.)
+my $command = shift;
+if ($command eq 'play') {
+} elsif ($command eq 'encode') {
+  die "Sorry, encode not yet supported\n";
+} elsif ($command eq 'decode') {
+} elsif ($command eq 'convert') {
+  die "Sorry, convert not yet supported\n";
+} elsif ($command eq 'comment') {
+  @opts = @comment_opts;
+} else {
+  # No command specified... default to play and push back the arg.
+  unshift @ARGV, $command;
+  $command = 'play';
+}
+
+
+=head1 OPTIONS
+
+=over 4
+
+=item -h, --help
+
+Print a brief usage message.
+
+=item -v, --version
+
+Display version info.
+
+=item -d, --device DEVICE
+
+Add a device to play to.  The device may be any of oss, esd, alsa,
+irix or solaris as the output device, or wav to write to a wav file.
+You may specify additional options to a device by appending a colon
+and comma-separated list of key=value pairs.  Examples:
+
+  pogg file.ogg -d wav:file=output.wav
+  pogg file.ogg -d esd -d alsa:card=0,dev=1
+
+=item -b, --bits BITS
+
+Set the number of bits per sample (8 or 16, default 16).
+
+=item -r, --rate RATE
+
+Set the number of samples per second (default 44100).
+
+=item -c, --channels CHANNELS
+
+Set the number of channels (1 = mono, 2 = stereo).
+
+=item -s, --buffer SIZE
+
+Set buffer size (default 4096).
+
+=back
+
+=cut
+
+# Parse Options
+GetOptions(\%opts, @opts) or usage();
+usage() if $opts{help};
+if ($opts{version}) { version(); exit; }
+# Create buffer (just a string to store data)
+$buffer = 'x' x $opts{buffer};
+# If no files, read file list from stdin
+@list = @ARGV;
+unless (@list) {
+  while (<>) {
+    chomp;
+    # Modify to recognize external (http) resources
+    if (-e $_) {
+      unshift @list, $_;
+    }
+  }
+}
+# Sort or shuffle list (may have to wait until we have more info on
+# sources).  XXXX Add sort by genre, time, file type, etc.
+if ($opts{random} || (exists $opts{sort} &&
+                             ($opts{sort} =~ /^rand(om)?$/))) {
+  my $temp;
+  for (my $i=0; $i<@list; $i++) {
+    my $j = int(rand(@list));
+    $temp = $list[$i];
+    $list[$i] = $list[$j];
+    $list[$j] = $temp;
+  }
+} elsif ($opts{sort}) {
+  if ($opts{sort} =~ /order|given|default/) {
+    # default, don't sort
+  } elsif ($opts{sort} =~ /^(asc(end(ing)?)?|alpha)$/i) {
+    @list = sort @list;
+  } elsif ($opts{sort} =~ /^(de?sc(end(ing)?)?|omega)$/i) {
+    @list = sort {$b cmp $a} @list;
+  } else {
+    # unkown method, give warning and leave list alone
+    warn "unknown sort method: $opts{sort}\n";
+  }
+}
+# Handle special commands
+if ($command eq 'convert') {
+  do_convert();
+  exit;
+} elsif ($command eq 'comment') {
+  do_comments();
+  exit;
+} else {
+  # Configure default output device
+  unless ($opts{device}) {
+    if ($command eq 'play') {
+      $opts{device} = ['oss'];
+    } elsif ($command eq 'decode') {
+      $opts{device} = ['wav'];
+    }
+  }
+  # Open devices (change concept here... allow for default FILE.wav
+  # instead of output.wav).
+  open_devices();
+  play_files();
+  close_devices();
+}
+
+
+# Try to play all listed files
+# XXXX rewrite as play_list(@) for recursion
+sub play_files {
+  no strict qw(subs);
+  version() unless $opts{quiet};
+  foreach my $source (@list) {
+    print "\nPlaying $source\n" if ($opts{verbose});
+    if ($source =~ /\.ogg$/) {
+      # Open the .ogg
+      unless (open(INPUT, "< $source")) {
+        warn "couldn't open $source\n";
+        next;
+      }
+      if ($ogg->open(INPUT) < 0) {
+        warn "$source does not appear to be an Ogg Vorbis bitstream\n";
+        next;
+      } else {
+      # Play the .ogg
+        unless ($opts{quiet}) {
+          write_info($ogg);
+          print "\n";
+        }
+        my $t_time = $ogg->time_total;
+        my $t_min = int($t_time / 60);
+        my $t_sec = $t_time % 60;
+        while (1) {
+          my $bytes = $ogg->read($buffer, $opts{buffer}, $big_endian_p,
+                                 2, 1, $bitstream);
+          if ($bytes == 0) {
+            # EOS
+            last;
+          } elsif ($bytes < 0) {
+            # Error
+            warn "error in stream\n" unless $opts{quiet};
+          } else {
+            # Successful read, play on each device
+            foreach my $ao (@devices) {
+              $ao->play($buffer, $bytes);
+            }
+            # Print info if verbose
+            if ($opts{verbose}) {
+              my $c_time = $ogg->time_tell;
+              my $c_min = int($c_time / 60);
+              my $c_sec = $c_time - 60 * $c_min;
+              my $r_min = int(($t_time - $c_time) / 60);
+              my $r_sec = ($t_time - $c_time) - 60 * $r_min;
+              printf STDERR "\rTime: %02li:%05.2f [%02li:%05.2f] %.1f kbit/s  \r",
+                     $c_min, $c_sec, $r_min, $r_sec, $ogg->bitrate_instant / 1000;
+            }
+          }
+        }
+        printf STDERR "\r%s\r\n", ' ' x 60;
+      }
+    } elsif ($source =~ /\.mp3$/) {
+      # Translate our options into the mp3 player's options
+      my $command_line = $mp3play;
+      while (my ($k, $v) = each(%opts)) {
+        if (exists $mp3play_opts{$k}) {
+          $command_line .= " \"$mp3play_opts{$k}\" \"$v\"";
+        }
+      }
+      # Call the external player, let it handle warnings/errors.
+      print "$command_line \"$source\"\n" unless $opts{quiet};
+      `$command_line $source`;
+    } else {
+      warn "unknown format: $source\n";
+    }
+  }
+}
+
+
+# Convert between ogg and mp3
+sub do_convert {
+  no strict qw(subs);
+  foreach my $source (@list) {
+  }
+}
+
+
+# Display comments (XXXX add modify when we can write)
+sub do_comments {
+  no strict qw(subs);
+  foreach my $source (@list) {
+    print "Commenting $source\n" if ($opts{verbose});
+    if ($source =~ /\.ogg$/) {
+      # Comment .ogg
+      unless (open(INPUT, "< $source")) {
+        warn "couldn't open $source\n";
+        next;
+      }
+      if ($ogg->open(INPUT) < 0) {
+        warn "$source does not appear to be an Ogg Vorbis bitstream\n";
+        next;
+      } else {
+        # XXXX when available, add code to modify info
+        write_info($ogg);
+        $ogg->clear;
+        close(INPUT);
+      }
+    } elsif ($source =~ /\.mp3/) {
+      # Comment .mp3
+      my $command_line = $mp3info;
+      # Check known comments
+      foreach my $k (@known_comments) {
+        if ((exists $mp3info_opts{$k}) and (exists $opts{$k})) {
+          $command_line .= " \"$mp3info_opts{$k}\" \"$opts{$k}\"";
+        }
+      }
+      # Check for anything mp3info knows about that we don't
+      while (my ($k, $v) = each(%{$opts{comment}})) {
+        if (exists $mp3info_opts{$k}) {
+          $command_line .= " \"$mp3info_opts{$k}\" \"$v\"";
+        }
+      }
+      # Now run the command (die on error... we don't want to muck up
+      # multiple files).
+      open(OUTPUT, "$command_line $source |") ||
+          die "couldn't run \`$command_line $source \`\n";
+      while (<OUTPUT>) { print }
+      close(OUTPUT);
+    } else {
+      warn "unkown format: $source\n";
+    }
+  }
+}
+
+
+# Open device and place in global @devices list
+sub open_devices {
+  foreach my $dev (@{$opts{device}}) {
+    my $opt_string = '';
+    my %dev_opts = ();
+    if ($dev =~ /([^:]*):(.*)/) {
+      $dev = $1;
+      $opt_string = $2;
+      %dev_opts = split(/[,=]/, $opt_string);
+    }
+    my $dev_id = Ao::get_driver_id($dev);
+    my $ao = Ao::open($dev_id, $opts{bits}, $opts{rate},
+                      $opts{channels}, \%dev_opts) ||
+       die "error: couldn't open device $dev\n";
+    unshift @devices, $ao;
+  }
+}
+
+
+# Close devices in @devices list
+sub close_devices {
+  foreach my $ao (@devices) {
+    $ao->close;
+  }
+}
+
+
+sub write_info {
+  # Short, one line comment format like mp3info, followed by
+  # longer comments.
+  my %comments = %{$ogg->comment};
+  my $info = $ogg->info;
+  my $time = $ogg->time_total;
+  my $min = int($time / 60);
+  my $sec = $time % 60;
+  my $rate = int($ogg->bitrate / 1024);
+  # Try to print like mp3info, add album because it's nice to know
+  print "$comments{TITLE}($comments{ARTIST}, $comments{ALBUM})",
+        ", $rate kbit/s ", ($info->channels == 2)?'stereo':'mono',
+        " (${min}m ${sec}s)\n";
+  # Now print other known comments.
+  while (my ($k, $v) = each(%comments)) {
+    # XXXX Format nicer
+    if (grep {/^\Q$k\E$/} @known_comments) {
+      print "$k: $v\n" unless grep {/^\Q$k\E$/} ('TITLE','ARTIST','ALBUM');
+    } else {
+      warn "unknown comment: $k\n";
+    }
+  }
+}
+
+
+# Print a usage summary
+sub usage {
+  print <<EOF;
+usage: $0 [options] [command] [file ...]
+
+  -h, --help                 display this message
+  -v, --version              print version info
+  -d, --device DEVICE        add a device to play to
+  -b, --bits BITS            set bits per sample (8 or 16)
+  -r, --rate RATE            set samples per second (default 44100)
+  -c, --channels CHANNELS    set channels (1 = mono, 2 = stereo)
+  -s, --buffer SIZE          set default buffer size
+  -S, --sort METHOD          specify a sorting method
+  -R, --random               shuffle files (alias for --sort random)
+
+where COMMAND is any of play, encode, decode, convert or comment, and
+DEVICE is any of oss, esd, alsa, irix, solaris or wav.  The device may
+be followed by an optional colon with a comma separated list of
+key=value parameters, such as --device wav:file=output.wav.
+EOF
+  exit 0;
+}
+
+# Print version info
+sub version {
+  print "pogg $VERSION ($MODIFIED)\n";
+}
+
+
+=head1 AUTHOR
+
+Alex Shinn, foof@synthcode.com
+
+=head1 SEE ALSO
+
+Ogg::Vorbis(3pm), Ao(3pm), ogg123(1), oggenc(1), perl(1).
+
+=cut

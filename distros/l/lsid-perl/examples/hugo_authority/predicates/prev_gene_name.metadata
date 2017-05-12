@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<rdf:RDF
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+>
+	<rdf:Description rdf:about="urn:lsid:gene.ucl.ac.uk.lsid.biopathways.org:predicates:prev_gene_name">
+		<rdfs:label>Previous Gene Name</rdfs:label>
+		<dc:title>The Previous Gene Name Predicate</dc:title>
+		<rdfs:comment>The predicate describes any previous gene names</rdfs:comment>
+	</rdf:Description>
+</rdf:RDF>

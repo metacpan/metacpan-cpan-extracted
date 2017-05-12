@@ -1,0 +1,19 @@
+LSID Authority Security
+
+Versions 0.07 of the Perl LSID resolver library and authority framework
+provide HTTP Basic authentication for securing authorities. In order
+to use this functionality, you must use the following mod_rewrite
+configuration directives in Apache:
+
+Alias /authority/ "/var/www/htdocs/authority/authority.pl"
+                                                                                                                 
+<Location /authority>
+    SetHandler cgi-script
+    Options +ExecCGI
+    RewriteEngine on 
+    RewriteCond %{HTTP:Authorization} ^(.*)
+    RewriteRule ^(.*) $1 [e=HTTP_CGI_AUTHORIZATION:%1,t=application/x-httpd-cgi,l]
+</Location>
+
+This is to overcome Apache's automatic consumption of the authentication
+headers.

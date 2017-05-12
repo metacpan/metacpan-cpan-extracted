@@ -1,0 +1,11 @@
+Revision history for latest
+
+0.01    2009-06-23
+        - Initial release.
+
+0.02    2009-06-23
+        - Handle case where feature.pm isn't available.
+
+0.03    2009-06-25
+        - Don't care if feature doesn't support the bundle we ask for.
+

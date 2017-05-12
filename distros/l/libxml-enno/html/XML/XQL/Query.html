@@ -1,0 +1,148 @@
+<HTML><HEAD><TITLE>XML::XQL::Query - Creates an XQL query evaluater from a XQL expression</TITLE></HEAD><BODY><H1><A NAME="NAME">NAME
+
+</A></H1><P>XML::XQL::Query - Creates an XQL query evaluater from a XQL expression
+
+<P><HR><H1><A NAME="SYNOPSIS">SYNOPSIS
+
+</A></H1><PRE> use XML::XQL;
+
+</PRE><PRE> $parser = new XML::DOM::Parser;
+ $doc = $parser-&gt;parsefile ("file.xml");
+
+</PRE><PRE> # Return all elements with tagName='title' under the root element 'book'
+ $query = new XML::XQL::Query (Expr =&gt; "book/title");
+ @result = $query-&gt;solve ($doc);
+
+</PRE><PRE> # Or (to save some typing)
+ @result = XML::XQL::solve ("book/title", $doc);
+
+</PRE><P><HR><H1><A NAME="DESCRIPTION">DESCRIPTION
+
+</A></H1><P>To perform XQL queries on an XML::DOM document (or, in the future, on other XML
+storage structures), you first have to create an XML::XQL::Query object and
+pass it a valid XQL query expression. You can then perform queries on one or
+more documents by calling the solve() method.
+
+<P><HR><H1><A NAME="XML_XQL_Query_constructor">XML::XQL::Query constructor
+
+</A></H1><P>Usage, e.g:
+
+<PRE> $query = new XML::XQL::Query(
+	Expr =&gt; "book/author",
+	Func =&gt; [ myfunc =&gt; \&amp;my_func,		# define 2 functions
+		  myfunc2 =&gt; \&amp;my_func2 ],
+	FuncArgCount =&gt; [ myfunc2 =&gt; [2, -1] ], # myfunc2 has 2 or more args
+	AllowedOutSideSubquery =&gt; [ myfunc =&gt; 1 ],
+	ConstFunc =&gt; [ myfunc2 =&gt; 1],
+	CompareOper =&gt; [ mycmp =&gt; \&amp;mycmp ],	# define comparison operator
+	q =&gt; "str");				# use str// as string delim
+
+</PRE><DL><DT><A NAME="Expr_STRING_"><STRONG><P>Expr =&gt; STRING
+
+</STRONG></A><DD>The query expression to be evaluated.
+
+<DT><A NAME="NodeQuery_BOOLEAN_"><STRONG><P>NodeQuery =&gt; BOOLEAN
+
+</STRONG></A><DD>If set to 1, the query is a <I>Node Query</I> as opposed to a 
+<I>Full Query</I> (which is the default.) 
+A node query is a query that is only capable of returning Nodes. 
+A full query is capable of returning Node values and non-Node values. 
+Non-Node values include XML Primitives, element type names, namespace URI's, 
+concatenated text nodes, and node type names. The distinction is significant
+because node queries may appear as XSL match and select patterns, while full 
+queries have use in other applications.
+The difference between the two forms of queries is trivial and exists only as 
+constraints on the syntax of node queries. 
+Node queries may contain nested full queries.
+
+<DT><A NAME="Func_FUNCNAME_FUNCREF_"><STRONG><P>Func =&gt; [ FUNCNAME =&gt; FUNCREF, ...]
+
+</STRONG></A><DD>Defines one or more functions. FUNCNAME is the name as used in the query 
+expression. FUNCREF can be either a function reference like \&amp;my_func or
+an anonymous sub.
+See also: defineFunction
+
+<DT><A NAME="Method_FUNCNAME_FUNCREF_"><STRONG><P>Method =&gt; [ FUNCNAME =&gt; FUNCREF, ...]
+
+</STRONG></A><DD>Defines one or more methods. FUNCNAME is the name as used in the query 
+expression. FUNCREF can be either a function reference like \&amp;my_func or
+an anonymous sub.
+See also: defineMethod
+
+<DT><A NAME="FuncArgCount_FUNCNAME_ARGCOUNT_"><STRONG><P>FuncArgCount =&gt; [ FUNCNAME =&gt; ARGCOUNT, ...]
+
+</STRONG></A><DD>Defines the number of arguments for one or more functions or methods. 
+FUNCNAME is the name as used in the query expression. 
+See also: defineFunction and defineMethod
+
+<DT><A NAME="AllowedOutsideSubquery_FUNCNAME_BOOLEAN_"><STRONG><P>AllowedOutsideSubquery =&gt; [ FUNCNAME =&gt; BOOLEAN, ...]
+
+</STRONG></A><DD>Defines whether the specified function or method is allowed outside
+subqueries. FUNCNAME is the name as used in the query expression. 
+See also: defineFunction and defineMethod
+
+<DT><A NAME="ConstFunc_FUNCNAME_BOOLEAN_"><STRONG><P>ConstFunc =&gt; [ FUNCNAME =&gt; BOOLEAN, ...]
+
+</STRONG></A><DD>Defines whether the function (not method!) is a "constant" function.
+FUNCNAME is the name as used in the query expression. 
+See <A HREF="#Constant_Function_Invocations">Constant Function Invocations</A> for a definition of "constant"
+See also: defineFunction and defineMethod
+
+<DT><A NAME="CompareOper_OPERNAME_FUNCREF_"><STRONG><P>CompareOper =&gt; [ OPERNAME =&gt; FUNCREF, ...]
+
+</STRONG></A><DD>Defines the comparison operator with the specified OPERNAME, e.g. if
+OPERNAME is "contains", you can use "$contains$" in the query.
+See also: defineComparisonOperators
+
+<DT><A NAME="q_TOKEN_"><STRONG><P>q =&gt; TOKEN
+
+</STRONG></A><DD>Defines the q// token. See also: defineTokenQ
+
+<DT><A NAME="qq_TOKEN_"><STRONG><P>qq =&gt; TOKEN
+
+</STRONG></A><DD>Defines the qq// token. See also: defineTokenQQ
+
+<DT><A NAME="Error_FUNCREF_"><STRONG><P>Error =&gt; FUNCREF
+
+</STRONG></A><DD>Defines the function that is called when errors occur during parsing the
+query expression. The default function prints an error message to STDERR.
+
+<DT><A NAME="Debug_FLAGS_"><STRONG><P>Debug =&gt; FLAGS
+
+</STRONG></A><DD>Sets the debug level for the Yapp parser that parses the query expression.
+Default value is 0 (don't print anything). The maximum value is 0x17, which
+prints a lot of stuff. See the Parse::Yapp manpage for the meaning of the
+individual bits.
+
+<DT><A NAME="Reserved_hash_keys_"><STRONG><P>Reserved hash keys
+
+</STRONG></A><DD>Users may add their own (key, value) pairs to the Query constructor.
+Beware that the key 'Tree' is used internally.
+
+</DL><P><HR><H1><A NAME="XML_XQL_Query_methods">XML::XQL::Query methods
+
+</A></H1><DL><DT><A NAME="solve_INPUT_LIST_"><STRONG><P>solve (INPUT_LIST...)
+
+</STRONG></A><DD>Note that solve takes a list of nodes which are assumed to be in document order
+and must belong to the same document. E.g:
+
+<PRE> $query = new XML::XQL::Query (Expr =&gt; "doc//book");
+ @result = $query-&gt;solve ($doc);
+ @result2 = $query-&gt;solve ($node1, $node2, $node3);
+
+</PRE></DL><P>The following functions are also available at the query level, i.e. when called
+on a Query object they only affect this Query and no others:
+
+<PRE> defineFunction, defineMethod, defineComparisonOperators, 
+ defineTokenQ, defineTokenQQ
+
+</PRE><P>See <A HREF="../XQL.html#XML_XQL_global_functions">Global functions</A> for details.
+Another way to define these features for a particular Query is by passing the
+appropriate values to the XML::XQL::Query constructor.
+
+<P><HR><H1><A NAME="SEE_ALSO">SEE ALSO
+
+</A></H1><P><A HREF="../XQL.html">XML::XQL</A> for general information about the XML::XQL module
+
+<P><A HREF="Tutorial.html">XML::XQL::Tutorial</A> which describes the XQL syntax
+<P><HR><I><FONT SIZE="-1">Last updated: Fri Oct 22 18:47:41 1999</FONT></I></BODY></HTML>

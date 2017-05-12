@@ -1,0 +1,9 @@
+XML::Checker ERROR-101: undefined ELEMENT [a]
+	Context: line 9, column 2, byte 176
+XML::Checker ERROR-101: undefined ELEMENT [b]
+	Context: line 10, column 2, byte 188
+XML::Checker ERROR-153: Element should be EMPTY, found text [
+]
+	Context: line 12, column 4, byte 208
+XML::Checker ERROR-153: Element should be EMPTY, found text [ ]
+	Context: line 13, column 0, byte 209

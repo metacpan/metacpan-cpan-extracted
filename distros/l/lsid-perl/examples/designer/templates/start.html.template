@@ -1,0 +1,38 @@
+<TMPL_INCLUDE name="javascript.html.template">
+
+<div id="content">
+
+<div id="instructions" align="center">
+
+<div id="position">
+	<span id="bolden">Instructions</span> &nbsp; &nbsp; &nbsp;
+	Authority Identity &nbsp; &nbsp; &nbsp;
+	Services and Namespaces &nbsp; &nbsp; &nbsp;
+	Service Endpoints &nbsp; &nbsp; &nbsp;
+	View Code &nbsp; &nbsp; &nbsp;
+</div>
+
+</div>
+
+
+<h2 id="title">LSID Perl Authority Generator</h2>
+
+
+<p id="description"> This utility will give you the necessary code outline to create an
+authority that can be run on just about any Linux machine, it will not
+create a high-performance enterprise authority. It is assumed that you
+have the necessary administrative privileges on the system that will
+house the authority (this means that most likely you will need to have
+<b>root</b> access to deploy the service).
+
+</p>
+
+<br/>
+<br/>
+<br/>
+
+<div class="controls">
+<TMPL_VAR name="submit">
+</div>
+
+</div> <!-- content -->

@@ -1,0 +1,30 @@
+---
+abstract: 'create and use a local lib/ for perl modules with PERL5LIB'
+author:
+  - 'mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>'
+build_requires:
+  Test::More: '0'
+configure_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: local-lib
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  CPAN: '1.82'
+  ExtUtils::Install: '1.43'
+  ExtUtils::MakeMaker: '7.00'
+  Module::Build: '0.36'
+  perl: '5.006'
+resources:
+  IRC: irc://irc.perl.org/#local-lib
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=local-lib
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/Perl-Toolchain-Gang/local-lib
+version: '2.000019'

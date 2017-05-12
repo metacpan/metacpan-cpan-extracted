@@ -1,0 +1,23 @@
+Changes
+INSTALL
+MANIFEST
+Makefile.PL
+README
+bin/findirs
+bin/findnewest
+bin/lsas
+bin/lscount
+bin/lsd
+bin/lsdcounts
+bin/lsdu
+bin/lsf
+lib/LEOCHARRE/Dir/Lsutils.pm
+lib/LEOCHARRE/Dir/Lsutils.pod
+t/00-compile.t
+t/01-LEOCHARRE-Dir_Lsutils-sort.t
+t/02-LEOCHARRE-Dir_Lsutils-newestoldestbiggestsmalest.t
+t/99_cleanup.sh
+t/csrc/lscount.c
+t/csrc/lsd.c
+t/testing.pl
+META.yml                                 Module meta-data (added by MakeMaker)

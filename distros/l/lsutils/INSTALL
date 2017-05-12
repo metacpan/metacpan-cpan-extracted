@@ -1,0 +1,7 @@
+# INSTALL
+# you may either run the following commands or
+# try 'sh INSTALL'
+
+perl Makefile.PL
+make install
+make realclean

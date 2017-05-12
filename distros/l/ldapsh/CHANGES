@@ -1,0 +1,47 @@
+2.0b1:
+
+Added ReadLine support, although no completion yet.
+
+Added 'search' command.
+
+Added builtin 'set' command for switching between emacs and vi editing modes.
+(see set --help)
+
+Fixed 'new' to work even with a missing Parse::RecDescent library.  This
+should just be fixed to use the builtin schema stuff...
+
+Added history file:  LDAPSH_HISTFILE, defaults to ~/.ldapsh_history.
+
+Added profile: LDAPSH_PROFILE, defaults to ~/.ldapshrc.
+
+1.2:
+
+Fixed some stupid syntax bugs.  Basically, I fixed the things I did in 1.1.
+
+1.1:
+
+Changed a bit of the libraries around.  All of the connection stuff has
+been rolled into Net::LDAP::Config.pm, and it's now a bit more generic and
+completely separate from Net::LDAP::Shell.
+
+1.0:
+
+Not much; seemed to work, so I rolled the version.
+
+beta 1:
+
+Changed namespaces from LDAP to Net::LDAP::Shell
+
+alpha-2:
+
+Fixed 'cd ..' to work correctly
+Adding 'cd /' as an option
+Set prompt to include CWD
+Fixed Connect.pm to complain when it does not get a server list
+Fixed ls.pm to show nothing when there are no subordinates, rather than complaining
+Fixed a couple other small bugs
+Added more debugging
+
+alpha-1:
+
+Initial release

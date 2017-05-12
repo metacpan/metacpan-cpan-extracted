@@ -1,0 +1,16 @@
+<schema>
+  <table>
+    <name>MyTable</name>
+    <summary>A short summary</summary>
+    <description>A long description that may
+      contain a subset of HTML</description>
+    <column>
+      <name>MyColumn1</name>
+      <summary>A short summary</summary>
+      <description>A long description</description>
+      <unique/>
+      <non-null/>
+      <default>42</default>
+    </column>
+  </table>
+</schema>

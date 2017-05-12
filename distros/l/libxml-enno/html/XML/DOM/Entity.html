@@ -1,0 +1,50 @@
+<HTML><HEAD><TITLE>XML::DOM::Entity - An XML ENTITY in XML::DOM</TITLE></HEAD><BODY><H1><A NAME="NAME">NAME
+
+</A></H1><P>XML::DOM::Entity - An XML ENTITY in XML::DOM
+
+<P><HR><H1><A NAME="DESCRIPTION">DESCRIPTION
+
+</A></H1><P>XML::DOM::Entity extends <A HREF="Node.html">XML::DOM::Node</A>.
+
+<P>This node represents an Entity declaration, e.g.
+
+<PRE> &lt;!ENTITY % draft 'INCLUDE'&gt;
+
+</PRE><PRE> &lt;!ENTITY hatch-pic SYSTEM "../grafix/OpenHatch.gif" NDATA gif&gt;
+
+</PRE><P>The first one is called a parameter entity and is referenced like this: %draft;
+The 2nd is a (regular) entity and is referenced like this: &amp;hatch-pic;
+
+<H2><A NAME="METHODS">METHODS
+
+</A></H2><DL><DT><A NAME="getNotationName_"><STRONG><P>getNotationName
+
+</STRONG></A><DD>Returns the name of the notation for the entity.
+
+<P><I>Not Implemented</I> The DOM Spec says: For unparsed entities, the name of the 
+notation for the entity. For parsed entities, this is null.
+(This implementation does not support unparsed entities.)
+
+<DT><A NAME="getSysId_"><STRONG><P>getSysId
+
+</STRONG></A><DD>Returns the system id, or undef.
+
+<DT><A NAME="getPubId_"><STRONG><P>getPubId
+
+</STRONG></A><DD>Returns the public id, or undef.
+
+</DL><H2><A NAME="Additional_methods_not_in_the_DOM_Spec">Additional methods not in the DOM Spec
+
+</A></H2><DL><DT><A NAME="isParameterEntity_"><STRONG><P>isParameterEntity
+
+</STRONG></A><DD>Whether it is a parameter entity (%ent;) or not (&amp;ent;)
+
+<DT><A NAME="getValue_"><STRONG><P>getValue
+
+</STRONG></A><DD>Returns the entity value.
+
+<DT><A NAME="getNdata_"><STRONG><P>getNdata
+
+</STRONG></A><DD>Returns the NDATA declaration (for general unparsed entities), or undef.
+
+</DL><P><HR><I><FONT SIZE="-1">Last updated: Fri Oct 22 18:47:27 1999</FONT></I></BODY></HTML>

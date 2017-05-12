@@ -1,0 +1,84 @@
+<HTML>
+<HEAD>
+<TITLE>Servlet::Http::HttpSessionEvent - session event base class</TITLE>
+<LINK REL="stylesheet" HREF="../../../libservlet.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#constructor">CONSTRUCTOR</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Servlet::Http::HttpSessionEvent - session event base class</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  my $event = Servlet::Http::HttpSessionEvent-&gt;new($session);</PRE>
+<PRE>
+  my $session = $event-&gt;getSession();
+  # or
+  my $session = $event-&gt;getSource();</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This class represents event notifications for changes to sessions
+within a web application.</P>
+<P>
+<HR>
+<H1><A NAME="constructor">CONSTRUCTOR</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_new"><CODE>new($session)</CODE></A></STRONG><BR>
+<DD>
+Construct a session event from the given source.
+<P><STRONG>Parameters:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_%24session"><EM>$session</EM></A></STRONG><BR>
+<DD>
+the <STRONG>Servlet::Http::HttpSession</STRONG> instance that is the source of the
+event
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_getSession"><CODE>getSession()</CODE></A></STRONG><BR>
+<DD>
+Returns the <STRONG>Servlet::Http::HttpSession</STRONG> that is the source of this event.
+<P></P>
+<DT><STRONG><A NAME="item_getSource"><CODE>getSource()</CODE></A></STRONG><BR>
+<DD>
+Returns the <STRONG>Servlet::Http::HttpSession</STRONG> that is the source of this event.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../../api/Servlet/Http/HttpSession.html">the Servlet::Http::HttpSession manpage</A>,
+<A HREF="../../../api/Servlet/Http/HttpSessionListener.html">the Servlet::Http::HttpSessionListener manpage</A>,
+<A HREF="../../../api/Servlet/Util/Event.html">the Servlet::Util::Event manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

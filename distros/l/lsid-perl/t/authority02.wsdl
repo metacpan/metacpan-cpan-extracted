@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions targetNamespace="http://ncbi.nlm.nih.gov.lsid.biopathways.org/availableServices?urn:lsid:ncbi.nlm.nih.gov.lsid.biopathways.org:genbank_gi:5851672" xmlns:tns="http://ncbi.nlm.nih.gov.lsid.biopathways.org/availableServices?urn:lsid:ncbi.nlm.nih.gov.lsid.biopathways.org:genbank_gi:5851672" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:dsb="http://www.omg.org/LSID/2003/DataServiceSOAPBindings" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:dhb="http://www.omg.org/LSID/2003/DataServiceHTTPBindings" xmlns="http://schemas.xmlsoap.org/wsdl/">
+  <import namespace="http://www.omg.org/LSID/2003/DataServiceHTTPBindings" location="LSIDDataServiceHTTPBindings.wsdl"/>
+  <import namespace="http://www.omg.org/LSID/2003/DataServiceSOAPBindings" location="LSIDDataServiceSOAPBindings.wsdl"/>
+  <service name="NCBIHTTP">
+    <port name="HTTPData" binding="dhb:LSIDDataHTTPBinding">
+      <http:address location="http://ncbi.nlm.nih.gov.lsid.biopathways.org:9090/authority/data"/>
+    </port>
+    <port name="HTTPMetadata" binding="dhb:LSIDMetadataHTTPBinding">
+      <http:address location="http://ncbi.nlm.nih.gov.lsid.biopathways.org:9090/authority/metadata/"/>
+    </port>
+  </service>
+</definitions>

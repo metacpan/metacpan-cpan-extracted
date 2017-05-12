@@ -1,0 +1,79 @@
+=head1 Priorities
+
+Larry Wall suggests, ``In the absence of other considerations, I'd
+encourage you to provide the cleanest interface from the user's
+standpoint, and let the implementer worry about the details.''
+
+=head1 Naming
+
+B<Still Undecided:>
+
+All method names use lower-case, `C<_>' seperated names.
+
+B<or>
+
+All method names match their Java counterparts.
+
+All options, parameters, and property names use mixed case names, with
+an initial upper case character.  This eliminates a certain amount of
+potential confusion with reserved words, which, for the most part, are
+lower case.
+
+The following words are abbreviated in method names and parameters:
+
+ Declaration     decl     Decl
+ Reference       ref      Ref
+ Identifier      id       Id
+
+=head1 Object Instantiation and Options
+
+For creating new parser or handler objects, the `new' methods accept a
+list of key-value pairs (C<=E<gt>>) or a hash containing the options.
+The key names are derived from the SAX positional parameter names
+(`C<Source>' and `C<SystemId>' in Parser's `C<parse()>') or the name of
+option setting methods (`C<DocumentHandler>', `C<DTDHandler>',
+`C<EntityResolver>', `C<ErrorHandler>', and `C<Locale>' in Parser).
+
+Callers may get and set options directly in the object, for example:
+
+    $parser = SAX::Parser->new( Source => { ByteStream => $fh },
+                                DocumentHandler => $doc_handler );
+
+    $parser->{Locale} = 'el_GR.ISO-8859-7';
+
+There are no set/get methods in the Perl SAX API.
+
+=head1 Handler Calls
+
+Handler calls all take hashes instead of positional parameters.  Key
+names are derived from SAX positional parameter names.  This allows
+parsers and filters to provide additional parameters if they can or
+the user requests it.
+
+=head1 Extending Handler Interfaces
+
+Developers of event-generators can extend the handler interface as
+they need to.  Event-generators that use an extended interface should
+accept generator options or use `C<can>' to test whether a handler can
+support their extended interface.
+
+For example, a C<DocumentHandler> that wants to receive internal
+entity events instead of having them resolved and passed in to the
+`C<characters>' method would define a `C<internal_entity>' method
+and/or set a parser option to pass or not pass internal entity events.
+
+=head1 Helper Classes
+
+Perl SAX avoids helper classes (like SAXException and InputSource)
+where those classes only hold information and have no behavior.  In
+those cases, simple hashes are used instead.
+
+B<It is still undecided> if these should be implemented anyway for
+easier portability.
+
+=head1 Contributors
+
+ Eduard (Enno) Derksen
+ Ken MacLeod
+ Eric Prud'hommeaux
+ Larry Wall

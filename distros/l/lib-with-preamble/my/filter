@@ -1,0 +1,3 @@
+use strict; use warnings;
+print "use strict;\nuse warnings;\n#line 1\n";
+while (<STDIN>) { print }

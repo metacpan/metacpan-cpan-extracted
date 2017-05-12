@@ -1,0 +1,761 @@
+=head1 NAME
+
+APR::Request - wrapper for libapreq2's module/handle API.
+
+
+=begin testing
+    use APR::Pool;
+    use APR::Brigade;
+    use APR::Bucket;
+    use APR::BucketAlloc;
+    use APR::Request;
+    use APR::Request::Parser;
+    $pool = APR::Pool->new;
+    $ba = APR::BucketAlloc->new($pool);
+    $bb = APR::Brigade->new($pool, $ba);
+    $content = <<EOT;
+---XYZ-
+Content-Disposition: form-data; name="alpha"
+Content-Type: text/plain; charset=us-ascii
+
+body1
+---XYZ-
+Content-Disposition: form-data; name="beta" filename="foo.txt"
+Content-Type: text/plain; charset=us-ascii
+
+body2
+---XYZ-
+Content-Disposition: form-data; name="foo"
+Content-Type: text/plain; charset=us-ascii
+
+body3
+---XYZ---
+EOT
+    s/(?<!\015)\012/\015\012/g for $content;
+    $bb->insert_tail(APR::Bucket->new($ba, $content));
+    $parser = APR::Request::Parser->multipart($pool, $ba,
+                                    "multipart/form-data; boundary=-XYZ-");
+
+=end testing
+
+
+
+
+=head1 SYNOPSIS
+
+
+=for example begin
+
+  use APR::Request;
+
+  $req = APR::Request::Custom->handle($pool,
+                                      "foo=arg1&bar=arg2",
+                                      "apache=quux",
+                                       $parser, 1e6, $bb);
+  $param = $req->param("foo");
+  $cookie = $req->jar("apache");
+
+=for example end
+
+=for example_testing
+    ok $req->isa("APR::Request");
+    is $param, "arg1", "param";
+    is $cookie, "quux", "cookie";
+
+
+=head1 DESCRIPTION
+
+The C<< APR::Request >> module provides the base methods
+for interfacing with libapreq2's module API.  It also provides
+a few utility functions and constants.
+
+This manpage documents version 2.13
+of the APR::Request, APR::Request::Custom,
+APR::Request::Cookie::Table, and
+APR::Request::Param::Table packages.
+
+
+
+=head1 METHODS
+
+APR::Request::Custom - derived from APR::Request.
+
+
+
+
+=head2 handle
+
+    APR::Request::Custom->handle($pool,
+                                 $query_string,
+                                 $cookie_header,
+                                 $parser,
+                                 $read_limit,
+                                 $brigade)
+
+Creates a new APR::Request::Custom object.  The $query_string
+and $cookie_headers are immediately parsed into the C<args> and
+C<jar> tables.  The $parser is an APR::Request::Parser object
+which is invoked when fetching C<body> entries from the $brigade.
+The $read_limit represents the maximum number of bytes this handle
+may feed into the parser.
+
+
+
+
+
+=head1 METHODS
+
+APR::Request
+
+
+
+
+=head2 pool
+
+    $req->pool()
+
+Returns the APR::Pool object associated to this handle.
+
+=for example begin
+
+=for example end
+
+=for example_testing
+    is ${$req->pool()}, $$pool, "pool";
+
+
+
+
+=head2 bucket_alloc
+
+    $req->bucket_alloc()
+
+Returns the APR::BucketAlloc object associated to this handle.
+
+=for example begin
+
+=for example end
+
+=for example_testing
+    is ${$req->bucket_alloc()}, $$ba, "bucket alloc";
+
+
+
+
+=head2 jar_status
+
+    $req->jar_status()
+
+Returns the final status code of the handle's cookie header parser.
+
+=for example begin
+
+=for example end
+
+=for example_testing
+    is $req->jar_status == 0, 1, "jar status";
+
+
+
+
+=head2 args_status
+
+    $req->args_status()
+
+Returns the final status code of the handle's query-string parser.
+
+=for example begin
+
+=for example end
+
+=for example_testing
+    is $req->args_status == 0, 1, "args status";
+
+
+
+
+=head2 body_status
+
+    $req->body_status()
+
+Returns the final status code of the handle's body parser.
+
+=for example begin
+
+=for example end
+
+=for example_testing
+    is $req->body_status == 0, 1, "body status";
+
+
+
+
+=head2 param_status
+
+    $req->param_status()
+
+Returns C<< ($req->args_status, $req->body_status) >> in list
+context; otherwise returns C<< $req->args_status || $req->body_status >>.
+
+=for example begin
+
+=for example end
+
+=for example_testing
+    is $req->param_status == 0, 1, "param status";
+
+
+
+
+=head2 parse
+
+    $req->parse()
+
+Parses the jar, args, and body tables. Returns
+C<< $req->jar_status, $req->args_status, $req->body_status >>.
+
+=for example begin
+
+    @status = $req->parse;
+    ok @status == 3;
+    ok $status[0] == $req->jar_status;
+    ok $status[1] == $req->args_status;
+    ok $status[2] == $req->body_status;
+
+=for example end
+
+=for example_testing
+    $_ += 0 for @status; # convert to proper IVs
+    is "@status", "0 0 0", "parse";
+
+
+
+
+=head2 jar
+
+    $req->jar()
+    $req->jar($key)
+
+With no arguments, this method returns a tied APR::Request::Cookie::Table
+object (or undef if the "Cookie" header is absent) in scalar context, or 
+the names (in order, with repetitions) of all the parsed cookies.
+
+With the C<$key> argument, in scalar context this method fetches the first
+matching cookie.  In list context it returns all matching cookies.
+The returned cookies are the values as they appeared in the incoming
+Cookie header.
+
+jar() will throw an APR::Request::Error object whenever jar_status() 
+is non-zero and the return value is potentially invalid (eg
+C<< scalar $req->jar($key) >> will not die if the desired cookie
+was successfully parsed).
+
+
+=for example begin
+
+    $jar = $req->jar;
+    @cookie_names = $req->jar;
+    ok $jar->isa("APR::Request::Cookie::Table");
+    ok shift @cookie_names eq $_ for keys %$jar;
+
+    $cookie = $req->jar("apache");
+    @cookies = $req->jar("apache");
+
+=for example end
+
+=for example_testing
+    is $cookie, "quux", "cookie";
+    is "@cookies", "quux", "cookies";
+
+
+
+
+=head2 args
+
+    $req->args()
+    $req->args($key)
+
+With no arguments, this method returns a tied APR::Request::Param::Table
+object (or undef if the query string is absent) in scalar context, or the 
+names (in order, with repetitions) of all the parsed query-string arguments.
+
+With the C<$key> argument, in scalar context this method fetches the first
+matching query-string arg.  In list context it returns all matching args.
+
+args() will throw an APR::Request::Error object whenever args_status() 
+is non-zero and the return value is potentially invalid (eg
+C<< scalar $req->args($key) >> will not die if the desired query argument
+was successfully parsed).
+
+=for example begin
+
+   $args = $req->args;
+   @arg_names = $req->args;
+   ok $args->isa("APR::Request::Param::Table");
+   ok shift @arg_names eq $_ for keys %$args;
+
+   $foo = $req->args("foo");
+   @bar = $req->args("bar");
+
+=for example end
+
+=for example_testing
+   is $foo, "arg1", "arg";
+   is "@bar", "arg2", "args";
+
+
+
+
+=head2 body
+
+    $req->body()
+    $req->body($key)
+
+With no arguments, this method returns a tied APR::Request::Param::Table
+object (or undef if the request body is absent) in scalar context, or the 
+names (in order, with repetitions) of all the parsed cookies.
+
+With the C<$key> argument, in scalar context this method fetches the first
+matching body param.  In list context it returns all matching body params.
+
+body() will throw an APR::Request::Error object whenever body_status() 
+is non-zero and the return value is potentially invalid (eg 
+C<< scalar $req->body($key) >> will not die if the desired body param was
+successfully parsed).
+
+=for example begin
+
+    $body = $req->body;
+    @body_names = $req->body;
+    ok $body->isa("APR::Request::Param::Table");
+    ok shift @body_names eq $_ for keys %$body;
+
+    $alpha = $req->body("alpha");
+    @beta = $req->body("beta");
+
+=for example end
+
+=for example_testing
+    is $alpha, "body1", "alpha body";
+    is "@beta", "foo.txt", "beta body";
+
+
+
+
+=head2 param
+
+    $req->param()
+    $req->param($key)
+
+With no arguments, this method returns a tied APR::Request::Param::Table
+object (or undef, if the query string and request body are absent) in scalar
+context, or the names (in order, with repetitions) of all the incoming
+(args + body) params.
+
+With the C<$key> argument, in scalar context this method fetches the first
+matching param.  In list context it returns all matching params.
+
+param() will throw an APR::Request::Error object whenever param_status() 
+is non-zero and the return value is potentially invalid (eg 
+C<< scalar $req->param($key) >> will not die if the desired param 
+was successfully parsed).
+
+=for example begin
+
+    $param = $req->param;
+    @param_names = $req->param;
+    ok $param->isa("APR::Request::Param::Table");
+    ok shift @param_names eq $_ for keys %$param;
+
+    $foo = $req->param("foo");
+    @foo = $req->param("foo");
+
+=for example end
+
+=for example_testing
+    is $foo, "arg1", "scalar param";
+    is "@foo", "arg1 body3", "list param";
+
+
+
+
+=head2 upload
+
+    $req->upload()
+    $req->upload($key)
+
+With no arguments, this method returns a tied APR::Request::Param::Table
+object (or undef if the request body is absent) in scalar context (whose
+entries are APR::Request::Param objects), or the names (in order, with 
+repetitions) of all the incoming uploads.
+
+With the C<$key> argument, in scalar context this method fetches the first
+matching upload.  In list context it returns all matching uploads.  The return
+values are APR::Request::Param objects.
+
+upload() will throw an APR::Request::Error object whenever body_status() 
+is non-zero.
+
+
+=for example begin
+
+    $uploads = $req->upload;
+    @upload_names = $req->upload;
+    ok $uploads->isa("APR::Request::Param::Table");
+    ok shift @upload_names eq $_ for keys %$uploads;
+    ok $_->upload for values %$uploads;
+
+    $up = $req->upload("beta");
+    @ups = $req->upload("beta");
+    ok $_->isa("APR::Request::Param") for $up, @ups;
+    ok $_->upload for $up, @ups;
+
+
+=for example end
+
+=for example_testing
+   is $up, "foo.txt", "scalar upload";
+   is "@ups", "foo.txt", "list upload";
+
+
+
+
+=head2 read_limit
+
+    $req->read_limit()
+    $req->read_limit($set)
+
+
+Get/set the read limit, which controls the total amount of
+bytes that can be fed to the current parser.
+
+
+
+
+=head2 brigade_limit
+
+    $req->brigade_limit()
+    $req->brigade_limit($set)
+
+Get/set the brigade_limit for the current parser.  This limit
+determines how many bytes of a file upload that the parser may
+spool into main memory.  Uploads exceeding this limit are written
+directly to disk.
+
+
+=head2 temp_dir
+
+    $req->temp_dir()
+    $req->temp_dir($set)
+
+Get/set the spool directory for uploads which exceed the configured
+brigade_limit.
+
+
+=head2 disable_uploads
+
+    $req->disable_uploads()
+
+Engage the disable_uploads hook for this request.
+
+
+
+
+=head2 upload_hook
+
+    $req->upload_hook($callback)
+
+Add an upload hook callback for this request.  The
+arguments to the $callback sub are ($upload, $new_data).
+
+
+
+
+=head2 import
+
+Exports a list of subs into the caller's package.
+
+
+
+
+=head1 SUBROUTINES
+
+APR::Request
+
+
+
+
+=head2 encode
+
+    encode($string)
+
+Exportable sub which returns the url-encoded form of C<$string>.
+
+
+
+
+=head2 decode
+
+    decode($string)
+
+Exportable sub which returns the url-decoded form of C<$string>.
+
+
+
+
+=head1 SUBCLASSING
+
+APR::Request
+
+If the instances of your subclass are hash references then you can actually
+inherit from APR::Request as long as the APR::Request object is stored in
+an attribute called "r" or "_r". (The APR::Request class effectively does the
+delegation for you automagically, as long as it knows where to find the
+APR::Request object to delegate to.)  For example:
+
+	package MySubClass;
+	use APR::Request::Custom;
+	our @ISA = qw(APR::Request);
+	sub new {
+            my($class, @args) = @_;
+            return bless { r => APR::Request::Custom->handle(@args) }, $class;
+	}
+
+
+
+
+
+=head1 METHODS
+
+  APR::Request::Cookie::Table - read-only version of APR::Table.
+
+Tables in this class normally arise from calls to
+C<< APR::Request::jar() >>.
+
+
+
+
+=head2 cookie_class
+
+    $table->cookie_class()
+    $table->cookie_class($set)
+
+Get/set the class each table element is blessed into during a
+L<get> or L<FETCH> call.  If defined, the class must be derived
+from APR::Request::Cookie.  When called with $set, it returns
+the $table.  Otherwise it returns the name of the current class,
+or undef if no cookie class is defined.
+
+
+
+=for example begin
+    $jar = $req->jar;
+    {
+        package FOO;
+        use base 'APR::Request::Cookie';
+    }
+    $jar->cookie_class("FOO");
+    ok $_->isa("FOO") for values %$jar;
+
+=for example end
+
+=for example_testing
+    $jar->do(sub { ok $_[1]->isa("FOO"); });
+
+
+
+
+=head2 get
+
+    $table->get($key)
+
+Same as FETCH.
+
+
+
+=head2 FETCH
+
+    $table->FETCH($key)
+
+In scalar context, this returns the first value matching
+$key (note: see NEXTKEY for additional notes).  The match
+is always case-insensitive.  In list context, this returns
+all matching values.  Note: the type of the return values
+depends on the table's current cookie_class.
+
+
+
+
+=head2 EXISTS
+
+Synonym for C<< defined >>; these tables are not
+allowed to contain undefined values. Since these
+are constant tables, they don't autovivify either.
+
+
+
+
+=head2 FIRSTKEY
+
+    $table->FIRSTKEY()
+
+Returns the first key in the table.
+
+
+
+
+=head2 NEXTKEY
+
+    $table->NEXTKEY()
+
+Returns the next key in the table.  For perl 5.8+,
+if the key is multivalued, a subsequent FETCH on
+this key will return the corresponding value, until
+either NEXTKEY or FIRSTKEY is invoked again.  For
+perl 5.6, FETCH always returns the first value.
+
+
+
+
+=head2 do
+
+    $table->do($callback, @keys)
+
+Same as APR::Table::do; iterates over the table
+calling $callback->($key, $value) for each matching
+@keys.  If @keys is empty, this iterates over the
+entire table.
+
+Note: The type of $value inserted into the callback
+depends on the table's current cookie_class.
+
+
+
+
+=head1 METHODS
+
+APR::Request::Param::Table
+
+
+
+
+=head2 param_class
+
+    $table->param_class()
+    $table->param_class($set)
+
+
+Get/set the class each table element is blessed into during a
+C<get> or C<FETCH> call.  If defined, the class must be derived
+from APR::Request::Param.  When called with $set, it returns
+the $table.  Otherwise it returns the name of the current class,
+or undef if no param class is defined.
+
+=for example begin
+    $body = $req->body;
+    {
+        package BAR;
+        use base 'APR::Request::Param';
+    }
+    $body->param_class("BAR");
+    ok $_->isa("BAR") for values %$body;
+
+=for example end
+
+=for example_testing
+    $body->do(sub { ok $_[1]->isa("BAR"); });
+
+
+
+
+=head2 get
+
+    $table->get($key)
+
+Same as FETCH.
+
+
+
+
+=head2 FETCH
+
+    $table->FETCH($key)
+
+In scalar context, this returns the first value matching
+$key (see NEXTKEY for additional notes on this).  The match
+is always case-insensitive.  In list context, this returns
+all matching values.  Note: the type of the return values
+depends on the table's current param_class.
+
+
+
+=head2 EXISTS
+
+Synonym for C<< defined >>; these tables are not
+allowed to contain undefined values. Since these
+are constant tables, they don't autovivify either.
+
+
+
+
+=head2 NEXTKEY
+
+    $table->NEXTKEY()
+
+Returns the next key in the table.  For perl 5.8+,
+if the key is multivalued, a subsequent FETCH on
+this key will return the corresponding value, until
+either NEXTKEY or FIRSTKEY is invoked again.  For
+perl 5.6, FETCH always returns the first value.
+
+
+
+
+=head2 FIRSTKEY
+
+    $table->FIRSTKEY()
+
+Returns the first key in the table.
+
+
+
+
+=head2 do
+
+    $table->do($callback, @keys)
+
+Same as APR::Table::do; iterates over the table
+calling $callback->($key, $value) for each matching
+@keys.  If @keys is empty, this iterates over the
+entire table.
+
+Note: The type of $value inserted into the callback
+depends on the table's current value_class.
+
+
+
+
+=head1 SEE ALSO
+
+L<APR::Request::Error>, L<APR::Request::Param>,
+L<APR::Request::Cookie>, L<APR::Request::Parser>
+
+
+
+
+=head1 COPYRIGHT
+
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.

@@ -1,0 +1,70 @@
+#!/usr/bin/perl
+use strict;
+use LEOCHARRE::CLI2 'a';
+use LEOCHARRE::Dir ':all';
+our $VERSION = sprintf "%d.%02d", q$Revision: 1.4 $ =~ /(\d+)/g;
+
+@ARGV or push @ARGV, '.';
+for (@ARGV){
+   
+   my @dirs = $opt_a ? lsda($_) : lsd($_);
+
+   (printf "%s\n", $_ ) for sort @dirs;
+
+}
+
+
+
+
+sub usage {q{lsd [OPTIONS].. PATH..
+List directories of PATH.
+
+   -a    print as abs path
+   -d    debug
+   -v    version
+   -h    help
+
+Try 'man lsd' for more info.
+}}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+lsd - list directories of path
+
+=head1 USAGE
+
+lsd [OPTIONS].. PATH..
+
+   -a    print as abs path
+   -d    debug
+   -v    version
+   -h    help
+
+=head1 SEE ALSO
+
+lsutils - master package
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 COPYRIGHT
+
+Copyright (c) Leo Charre. All rights reserved.
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+   
+=cut
+

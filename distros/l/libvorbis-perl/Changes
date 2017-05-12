@@ -1,0 +1,20 @@
+Revision history for Perl extension Ogg::Vorbis.
+
+0.05  Mon Mar 15 15:15:00 2004
+        - Removing blib from build so we get indexed properly.
+
+0.04  Thu Apr 25 10:26:42 2002
+        - Removing host_is_big_endian.  Where'd it go?
+
+0.03  Tue Jan 23 00:10:45 2001
+        - Removing non-existant vorbis_info functions
+        - Removing hard-coded includes
+        - Using perl5.6
+
+0.02  Tue Oct 24 00:12:56 2000
+        - Basic reading/decoding works
+        - initial version of pogg
+
+0.01  Fri Oct 20 11:22:54 2000
+	- original version; created by h2xs 1.19
+

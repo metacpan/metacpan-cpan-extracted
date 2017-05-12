@@ -1,0 +1,83 @@
+<HTML>
+<HEAD>
+<TITLE>Servlet::FilterChain - filter chain interface</TITLE>
+<LINK REL="stylesheet" HREF="../../libservlet.css" TYPE="text/css">
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#methods">METHODS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>Servlet::FilterChain - filter chain interface</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  $chain-&gt;doFilter($request, $response);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This is the interface for an object provided by the servlet container
+to the developer giving a view into the invocation chain of a filtered
+request for a resource. <STRONG>Servlet::Filter</STRONG> objects use it to invoke
+the next filter in the chain, or if the calling filter is the last
+filter in the chain, to invoke the resource at the end of the chain.</P>
+<P>
+<HR>
+<H1><A NAME="methods">METHODS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_doFilter">doFilter($request, $response)</A></STRONG><BR>
+<DD>
+Causes the next filter in the chain to be invoked, or if the calling
+filter is the last filter in the chain, causes the resource at the end
+of the chain to be invoked.
+<P><STRONG>Parameters:</STRONG></P>
+<P>$request
+$request
+=item <EM>$request</EM></P>
+<P>the <STRONG>Servlet::ServletRequest</STRONG> object that contains the client's
+request</P>
+<P>$response
+$response
+=item <EM>$response</EM></P>
+<P>the <STRONG>Servlet::ServletResponse</STRONG> object that contains the servlet's
+response</P>
+<P><STRONG>Throws:</STRONG></P>
+<DL>
+<DT><STRONG><A NAME="item_Servlet%3A%3AServletException"><STRONG>Servlet::ServletException</STRONG></A></STRONG><BR>
+<DD>
+if an exception occurs while performing the filtering task
+<P></P></DL>
+</DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="../../api/Servlet/Filter.html">the Servlet::Filter manpage</A>,
+<A HREF="../../api/Servlet/ServletException.html">the Servlet::ServletException manpage</A>,
+<A HREF="../../api/Servlet/ServletRequest.html">the Servlet::ServletRequest manpage</A>,
+<A HREF="../../api/Servlet/ServletResponse.html">the Servlet::ServletResponse manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Brian Moseley, <A HREF="mailto:bcm@maz.org">bcm@maz.org</A></P>
+
+</BODY>
+
+</HTML>

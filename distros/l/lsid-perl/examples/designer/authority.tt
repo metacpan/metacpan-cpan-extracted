@@ -1,0 +1,144 @@
+#!/usr/bin/perl
+# =====================================================================
+# Copyright (c) 2002,2003 IBM Corporation 
+# All rights reserved.   This program and the accompanying materials
+# are made available under the terms of the Common Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.opensource.org/licenses/cpl.php
+# 
+# =====================================================================
+use strict;
+use warnings;
+
+use Namespaces;
+
+use LS::ID;
+use LS::Service;
+
+use LS::HTTP::Service;
+
+#
+# The SOAP service will travel over HTTP to a CGI where
+# all of the SOAP messages are decoded and passed up the SOAP
+# stack until they reach this framework
+#
+use LS::SOAP::Service transport=> 'HTTP::CGI';
+
+
+
+##############
+
+my $location = 'http://';
+
+if($ENV{'HTTP_HOST'} ) {
+
+        $location .= $ENV{'HTTP_HOST'};
+}
+else {
+
+	# Set this to the default hostname for this authority
+        $location .= '[% defaultLocation %]';
+}
+
+# Create the authority service
+#
+# name - The name of the authority
+# authority - The hostname of the authority
+# location - The URL to the authority 
+#
+my $authority = LS::Service::Authority->new(name=> '[% authorityName %]', 
+					    authority=> '[% authorityID %]', 
+					    location=> $location);
+
+
+
+#
+# Service ports
+#
+#
+
+[% FOREACH port IN portList %]
+$authority->[% port.type %](
+			serviceName=> '[% authorityName %]', 
+			portName=> '[% port.name %]',
+		        endpoint=> 'http://[% port.endpoint %]',
+		        protocol=> '[% port.protocol %]',
+		       );
+[% END %]
+
+#
+# Namespaces
+#
+
+my @namespaces;
+
+[% FOREACH ns IN namespaces %]
+push @namespaces, Namespaces->[% ns %](); 
+[% END %]
+
+#
+# Metadata Namespace and Mappings
+#
+my $metadata = LS::Service::AdvancedDataService->new();
+
+[% FOREACH m IN mappings %]
+$metadata->addNamespaceMappings( '[% m.value %]'=> '[% m.key %]' );
+[% END %]
+
+
+
+#
+# Data Namespace and Mappings
+#
+my $data = LS::Service::AdvancedDataService->new();
+
+[% FOREACH m IN mappings %]
+$data->addNamespaceMappings( '[% m.value %]'=> '[% m.key %]' );
+[% END %]
+
+
+
+
+#
+# Add namespaces to each service
+#
+foreach my $ns (@namespaces) {
+
+	$metadata->addNamespace( $ns );
+	$data->addNamespace( $ns );
+}
+
+
+
+#
+# Service details
+#
+my $service = LS::SOAP::Service->new();
+
+$service->metadataService($metadata) 	if( [% metadataService %] );
+$service->dataService($data)			if( [% dataService %] );
+$service->authorityService($authority)	if( [% authorityService %] );
+
+
+#
+# Create a HTTP service and instruct the SOAP service to
+# accept HTTP queries
+#
+if( [% useHTTPService %] ) {
+
+	my $http = new LS::HTTP::Service;
+
+	$http->dispatch_authority_to($authority) if( [% authorityService %] );
+	$http->dispatch_data_to($data)		 	 if( [% dataService %] );
+	$http->dispatch_metadata_to($metadata)	 if( [% metadataService %] );
+
+	$service->httpServer($http);
+}
+
+
+#
+# Dispatch to the service 
+#
+$service->dispatch();
+
+

@@ -1,0 +1,31 @@
+libalarm version 1.0
+====================
+
+This library contains two extensions to Perl's built-in alarm function:
+Alarm::Concurrent, and Alarm::Queued.  The purpose of these extensions
+is to allow multiple alarms to be scheduled.  See the documentation
+for the individual modules for more information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This library requires these other modules and libraries:
+
+  Exporter, Carp
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2001, Cory Johns.  All rights reserved.
+
+This module is free software; you can redistribute and/or modify
+it under the same terms as Perl itself.
+
+Address bug reports and comments to: Cory Johns <johnsca@cpan.org>

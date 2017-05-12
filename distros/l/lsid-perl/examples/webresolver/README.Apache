@@ -1,0 +1,18 @@
+
+#
+# mod_rewrite
+#
+<IfModule mod_rewrite.c>
+        RewriteEngine On
+        RewriteLogLevel 0
+        RewriteLog "/usr/local/apache/logs/rewrite.log"
+
+        RewriteRule ^/resolver/metadata/(urn:.*) /webresolver/index.cgi/?raw=1&lsid=$1 [L]
+        RewriteRule ^/resolver/image/(urn:.*) /webresolver/index.cgi/?image=1&lsid=$1 [L]
+        RewriteRule ^/resolver/image/style.css /webresolver/style.css [L]
+        RewriteRule ^/resolver/(urn:.*) /webresolver/index.cgi?summary=1&lsid=$1 [L]
+        RewriteRule ^/resolver/style.css /webresolver/style.css [L]
+        RewriteRule ^/resolver/(.*) /webresolver/index.cgi [L]
+</IfModule>
+
+

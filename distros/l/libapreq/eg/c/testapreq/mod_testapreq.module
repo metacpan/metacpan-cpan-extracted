@@ -1,0 +1,6 @@
+Name: testapreq_module 
+ConfigStart 
+  echo "configuring testapreq"
+  LIBS="$LIBS `perl -MApache::libapreq -e ldopts`" 
+  CFLAGS="$CFLAGS `perl -MApache::libapreq -e ccopts` -I\$(SRCDIR)/os/unix -I\$(SRCDIR)/include" 
+ConfigEnd 
